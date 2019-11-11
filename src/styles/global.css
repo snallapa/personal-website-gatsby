@@ -1,0 +1,296 @@
+.header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+}
+
+.home {
+    text-decoration: none;
+    color: black;
+}
+
+.nav {
+    padding: 10px 20px;
+    text-decoration: none;
+    color: black;
+}
+
+.nav:hover {
+    color: white;
+    background-color: black;
+    border-radius: 50px;
+}   
+.content {
+    margin-top: 16px;
+    width: 100%;
+    min-width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.content > svg {
+    width: 40%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
+.sword {
+    animation: stab 4s infinite ease-in 1s forwards;
+    transform-origin: center;
+  }
+  
+@keyframes stab {
+  0% {
+    transform: translateX(0) translateY(0) rotateZ(0) scale(1);
+  }
+
+  32% {
+    transform: translateX(44px) translateY(-44px) rotateZ(133deg) scale(1.5);
+  }
+
+  40% {
+    transform: translateX(0) translateY(0) rotateZ(0) scale(1);
+  }
+
+  100% {
+    transform: translateX(0) translateY(0) rotateZ(0) scale(1);
+  }
+}
+
+.pikachu1 {
+  stroke: black;
+  stroke-dasharray: 2293.145263671875;
+  stroke-dashoffset: 2293.145263671875;
+  animation: dash 5s linear forwards;
+  fill-opacity: 0
+}
+.pikachu2 {
+    stroke-dasharray: 2990.060546875;
+    stroke-dashoffset: 2990.060546875;
+    animation: dash 5s linear forwards;
+    fill-opacity: 0
+}
+.pikachu3 {
+    stroke-dasharray: 4619.7490234375;
+    stroke-dashoffset: 4619.7490234375;
+    animation: dash 5s linear forwards;
+    fill-opacity: 0
+}
+.pikachu4 {
+    stroke-dasharray: 4994.43994140625;
+    stroke-dashoffset: 4994.43994140625;
+    animation: dash 5s linear forwards;
+    fill-opacity: 0
+}
+.pikachu5 {
+    stroke-dasharray: 5032.2275390625;
+    stroke-dashoffset: 5032.2275390625;
+    animation: dash 5s linear forwards;
+    fill-opacity: 0
+}
+.pikachu6 {
+    stroke-dasharray: 5008.92333984375;
+    stroke-dashoffset: 5008.92333984375;
+    animation: dash 5s linear forwards;
+    fill-opacity: 0
+}
+.pikachu7 {
+    stroke-dasharray: 4443.62548828125;
+    stroke-dashoffset: 4443.62548828125;
+    animation: dash 5s linear forwards;
+    fill-opacity: 0
+}
+.pikachu8 {
+    stroke-dasharray: 4632.0087890625;
+    stroke-dashoffset: 4632.0087890625;
+    animation: dash 5s linear forwards;
+    fill-opacity: 0
+}
+.pikachu9 {
+    stroke-dasharray: 2676.97607421875;
+    stroke-dashoffset: 2676.97607421875;
+    animation: dash 5s linear forwards;
+    fill-opacity: 0
+}
+.pikachu10 {
+    stroke-dasharray: 1928.1224365234375;
+    stroke-dashoffset: 1928.1224365234375;
+    animation: dash 5s linear forwards;
+    fill-opacity: 0
+}
+.pikachu11 {
+    stroke-dasharray: 1590.471435546875;
+    stroke-dashoffset: 1590.471435546875;
+    animation: dash 5s linear forwards;
+    fill-opacity: 0
+}
+.pikachu12 {
+    stroke-dasharray: 545.7061767578125;
+    stroke-dashoffset: 545.7061767578125;
+    animation: dash 5s linear forwards;
+    fill-opacity: 0
+}
+
+@keyframes dash {
+    0% {
+        stroke-width: 1;
+    }
+    80% {
+        stroke-dashoffset: 0;
+        fill-opacity: 0;
+        stroke-width: 2;
+    }
+    100% {
+        stroke-width: 0;
+        fill-opacity: 1;
+    }
+  }
+
+
+.flower1 {
+  stroke: #000;
+  stroke-dasharray: 19580px;
+  stroke-dashoffset: 19580px;
+  animation: draw 8s linear forwards;
+  fill-opacity: 0;
+}
+
+.flower2 {
+  stroke: #000;
+  stroke-dasharray: 18763px;
+  stroke-dashoffset: 18763px;
+  animation: fill 8s linear forwards;
+  fill-opacity: 0;
+}
+
+.flower3 {
+  stroke: #000;
+  stroke-dasharray: 17017px;
+  stroke-dashoffset: 17017px;
+  animation: fill 8s linear forwards;
+  fill-opacity: 0;
+}
+
+.flower4 {
+  stroke: #000;
+  stroke-dasharray: 15182px;
+  stroke-dashoffset: 15182px;
+  animation: fill 8s linear forwards;
+  fill-opacity: 0;
+}
+
+.flower5 {
+  stroke: #000;
+  stroke-dasharray: 13686px;
+  stroke-dashoffset: 13686px;
+  animation: fill 8s linear forwards;
+  fill-opacity: 0;
+}
+
+.flower6 {
+  stroke: #000;
+  stroke-dasharray: 12120px;
+  stroke-dashoffset: 12120px;
+  animation: fill 8s linear forwards;
+  fill-opacity: 0;
+}
+
+.flower7 {
+  stroke: #000;
+  stroke-dasharray: 10699px;
+  stroke-dashoffset: 10699px;
+  animation: fill 8s linear forwards;
+  fill-opacity: 0;
+}
+
+.flower8 {
+  stroke: #000;
+  stroke-dasharray: 11314px;
+  stroke-dashoffset: 11314px;
+  animation: fill 8s linear forwards;
+  fill-opacity: 0;
+}
+
+.flower9 {
+  stroke: #000;
+  stroke-dasharray: 10469px;
+  stroke-dashoffset: 10469px;
+  animation: fill 8s linear forwards;
+  fill-opacity: 0;
+}
+
+.flower10 {
+  stroke: #000;
+  stroke-dasharray: 5375px;
+  stroke-dashoffset: 5375px;
+  animation: fill 8s linear forwards;
+  fill-opacity: 0;
+}
+
+.flower11 {
+  stroke: #000;
+  stroke-dasharray: 874px;
+  stroke-dashoffset: 874px;
+  animation: fill 8s linear forwards;
+  fill-opacity: 0;
+}
+
+@keyframes draw {
+  0% {
+      stroke-width: 1
+  }
+  80% {
+      stroke-dashoffset: 0;
+      stroke-width: 2;
+      fill-opacity: 0;
+  }
+  100% {
+      stroke-width: 0;
+      fill-opacity: 1;
+  }
+}
+
+@keyframes fill {
+  80% {
+      fill-opacity: 0;
+  }
+  100% {
+      fill-opacity: 1;
+  }
+}
+
+.wlr1 {
+    stroke-dasharray: 1689.050537109375;
+    stroke-dashoffset: 1689.050537109375;
+    animation: wlr 5s linear forwards;
+    stroke: red;
+}
+.wlr2, .wlr3 {
+    animation: wlr2 5s linear forwards;
+    stroke: red;
+    fill-opacity: 0;
+    stroke-width: 0;
+}
+@keyframes wlr {
+    95% {
+        fill-opacity: 0;
+    }
+    100% {
+        stroke-dashoffset: 0;
+        fill-opacity: 1;
+    }
+  }
+@keyframes wlr2 {
+    95% {
+        fill-opacity: 0;
+        stroke-width: 0;
+    }
+    100% {
+        fill-opacity: 1;
+        stroke-width: 1;
+    }
+}
