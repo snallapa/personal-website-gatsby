@@ -1,27 +1,4 @@
-.header {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px;
-}
 
-.home {
-    text-decoration: none;
-    color: black;
-}
-
-.nav {
-    padding: 10px 20px;
-    text-decoration: none;
-    color: black;
-}
-
-.nav:hover {
-    color: white;
-    background-color: black;
-    border-radius: 50px;
-}   
 .content {
     margin-top: 16px;
     width: 100%;
@@ -33,8 +10,6 @@
 
 .content > svg {
     width: 40%;
-    margin-left: auto;
-    margin-right: auto;
 }
 
 
