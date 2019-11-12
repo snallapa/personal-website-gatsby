@@ -1,12 +1,30 @@
 import React from "react"
-import Header from "../components/header"
-import Image from "../components/image-chooser"
+import Layout from "../components/layout"
+import RecentPosts from "../components/recent-posts"
+import { graphql } from "gatsby"
 
-export default () => (
-  <div>
-    <Header />
-    <div className="content">
-      <Image />
-    </div>
-  </div>
+export default ({ data }) => (
+  <Layout>
+    <RecentPosts posts={data.allMarkdownRemark.edges} />
+  </Layout>
 )
+
+export const query = graphql`
+  query {
+    allMarkdownRemark {
+      edges {
+        node {
+          id
+          frontmatter {
+            title
+            date(formatString: "MMMM DD, YYYY")
+            subtitle
+          }
+          fields {
+            slug
+          }
+        }
+      }
+    }
+  }
+`

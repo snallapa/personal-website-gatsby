@@ -6,9 +6,12 @@
     padding: 1%;
 }
 
-@media (max-width: 400px) {
+@media (max-width: 500px) {
     .name {
       font-size: 0.5em;
+    }
+    .nav {
+        font-size: 0.5em;
     }
   }
 
@@ -24,7 +27,6 @@
 }
 
 .nav:hover {
-    color: white;
-    background-color: black;
+    background-color: #f8e8fa;
     border-radius: 50px;
 }   

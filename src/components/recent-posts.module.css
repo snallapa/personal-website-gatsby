@@ -1,0 +1,25 @@
+.title {
+    color: #8d13a8;
+    font-weight: bold;  
+    text-decoration: underline;
+    margin-bottom: 8px;
+}
+
+.post {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 8px 2px;
+    padding: 24px;
+    text-decoration: none;
+    color: black;
+}
+
+.post:hover {
+    background-color: #f8e8fa;
+    transition: background-color 0.5s ease-in;
+}
+
+.leftSide {
+    max-width: 80%;
+}

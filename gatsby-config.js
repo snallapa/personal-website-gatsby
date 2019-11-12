@@ -5,6 +5,18 @@
  */
 
 module.exports = {
+  siteMetadata: {
+    links: [
+      { name: "Github", link: "https://github.com/snallapa/" },
+      { name: "Twitter", link: "https://twitter.com/snallapa" },
+      { name: "LinkedIn", link: "https://www.linkedin.com/in/snallapareddy" },
+      {
+        name: "Resume",
+        link:
+          "https://drive.google.com/file/d/1K4fi7OghfSGq8BHyAkHcuZ07u-hUtK69/view?usp=sharing",
+      },
+    ],
+  },
   plugins: [
     {
       resolve: `gatsby-plugin-typography`,
@@ -13,12 +25,12 @@ module.exports = {
       },
     },
     {
-      resolve: `gatsby-plugin-react-svg`,
+      resolve: `gatsby-source-filesystem`,
       options: {
-        rule: {
-          include: /svg/, // See below to configure properly
-        },
+        name: `posts`,
+        path: `${__dirname}/posts/`,
       },
     },
+    `gatsby-transformer-remark`,
   ],
 }
