@@ -4,7 +4,7 @@ date: "2019-11-13"
 subtitle: "A retrospective on my first trip down the path of graphics"
 ---
 
-Going back to Spring 2017, I wanted to venture into the world of graphics. I did not know anything about graphics, but I know I liked math and thought it would pique my interest. Additionally, I saw [this](https://mnmxmx.github.io/audio-visualizer-torus/dst/) on twitter and was extremely impressed (I recommend following them they create great content!). I thought a good project would be trying to recreate something similar. That is where I started. 
+Going back to Spring 2017, I wanted to venture into the world of graphics. I did not know anything about graphics, but I know I liked math and thought it would pique my interest. Additionally, I saw [this](https://mnmxmx.github.io/audio-visualizer-torus/dst/) on twitter and was extremely impressed (I recommend following them they create great content!). I thought a good project would be trying to recreate something similar. That is where my journey began. 
 
 ## Torus
 
@@ -21,8 +21,8 @@ Explaining this equation, `R` is the distance from the center of the torus to th
 ```javascript
 for (let i = 0; i < numCircles; i++) {
   for (let j = 0; j < pointsOnCircles; j++) {
-    const tubeAngle = (i / numCircles) * FULL_CIRCLE; //θ
-    const circleAngle = (j / pointsOnCircles) * FULL_CIRCLE; //φ
+    const tubeAngle = (i / numCircles) * FULL_CIRCLE; //θ in radians
+    const circleAngle = (j / pointsOnCircles) * FULL_CIRCLE; //φ in radians
     const x = (radius + tubeSize * Math.cos(circleAngle)) * Math.cos(tubeAngle);
     const y = (radius + tubeSize * Math.cos(circleAngle)) * Math.sin(tubeAngle);
     const z = tubeSize * Math.sin(circleAngle);
@@ -93,7 +93,7 @@ I did not cover the animation part of this as you would have to tie the audio an
 
 ## Knowing what I know now
 
-I think it was good I went through that initial experience, as my lack of understanding then only helped me in my class now. I remember I was really confused on coordinates and where things were in relation to each other (how far was (1,1,1) from (0,0,0) on the screen) and these initial experiences greatly helped me now. I also remember fiddling a lot with the lighting to make it work, and now that I understand how lighting works, it is funny to see all the different mistakes I made in trying to get it right. I remember I spent a lot of time trying to debug my disappearing triangle issue and was then so confused that something as small as switching the order of my arguments could fix it. Fundamentally, it does not change the triangle so it was weird to me that it was the difference between having something drawn or not. Now, it makes more sense (but I wish there was some documentation on Three.js that would tell me about that). I went on to make a ray tracer as well, which is not my final assignment in graphics. Everything is coming full circle (torus?), and I am glad I put the effort in then to try something new.
+I think it was good I went through that initial experience, as my lack of understanding then only helped me in my class now. I remember I was really confused on coordinates and where things were in relation to each other (how far was (1,1,1) from (0,0,0) on the screen) and these initial experiences greatly helped me now. I also remember fiddling a lot with the lighting to make it work, and now that I understand how lighting works, it is funny to see all the different mistakes I made in trying to get it right. I remember I spent a lot of time trying to debug my disappearing triangle issue and was then so confused that something as small as switching the order of my arguments could fix it. Fundamentally, it does not change the triangle so it was weird to me that it was the difference between having something drawn or not. Now, it makes more sense (but I wish there was some documentation on Three.js that would tell me about that). I went on to make a ray tracer as well, which is now my final assignment in graphics. Everything is coming full circle (torus?), and I am glad I put the effort in then to try something new.
 
 ## Future project ideas
 
