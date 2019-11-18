@@ -3,3 +3,35 @@
     width: 80%;
     margin: 0 auto;
 }
+
+.footer {
+    position: fixed;
+    bottom: 0;
+    width: 80%;
+    animation: grow 2s ease-in 0s forwards;
+}
+
+.flower {
+    opacity: 0;
+    animation: appear 1s ease-in 2s forwards;
+}
+
+@keyframes grow {
+    0% {
+        transform: translateY(calc(100%));
+    }
+
+    100% {
+        transform: translateY(calc(15%));
+    }
+}
+
+@keyframes appear {
+    0% {
+        opacity: 0;
+    }
+
+    100%{
+        opacity: 1;
+    }
+}
