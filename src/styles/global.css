@@ -7,6 +7,8 @@
 .footer {
     position: fixed;
     bottom: 0;
+    left: 10%;
+    right: 10%;
     width: 80%;
     animation: grow 2s ease-in 0s forwards;
 }
