@@ -1,0 +1,39 @@
+---
+title: "Spotify Wrapped 2020 - a Personal Journey"
+date: "2020-12-08"
+subtitle: "A whirlwind couple of months to bring your 2020 Wrapped"
+---
+
+Spotify Wrapped is the end of year celebration to recap everyone's listening. We show you your most listened to songs, artists, genres, and honestly anything that we can come up with. This is an incredibly important project for Spotify as it drives a large portion of consumption. The Your Top Songs playlist is often one of the most played playlists in the entire year. When I was presented the opportunity in July to work on Wrapped, there was no way I could say no. I was extremely excited to work on a strongly visible project but in no way prepared for the upcoming months of work to bring your Wrapped to life. 
+<br/><br/>
+Let me preface this by saying this is not a Spotify endorsed post (and if I get called out I might remove this). I will stay way from a lot of Spotify specific information and mostly focus on my own journey. There will be a post on wrapped on the official Spotify engineering blog that will be co-authored by me :)
+
+## How big is Wrapped
+
+Wrapped is a huuuge project. There is no singular team responsible for all of it as there are just so many areas where we showcase something. We have the client includes phones and browsers. There is the creator side, where artists will be able to see their own stats. There is the marketing team who is responsible for sending emails, communicating on our forums, and showcasing in Time Square. All of these probably come to around 9-10 teams in total who have to coordinate to bring you the best Wrapped experience there is. We are in charge of the actual data. From calculating to serving, we are 100% responsible for the accuracy of stats you saw from this year. Specifically, I was a data engineer who worked on the multiple data pipelines that were used to create your wrapped. We also had backend engineers, data scientists, data curation, and finally managers on our squad alone. Easily one of the biggest teams I have been a part of and this was just one portion of the entire Wrapped experience.
+
+## Where we started
+
+Since Wrapped is a yearly endeavor, there is very little continuity between each year. In fact, this was the *first* year we actually had something reusable from the year prior. Major props have to be given to the 2019 team who had the foresight to create a reusable architecture that we, 2020, could benefit from. Even better for us, we started a whole month earlier in August than when the 2019 Wrapped team started. With all of this working in our favor, it still took us every minute from August to December to get all the data ready. To put it lightly, 2018 and 2019 wrapped teams were VERY stressful because of the time crunch and so these improvements definitely helped us this year. While we were still pressed for time, it was a much smoother experience than years prior. 
+
+## Why is wrapped so hard
+
+For one, it's important to understand the scale of the project. We had 320 million monthly active users in Q3 and for each user we need to look at their entire yearly listening history. Even if each user listened to 10 tracks, we are already looking at the billions in terms of data size. We do not have a singular pipeline that just reads in the listening history of every user, this would just be too large and expensive. We often have to work in aggregates (summing up days/weeks worth and then working our way up). Even once we do have all the data we need, it can be very costly to do joins or difficult calculations at this size, so we have to find clever ways around this. Solving these problems were most of what we were tasked to do as data engineers.
+
+## ME ME ME
+
+My original squad, t-rex, that I am a part of works with listening history almost exclusively. Therefore, I was supposed to be in a good position coming in as t-rex has done a lot of work in the past to support the wrapped teams. I was going to already have a good understanding of the systems in place and have enough expertise to bring to the table. Except, I honestly did not. Only in June did I take the introductory data engineering course and by first week of July I was asked to be on the Wrapped team. A fear of mine coming in was that my inexperience would be a hindrance to the project. This fear disappeared quickly as sometimes jumping into the deep end is the best way to learn a lot in such a short amount of time.
+
+## The Unexpected
+
+Starting out the project, our team only had 2 data engineers (including me). We were faced with a very important task of rewriting our source pipelines to use a brand-new technology at Spotify (there will be a public post on this soon with a part written by me :)). This was a huge endeavor as we were one of the first adopters and there were many issues and bugs we had to face throughout that process. However, we knew this would result in a much better experience and save us a ton of money. To add to the mix, the other data engineer was offered a job elsewhere, they decided it was time to leave Spotify a week later. We were already expecting 2 other data engineers to join our team, but the bulk of the load fell on me to start planning our tasks, onboarding our new members, and changing our source of data. This was probably the first time I felt in charge of something at work and the first time that other people relied on me as a source of truth. This was incredibly frightening. It was definitely anxious thinking about whether I would say the wrong thing or say something that was incorrect. I learned to adjust and communicate much more than I have in the past. I quickly grew more confident in my abilities and trusted that I was able to handle the work that was coming my way. During this time i, I lived and breathed Wrapped. I would go to sleep checking my Slack and wake up with new notifications (thank you Sweden). It was extremely stressful trying to coordinate between all the different facets of our team, but also very rewarding to also feel so connected to the squad and project. I can definitely say that the experience changed me for the better and helped me grow as a person. I feel less afraid to speak up when I have opinions and find myself in positions where people are listening and asking for my thoughts on matters instead of the other way around.
+
+
+## The Result
+
+The day wrapped launch was easily one of the most satisfying days of my short career. I did not realize how much I would enjoy seeing everyone post their wrapped experience on social media. Seeing my favorite tik tokers and influencers talk about how ashamed they are of their top artist was truly amazing. Like with any big project, there were definitely complaints but I can confidently say right now that the data does not lie and a lot of this work is much harder than you may think! The first day of launch we soft released with no in app messaging so that we could roll back if things went wrong. What we did not expect is everyone to find it so quickly as Twitter spread the news at a blazing speed. Within the hour, we were already trending and our load surpassed last year's max within the night. It felt sooo rewarding. We ran into very minor data issues that were resolved quickly, which rounded out the night meaning a job well done :)
+<br/><br/>
+For anyone wondering, I played a part in the Story of your Top Song (specifically the day stats like most streams in one day), Collector (for those who got it), Podcast Binge, and finally the Take it Back Decade story (wrote both of those pipelines). By switching our data source, we were able to reduce our costs by 50-60% from last year, an effort almost exclusively done by me. A very difficult process that was clearly worth it in the end. An amazing project had an amazing end, I am so happy I was a part of the experience and was able to learn so much throughout!
+
+![My Wrapped](/5/wrapped.JPG)
+

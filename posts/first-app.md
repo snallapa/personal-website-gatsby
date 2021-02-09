@@ -1,7 +1,7 @@
 ---
 title: "The making of my first app"
 date: "2020-04-18"
-subtitle: "4 years since my first app created and so much learned then"
+subtitle: "4 years since my first app and so much learned"
 ---
 
 A lot of my early programming experience is in mobile app creation, especially on Android. This was in part because I had internships at that time working on Android apps. One day I had an idea I wanted to create and decided to pursue it further than I normally do. 
