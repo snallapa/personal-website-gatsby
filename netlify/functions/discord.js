@@ -4,7 +4,7 @@ import {
   } from 'discord-interactions';
 
 exports.handler = async function(event, context) {
-    const { type, id, data } = JSON.parse(event.body);
+    const { type, id, data } = event.body;
     if (type === InteractionType.PING) {
         return {
             statusCode: 200,
