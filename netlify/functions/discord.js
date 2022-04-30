@@ -4,6 +4,7 @@ import {
   } from 'discord-interactions';
 
 exports.handler = async function(event, context) {
+    console.log(event)
     const { type, id, data } = JSON.parse(event.body);
     if (type === InteractionType.PING) {
         return {
