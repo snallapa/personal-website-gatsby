@@ -11,5 +11,8 @@ exports.handler = async function(event, context) {
             body: JSON.stringify({ type: InteractionResponseType.PONG }),
           };
     }
-
+    return {
+        statusCode: 200,
+        body: JSON.stringify({ type: "NOT PONG" }),
+      };
 }
