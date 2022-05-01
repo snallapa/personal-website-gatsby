@@ -38,7 +38,7 @@ exports.handler = async function(event, context) {
                 // teams: teams
             });
 
-            console.log(`doc written with id ${docRef.id}`)
+            console.log(`doc written with id`)
             return {
                 statusCode: 200
             }
