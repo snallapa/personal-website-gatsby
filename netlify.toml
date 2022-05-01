@@ -1,19 +1,19 @@
 [[redirects]]
   from = "/madden/exporter/:username/:platform/:leagueId/leagueteams"
   to = "/.netlify/functions/exporter?api=leagueteams&league=:leagueId&username=:username"
-  status = 302
+  status = 200
   force = false
 
 [[redirects]]
   from = "/madden/exporter/:username/:platform/:leagueId/standings"
   to = "/.netlify/functions/exporter?api=standings&league=:leagueId&username=:username"
-  status = 302
+  status = 200
   force = false
 
 [[redirects]]
   from = "/madden/exporter/:username/:platform/:leagueId/week/:weekType/:weekNumber/:dataType"
   to = "/.netlify/functions/exporter?api=week&league=:leagueId&username=:username&weekType=:weekType&weekNumber=:weekNumber&datatype=:dataType"
-  status = 302
+  status = 200
   force = false
 
 [functions]
