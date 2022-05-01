@@ -42,7 +42,7 @@ exports.handler = async function(event, context) {
                 statusCode: 200
             }
         } catch (e) {
-            console.error('error adding document')
+            console.error('error adding document', e)
             return {
                 statusCode: 200
             }
