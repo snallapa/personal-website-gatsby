@@ -8,8 +8,9 @@ function VerifyDiscordRequest(clientKey) {
   return function (event) {
     const signature = event.headers['x-signature-ed25519'];
     const timestamp = event.headers['x-signature-timestamp'];
-
+    console.log(`signature ${signature} and timestamp ${timestamp}`)
     const isValidRequest = verifyKey(event.body, signature, timestamp, clientKey);
+    console.log(`valid?? ${isValidRequest}`)
     return isValidRequest;
   };
 }
