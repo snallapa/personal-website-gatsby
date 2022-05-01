@@ -18,7 +18,7 @@ function VerifyDiscordRequest(clientKey) {
 const verifier = VerifyDiscordRequest(process.env.PUBLIC_KEY);
 
 exports.handler = async function(event, context) {
-    if (verifier(event)) {
+    if (!verifier(event)) {
         return {
             statusCode: 401
         }
