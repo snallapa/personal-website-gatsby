@@ -22,9 +22,12 @@ const db = getFirestore(app);
 
 exports.handler = async function(event, context) {
     console.log(event)
-    const apiType = event.queryStringParameters.api
-    const username = event.queryStringParameters.username
-    const league = event.queryStringParameters.league
+    const path = event.path
+    const paths = path.split("/");
+    console.log(paths)
+    const apiType = paths[6]
+    const username = paths[3]
+    const league = paths[5]
     if (apiType == "leagueteams") {
         // const { leagueTeamInfoList: teams } = JSON.parse(event.body)
         try {

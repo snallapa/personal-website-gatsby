@@ -1,12 +1,12 @@
 [[redirects]]
   from = "/madden/exporter/:username/:platform/:leagueId/leagueteams"
-  to = "/.netlify/functions/exporter?api=leagueteams&league=:leagueId&username=:username"
+  to = "https://nallapareddy.netlify.app/.netlify/functions/exporter?api=leagueteams&league=:leagueId&username=:username"
   status = 200
   force = false
 
 [[redirects]]
   from = "/madden/exporter/:username/:platform/:leagueId/standings"
-  to = "/.netlify/functions/exporter?api=standings&league=:leagueId&username=:username"
+  to = "https://nallapareddy.netlify.app/.netlify/functions/exporter?api=standings&league=:leagueId&username=:username"
   status = 200
   force = false
 
