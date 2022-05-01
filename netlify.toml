@@ -16,3 +16,5 @@
   status = 302
   force = false
 
+[functions]
+  node_bundler = "esbuild"

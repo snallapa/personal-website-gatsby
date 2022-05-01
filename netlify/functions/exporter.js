@@ -1,7 +1,5 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore , doc, setDoc, collection, addDoc } from "firebase/firestore";
-import { doc } from "prettier";
-
 
 
 
