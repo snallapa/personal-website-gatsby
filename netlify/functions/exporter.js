@@ -28,13 +28,13 @@ exports.handler = async function(event, context) {
     const username = event.queryStringParameters.username
     const league = event.queryStringParameters.league
     if (apiType == "leagueteams") {
-        const { leagueTeamInfoList: teams } = JSON.parse(event.body)
+        // const { leagueTeamInfoList: teams } = JSON.parse(event.body)
         try {
             
             await setDoc(doc(db, "leagues", username), {
                 username: username,
                 league: league,
-                teams: teams
+                // teams: teams
             });
 
             console.log(`doc written with id ${docRef.id}`)
