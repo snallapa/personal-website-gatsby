@@ -1,5 +1,8 @@
 import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
+import { getFirestore , collection, addDoc } from "firebase/firestore";
+import { doc } from "prettier";
+
+
 
 
 const firebaseConfig = {
@@ -21,6 +24,48 @@ const db = getFirestore(app);
 
 exports.handler = async function(event, context) {
     console.log(event)
+    const apiType = event.queryStringParameters.api
+    const username = event.queryStringParameters.username
+    const league = event.queryStringParameters.league
+    if (apiType == "leagueteams") {
+        const { leagueTeamInfoList: teams } = JSON.parse(event.body)
+        try {
+            
+            await setDoc(doc(db, "leagues", username), {
+                username: username,
+                league: league,
+                teams: teams
+            });
+
+            console.log(`doc written with id ${docRef.id}`)
+            return {
+                statusCode: 200
+            }
+        } catch (e) {
+            console.error('error adding document')
+            return {
+                statusCode: 200
+            }
+        }
+    }
+    if (apiType == "standings") {
+        const {teamStandingInfoList: standings} = JSON.parse(event.body)
+        try {
+            await setDoc(doc(db, "leagues", username), {
+                standings: standings
+            }, { merge: true });
+
+            console.log(`doc written with id ${docRef.id}`)
+            return {
+                statusCode: 200
+            }
+        } catch (e) {
+            console.error('error adding document')
+            return {
+                statusCode: 200
+            }
+        }
+    }
     return {
         statusCode: 200
     }
