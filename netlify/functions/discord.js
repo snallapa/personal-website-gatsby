@@ -53,31 +53,32 @@ exports.handler = async function(event, context) {
     if (type === InteractionType.APPLICATION_COMMAND) {
         const { guild_id, name, resolved, options} = data;
         if (name === "import_league") {
-            let teamsData, schedulesData;
-            let attachmentValue = options[0].value;
-            let fileUrl = resolved.attachments[attachmentValue].url;
-            console.log(fileUrl);
-            const teamsFetch = fetch(fileUrl, {
+            // let teamsData, schedulesData;
+            const attachmentValue = options[0].value;
+            const attachmentValue2 = options[1].value
+            const schedulesUrl = resolved.attachments[attachmentValue].url;
+            const teamsUrl = resolved.attachments[attachmentValue2].url; 
+            const teamsFetch = fetch(teamsUrl, {
                 headers: {
         
                     "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.79 Safari/537.36"
                 }
             })
-            const schedulesFetch = fetch(fileUrl, {
+            const schedulesFetch = fetch(schedulesUrl, {
                 headers: {
         
                     "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.79 Safari/537.36"
                 }
             });
             console.time("timer");
-            const [res, res2] = await Promise.all([teamsFetch, schedulesFetch]);
-            if (!res.ok) {
-                schedulesData = await res.text();
-                console.log(res.status);
-                throw new Error(JSON.stringify(schedulesData));
-            } else {
-                schedulesData = await res.json();
-            }
+            const [teamsData, schedulesData] = await Promise.all([teamsFetch.then(res => res.json()), schedulesFetch.then(res => res.json())]);
+            // if (!res.ok) {
+            //     schedulesData = await res.text();
+            //     console.log(res.status);
+            //     throw new Error(JSON.stringify(schedulesData));
+            // } else {
+            //     schedulesData = await res.json();
+            // }
 
             // firestore cant do array in array, make this an object
             const preseason = {}
@@ -97,17 +98,14 @@ exports.handler = async function(event, context) {
                     regularseason[`week${i}`] = newGames
                 }
             }
-            
-            schedulesData.reg = regularseason
-            attachmentValue = options[1].value;
-            fileUrl = resolved.attachments[attachmentValue].url;
-            if (!res2.ok) {
-                teamsData = await res2.text();
-                console.log(res2.status);
-                throw new Error(JSON.stringify(teamsData));
-            } else {
-                teamsData = await res2.json();
-            }
+        
+            // if (!res2.ok) {
+            //     teamsData = await res2.text();
+            //     console.log(res2.status);
+            //     throw new Error(JSON.stringify(teamsData));
+            // } else {
+            //     teamsData = await res2.json();
+            // }
             let teams = {}
             Object.keys(teamsData).map((teamId) => {
                 teams[teamId] = {teamName: teamsData[teamId].displayName, abbr: teamsData[teamId].abbrName}
