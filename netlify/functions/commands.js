@@ -88,7 +88,7 @@ async function HasGuildCommand(guildId, command) {
             // This is just matching on the name, so it's not good for updates
             if (!installedNames.includes(command['name'])) {
                 console.log(`Installing "${command['name']}"`);
-                await InstallGuildCommand(process.env.APP_ID, guildId, command);
+                await InstallGuildCommand(guildId, command);
                 return true;
             } else {
                 console.log(`"${command['name']}" command already installed`);
