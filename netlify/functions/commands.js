@@ -96,7 +96,7 @@ async function HasGuildCommands(guildId, commands) {
     if (guildId === '') return;
   
     
-    return commands.map((c) => HasGuildCommand(appId, guildId, c)).every(x => x);
+    return commands.map((c) => HasGuildCommand(guildId, c)).every(x => x);
 }
 
 exports.handler = async function(event, context) {
