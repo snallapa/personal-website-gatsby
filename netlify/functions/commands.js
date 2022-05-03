@@ -1,6 +1,12 @@
 
 import fetch from 'node-fetch';
 
+export const TEST_COMMAND = {
+    name: 'test',
+    description: 'Basic guild command',
+    type: 1,
+  };
+
 const MADDEN_LEAGUE_COMMAND = {
     name: 'import_league',
     description: 'update the servers madden league',
@@ -10,7 +16,7 @@ const MADDEN_LEAGUE_COMMAND = {
         description: 'Upload your madden json from madden exporter',
         required: true
     }],
-    type: 1,
+    type: 1
 };
 
 const MADDEN_CHANNELS_CREATE_COMMAND = {
@@ -26,7 +32,8 @@ const MADDEN_CHANNELS_CREATE_COMMAND = {
         type: 7,
         name: 'category',
         description: 'category to create channels under',
-        required: true
+        required: true,
+        channel_types: [4]
     }
     ],
     type: 1,
@@ -101,7 +108,7 @@ async function HasGuildCommands(guildId, commands) {
 exports.handler = async function(event, context) {
     const guildId = event.queryStringParameters.guild;
     console.log(event);
-    const hasGuild = await HasGuildCommands(guildId, [MADDEN_LEAGUE_COMMAND, MADDEN_CHANNELS_CREATE_COMMAND]);
+    const hasGuild = await HasGuildCommands(guildId, [TEST_COMMAND, MADDEN_LEAGUE_COMMAND, MADDEN_CHANNELS_CREATE_COMMAND]);
     if (!hasGuild) {
         return {
             statusCode: 400
