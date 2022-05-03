@@ -57,12 +57,19 @@ exports.handler = async function(event, context) {
             let attachmentValue = options[0].value;
             let fileUrl = resolved.attachments[attachmentValue].url;
             console.log(fileUrl);
-            const res = await fetch(fileUrl, {
+            const teamsFetch = fetch(fileUrl, {
+                headers: {
+        
+                    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.79 Safari/537.36"
+                }
+            })
+            const schedulesFetch = fetch(fileUrl, {
                 headers: {
         
                     "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.79 Safari/537.36"
                 }
             });
+            const [res, res2] = await Promise.all([teamsFetch, schedulesFetch]);
             if (!res.ok) {
                 schedulesData = await res.text();
                 console.log(res.status);
@@ -84,12 +91,7 @@ exports.handler = async function(event, context) {
             schedulesData.reg = regularseason
             attachmentValue = options[1].value;
             fileUrl = resolved.attachments[attachmentValue].url;
-            const res2 = await fetch(fileUrl, {
-                headers: {
-        
-                    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.79 Safari/537.36"
-                }
-            });
+            const res2 = await ;
             if (!res2.ok) {
                 teamsData = await res2.text();
                 console.log(res2.status);
