@@ -59,7 +59,7 @@ exports.handler = async function(event, context) {
             console.log(fileUrl);
             const res = await fetch(fileUrl, {
                 headers: {
-                    Authorization: `Bot ${process.env.DISCORD_TOKEN}`,
+                    // Authorization: `Bot ${process.env.DISCORD_TOKEN}`,
                     "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.79 Safari/537.36"
                 }
             });
