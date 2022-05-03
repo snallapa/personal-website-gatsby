@@ -52,10 +52,11 @@ exports.handler = async function(event, context) {
           };
     }
     if (type === InteractionType.APPLICATION_COMMAND) {
-        const { guild_id, id, name, resolved, options, token} = data;
+        const { guild_id, name, resolved, options} = data;
         if (name === "import_league") {
             const attachmentValue = options[0].value;
-            const fileUrl = resolved.attachments[attachmentValue.url];
+            const fileUrl = resolved.attachments[attachmentValue].url;
+            console.log(fileUrl);
             const res = await fetch(fileUrl, {
                 headers: {
                 Authorization: `Bot ${process.env.DISCORD_TOKEN}`,
@@ -72,21 +73,6 @@ exports.handler = async function(event, context) {
             }
         } else if (name === "test") {
             console.log("test command received!")
-            // const res = await fetch(`https://discord.com/api/v9/interactions/${id}/${token}/callback`, {
-            //     headers: {
-            //         Authorization: `Bot ${process.env.DISCORD_TOKEN}`,
-            //         'Content-Type': 'application/json; charset=UTF-8',
-            //         },
-            //     body: JSON.stringify({
-            //         headers: { 'Content-Type': 'application/json'},
-            //         type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-            //         data: {
-            //           content: 'ayyye'
-            //         }
-            //     }),
-            //     method: 'POST'
-            // });
-            // console.log(res)
             return {
                 statusCode: 200,
                 headers: { 'Content-Type': 'application/json'},
