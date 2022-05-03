@@ -36,25 +36,6 @@ const app = initializeApp(firebaseConfig);
 // Initialize Cloud Firestore and get a reference to the service
 const db = getFirestore(app);
 
-async function fetchData(url) {
-    const res = await fetch(fileUrl, {
-        headers: {
-
-            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.79 Safari/537.36"
-        }
-    });
-    if (!res.ok) {
-        resData = await res.text();
-        console.log(res.status);
-        throw new Error(JSON.stringify(data));
-    } else {
-        resData = await res.json();
-        console.log(data);
-        return resData;
-    }
-}
-
-
 exports.handler = async function(event, context) {
     if (!verifier(event)) {
         return {
@@ -76,7 +57,21 @@ exports.handler = async function(event, context) {
             let attachmentValue = options[0].value;
             let fileUrl = resolved.attachments[attachmentValue].url;
             console.log(fileUrl);
-            schedulesData = fetchData(fileUrl);
+            const res = await fetch(fileUrl, {
+                headers: {
+        
+                    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.79 Safari/537.36"
+                }
+            });
+            if (!res.ok) {
+                schedulesData = await res.text();
+                console.log(res.status);
+                throw new Error(JSON.stringify(schedulesData));
+            } else {
+                schedulesData = await res.json();
+                console.log(data);
+            }
+
             // firestore cant do array in array, make this an object
             alteredPre = schedulesData.pre.reduce((accum, week, idx) => accum[`week${idx}`] = week, {})
             schedulesData.pre = alteredPre
@@ -84,7 +79,20 @@ exports.handler = async function(event, context) {
             schedulesData.reg = alteredReg
             attachmentValue = options[1].value;
             fileUrl = resolved.attachments[attachmentValue].url;
-            const teamsData = fetchData(fileUrl);
+            const res2 = await fetch(fileUrl, {
+                headers: {
+        
+                    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.79 Safari/537.36"
+                }
+            });
+            if (!res2.ok) {
+                teamsData = await res2.text();
+                console.log(res2.status);
+                throw new Error(JSON.stringify(teamsData));
+            } else {
+                teamsData = await res2.json();
+                console.log(data);
+            }
 
             try {
                 await setDoc(doc(db, "leagues", guild_id), {
