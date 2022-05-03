@@ -34,7 +34,6 @@ exports.handler = async function (event) {
         }
     });
     const [teamsData, schedulesData] = await Promise.all([teamsFetch.then(res => res.json()), schedulesFetch.then(res => res.json())]);
-    console.log(schedulesData);
     console.log("modifying preseason");
     const preseason = {}
     for (let i = 0; i < schedulesData.pre.length; i++) {
@@ -62,7 +61,7 @@ exports.handler = async function (event) {
     })
     console.log("teams modified");
     try {
-        console.log("writing to firebase ", teams, schedules);
+        console.log("writing to firebase ", teams, schedulesData);
         await setDoc(doc(db, "leagues", guild_id), {
             guild_id: guild_id,
             teams: teams,
