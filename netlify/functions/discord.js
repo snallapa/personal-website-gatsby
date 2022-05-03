@@ -91,7 +91,6 @@ exports.handler = async function(event, context) {
             schedulesData.reg = regularseason
             attachmentValue = options[1].value;
             fileUrl = resolved.attachments[attachmentValue].url;
-            const res2 = await ;
             if (!res2.ok) {
                 teamsData = await res2.text();
                 console.log(res2.status);
