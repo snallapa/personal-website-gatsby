@@ -73,10 +73,16 @@ exports.handler = async function(event, context) {
             }
 
             // firestore cant do array in array, make this an object
-            alteredPre = schedulesData.pre.reduce((accum, week, idx) => accum[`week${idx}`] = week, {})
-            schedulesData.pre = alteredPre
-            alteredReg = schedulesData.reg.reduce((accum, week, idx) => accum[`week${idx}`] = week, {})
-            schedulesData.reg = alteredReg
+            const preseason = {}
+            for (let i = 0; schedulesData.pre.length; i++) {
+                preseason[`week${i}`] = schedulesData.pre[i]
+            }
+            schedulesData.pre = preseason;
+            const regularseason = {}
+            for (let i = 0; schedulesData.reg.length; i++) {
+                regularseason[`week${i}`] = schedulesData.reg[i]
+            }
+            schedulesData.reg = regularseason
             attachmentValue = options[1].value;
             fileUrl = resolved.attachments[attachmentValue].url;
             const res2 = await fetch(fileUrl, {
