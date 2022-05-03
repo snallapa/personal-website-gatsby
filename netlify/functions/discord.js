@@ -42,7 +42,7 @@ exports.handler = async function(event, context) {
             statusCode: 401
         }
     }
-    console.log(event)
+    // console.log(event)
     const { type, id, data } = JSON.parse(event.body);
     if (type === InteractionType.PING) {
         return {
@@ -69,7 +69,6 @@ exports.handler = async function(event, context) {
                 throw new Error(JSON.stringify(schedulesData));
             } else {
                 schedulesData = await res.json();
-                console.log(data);
             }
 
             // firestore cant do array in array, make this an object
@@ -97,7 +96,6 @@ exports.handler = async function(event, context) {
                 throw new Error(JSON.stringify(teamsData));
             } else {
                 teamsData = await res2.json();
-                console.log(data);
             }
 
             try {
