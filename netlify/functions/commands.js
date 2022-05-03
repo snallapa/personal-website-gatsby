@@ -95,7 +95,8 @@ async function HasGuildCommand(guildId, command) {
 exports.handler = async function(event, context) {
     const guildId = event.queryStringParameters.guild;
     console.log(event);
-    if (!HasGuildCommand(guildId, [MADDEN_LEAGUE_COMMAND, MADDEN_CHANNELS_CREATE_COMMAND])) {
+    const hasGuild = await HasGuildCommand(guildId, [MADDEN_LEAGUE_COMMAND, MADDEN_CHANNELS_CREATE_COMMAND]);
+    if (!hasGuild) {
         return {
             statusCode: 400
         }
