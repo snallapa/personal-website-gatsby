@@ -44,6 +44,7 @@ async function DiscordRequest(endpoint, options) {
     const url = 'https://discord.com/api/v9/' + endpoint;
     // Stringify payloads
     if (options.body) options.body = JSON.stringify(options.body);
+    console.log(options);
     // Use node-fetch to make requests
     const res = await fetch(url, {
         headers: {
@@ -65,6 +66,7 @@ async function DiscordRequest(endpoint, options) {
 async function InstallGuildCommand(guildId, command) {
     // API endpoint to get and post guild commands
     const endpoint = `applications/${process.env.APP_ID}/guilds/${guildId}/commands`;
+    console.log(command);
     // install command
     try {
         await DiscordRequest(endpoint, { method: 'POST', body: command });
