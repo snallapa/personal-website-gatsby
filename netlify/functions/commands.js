@@ -1,11 +1,11 @@
 
 import fetch from 'node-fetch';
 
-export const TEST_COMMAND = {
+const TEST_COMMAND = {
     name: 'test',
     description: 'Basic guild command',
     type: 1,
-  };
+};
 
 const MADDEN_LEAGUE_COMMAND = {
     name: 'import_league',
