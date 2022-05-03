@@ -71,11 +71,13 @@ exports.handler = async function(event, context) {
                 console.log(data);
             }
         } else if (name === "test") {
+            console.log("test command received!")
             return {
                 statusCode: 200,
-                body: JSON.stringify({type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+                body: JSON.stringify({
+                    type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
                     data: {
-                      // Fetches a random emoji to send from a helper function
+
                       content: 'ayyye',
                     }
                 })
