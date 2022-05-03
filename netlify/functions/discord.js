@@ -38,11 +38,11 @@ const db = getFirestore(app);
 
 
 exports.handler = async function(event, context) {
-    // if (!verifier(event)) {
-    //     return {
-    //         statusCode: 401
-    //     }
-    // }
+    if (!verifier(event)) {
+        return {
+            statusCode: 401
+        }
+    }
     console.log(event)
     const { type, id, data } = JSON.parse(event.body);
     if (type === InteractionType.PING) {
@@ -75,6 +75,7 @@ exports.handler = async function(event, context) {
             return {
                 statusCode: 200,
                 body: JSON.stringify({
+                    headers: { 'Content-Type': 'application/json'},
                     type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
                     data: {
                       content: 'ayyye'
