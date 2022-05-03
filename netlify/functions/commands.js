@@ -12,13 +12,13 @@ const MADDEN_LEAGUE_COMMAND = {
     description: 'update the servers madden league',
     options: [{
         type: 11,
-        name: 'schedules.json',
+        name: 'schedules',
         description: 'Upload your schedules json from madden exporter',
         required: true
     }, 
     {
         type: 11,
-        name: 'teams.json',
+        name: 'teams',
         description: 'Upload your teams json from madden exporter',
         required: true
     }
