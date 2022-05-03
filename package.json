@@ -1,4 +1,5 @@
 {
+  "type": "module",
   "name": "personal-website",
   "private": true,
   "description": "My gatsby version of a personal website",
