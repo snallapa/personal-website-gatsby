@@ -1,7 +1,7 @@
 
 import fetch from 'node-fetch';
 
-export const MADDEN_LEAGUE_COMMAND = {
+const MADDEN_LEAGUE_COMMAND = {
     name: 'import_league',
     description: 'update the servers madden league',
     options: [{
@@ -13,7 +13,7 @@ export const MADDEN_LEAGUE_COMMAND = {
     type: 1,
 };
 
-export const MADDEN_CHANNELS_CREATE_COMMAND = {
+const MADDEN_CHANNELS_CREATE_COMMAND = {
     name: 'create_game_channels',
     description: 'Create game channels for the current week',
     options: [{
