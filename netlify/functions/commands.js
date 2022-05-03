@@ -72,6 +72,7 @@ async function HasGuildCommand(guildId, command) {
     try {
         const res = await DiscordRequest(endpoint, { method: 'GET' });
         const data = await res.json();
+        console.log(data)
 
         if (data) {
         const installedNames = data.map((c) => c['name']);
@@ -93,6 +94,7 @@ async function HasGuildCommand(guildId, command) {
 
 exports.handler = async function(event, context) {
     const guildId = event.queryStringParameters.guild;
+    console.log(event);
     if (!HasGuildCommand(guildId, [MADDEN_LEAGUE_COMMAND, MADDEN_CHANNELS_CREATE_COMMAND])) {
         return {
             statusCode: 400
