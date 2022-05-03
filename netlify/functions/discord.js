@@ -60,7 +60,7 @@ exports.handler = async function(event, context) {
             const res = await fetch(fileUrl, {
                 headers: {
                 Authorization: `Bot ${process.env.DISCORD_TOKEN}`,
-                'Content-Type': 'application/json; charset=UTF-8',
+                'Content-Type': 'gzip, deflate, br',
                 }
             });
             if (!res.ok) {
