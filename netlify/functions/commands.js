@@ -75,16 +75,16 @@ async function HasGuildCommand(guildId, command) {
         console.log(data)
 
         if (data) {
-        const installedNames = data.map((c) => c['name']);
-        // This is just matching on the name, so it's not good for updates
-        if (!installedNames.includes(command['name'])) {
-            console.log(`Installing "${command['name']}"`);
-            await InstallGuildCommand(process.env.APP_ID, guildId, command);
-            return true;
-        } else {
-            console.log(`"${command['name']}" command already installed`);
-            return true;
-        }
+            const installedNames = data.map((c) => c['name']);
+            // This is just matching on the name, so it's not good for updates
+            if (!installedNames.includes(command['name'])) {
+                console.log(`Installing "${command['name']}"`);
+                await InstallGuildCommand(process.env.APP_ID, guildId, command);
+                return true;
+            } else {
+                console.log(`"${command['name']}" command already installed`);
+                return true;
+            }
         }
     } catch (err) {
         console.error(err);
@@ -92,10 +92,17 @@ async function HasGuildCommand(guildId, command) {
     }
 }
 
+async function HasGuildCommands(guildId, commands) {
+    if (guildId === '') return;
+  
+    
+    return commands.map((c) => HasGuildCommand(appId, guildId, c)).every(x => x);
+}
+
 exports.handler = async function(event, context) {
     const guildId = event.queryStringParameters.guild;
     console.log(event);
-    const hasGuild = await HasGuildCommand(guildId, [MADDEN_LEAGUE_COMMAND, MADDEN_CHANNELS_CREATE_COMMAND]);
+    const hasGuild = await HasGuildCommands(guildId, [MADDEN_LEAGUE_COMMAND, MADDEN_CHANNELS_CREATE_COMMAND]);
     if (!hasGuild) {
         return {
             statusCode: 400
