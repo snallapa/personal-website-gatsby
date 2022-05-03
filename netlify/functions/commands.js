@@ -95,10 +95,10 @@ exports.handler = async function(event, context) {
     const guildId = event.queryStringParameters.guild;
     if (!HasGuildCommand(guildId, [MADDEN_LEAGUE_COMMAND, MADDEN_CHANNELS_CREATE_COMMAND])) {
         return {
-            status: 400
+            statusCode: 400
         }
     }
     return {
-        status: 200
+        statusCode: 200
     }
 }
