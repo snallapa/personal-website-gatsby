@@ -4,7 +4,9 @@ import {
     verifyKey
   } from 'discord-interactions';
 import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
+import { getFirestore , doc, setDoc, collection, addDoc } from "firebase/firestore";
+
+import fetch from 'node-fetch';
 
 const firebaseConfig = {
     apiKey: "AIzaSyDf9ZiTBWf-sWY007WsKktMPewcrs07CWw",
@@ -14,14 +16,6 @@ const firebaseConfig = {
     messagingSenderId: "163156624093",
     appId: "1:163156624093:web:dfe860c8bb38a62b075134"
 };
-  
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-
-
-// Initialize Cloud Firestore and get a reference to the service
-const db = getFirestore(app);
 
 
 function VerifyDiscordRequest(clientKey) {
@@ -34,6 +28,14 @@ function VerifyDiscordRequest(clientKey) {
 }
 
 const verifier = VerifyDiscordRequest(process.env.PUBLIC_KEY);
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+
+
+// Initialize Cloud Firestore and get a reference to the service
+const db = getFirestore(app);
+
 
 exports.handler = async function(event, context) {
     if (!verifier(event)) {
@@ -49,8 +51,39 @@ exports.handler = async function(event, context) {
             body: JSON.stringify({ type: InteractionResponseType.PONG }),
           };
     }
+    if (type === InteractionType.APPLICATION_COMMAND) {
+        const { guild, name, resolved, options} = data;
+        if (name === "import_league") {
+            const attachmentValue = options[0].value;
+            const fileUrl = resolved.attachments[attachmentValue.url];
+            const res = await fetch(fileUrl, {
+                headers: {
+                Authorization: `Bot ${process.env.DISCORD_TOKEN}`,
+                'Content-Type': 'application/json; charset=UTF-8',
+                }
+            });
+            if (!res.ok) {
+                const data = await res.json();
+                console.log(res.status);
+                throw new Error(JSON.stringify(data));
+            } else {
+                const data = await res.json();
+                console.log(data);
+            }
+        } else if (name === "test") {
+            return {
+                statusCode: 200,
+                body: JSON.stringify({type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+                    data: {
+                      // Fetches a random emoji to send from a helper function
+                      content: 'ayyye',
+                    }
+                })
+              };
+        }
+    }
     return {
-        statusCode: 200,
-        body: JSON.stringify({ type: "NOT PONG" }),
+        statusCode: 400,
+        body: JSON.stringify({ type: "we should not have gotten here" }),
       };
 }
