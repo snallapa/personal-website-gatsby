@@ -72,16 +72,17 @@ exports.handler = async function(event, context) {
             }
         } else if (name === "test") {
             console.log("test command received!")
-            return {
+            const res = {
                 statusCode: 200,
                 body: JSON.stringify({
                     type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
                     data: {
-
-                      content: 'ayyye',
+                      content: 'ayyye'
                     }
                 })
               };
+            console.log(res)
+            return res;
         }
     }
     return {
