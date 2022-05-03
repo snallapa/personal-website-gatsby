@@ -54,22 +54,70 @@ exports.handler = async function(event, context) {
     if (type === InteractionType.APPLICATION_COMMAND) {
         const { guild_id, name, resolved, options} = data;
         if (name === "import_league") {
-            const attachmentValue = options[0].value;
-            const fileUrl = resolved.attachments[attachmentValue].url;
+            let teamsData, schedulesData;
+            let attachmentValue = options[0].value;
+            let fileUrl = resolved.attachments[attachmentValue].url;
             console.log(fileUrl);
-            const res = await fetch(fileUrl, {
+            const schedules = await fetch(fileUrl, {
                 headers: {
 
                     "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.79 Safari/537.36"
                 }
             });
-            if (!res.ok) {
-                const data = await res.text();
-                console.log(res.status);
+            if (!schedules.ok) {
+                schedulesData = await schedules.text();
+                console.log(schedules.status);
                 throw new Error(JSON.stringify(data));
             } else {
-                const data = await res.json();
+                schedulesData = await schedules.json();
                 console.log(data);
+            }
+            attachmentValue = options[1].value;
+            fileUrl = resolved.attachments[attachmentValue].url;
+            const teams = await fetch(fileUrl, {
+                headers: {
+
+                    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.79 Safari/537.36"
+                }
+            });
+            if (!teams.ok) {
+                teamsData = await teams.text();
+                console.log(teams.status);
+                throw new Error(JSON.stringify(data));
+            } else {
+                teamsData = await teams.json();
+                console.log(data);
+            }
+            try {
+                await setDoc(doc(db, "leagues", guild_id), {
+                    guild_id: guild_id,
+                    teams: teamsData,
+                    schedules: schedulesData
+                });
+    
+                console.log(`doc written with id`)
+                return {
+                    statusCode: 200,
+                    headers: { 'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+                        data: {
+                          content: 'loaded!'
+                        }
+                    })
+                  }
+            } catch (e) {
+                console.error('error adding document', e)
+                return {
+                    statusCode: 200,
+                    headers: { 'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+                        data: {
+                          content: 'sorry it failed...'
+                        }
+                    })
+                  };
             }
         } else if (name === "test") {
             console.log("test command received!")
