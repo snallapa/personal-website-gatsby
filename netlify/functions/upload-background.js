@@ -34,7 +34,6 @@ exports.handler = async function (event) {
         }
     });
     const [teamsData, schedulesData] = await Promise.all([teamsFetch.then(res => res.json()), schedulesFetch.then(res => res.json())]);
-    console.log(teamsData);
     const preseason = {}
     for (let i = 0; schedulesData.pre.length; i++) {
         const games = schedulesData.pre[i];
@@ -43,6 +42,7 @@ exports.handler = async function (event) {
             preseason[`week${i}`] = newGames
         }
     }
+    console.log("preseason modified");
     schedulesData.pre = preseason;
     const regularseason = {}
     for (let i = 0; schedulesData.reg.length; i++) {
@@ -53,10 +53,12 @@ exports.handler = async function (event) {
         }
     }
     schedulesData.reg = regularseason;
+    console.log("regular season modified");
     let teams = {}
     Object.keys(teamsData).map((teamId) => {
         teams[teamId] = {teamName: teamsData[teamId].displayName, abbr: teamsData[teamId].abbrName}
     })
+    console.log("teams modified");
     console.timeEnd("timer");
     try {
         console.log("writing to firebase");
