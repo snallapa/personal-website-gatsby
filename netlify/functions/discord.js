@@ -58,90 +58,25 @@ exports.handler = async function(event, context) {
             const attachmentValue2 = options[1].value
             const schedulesUrl = resolved.attachments[attachmentValue].url;
             const teamsUrl = resolved.attachments[attachmentValue2].url; 
-            const teamsFetch = fetch(teamsUrl, {
-                headers: {
-        
-                    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.79 Safari/537.36"
-                }
-            })
-            const schedulesFetch = fetch(schedulesUrl, {
-                headers: {
-        
-                    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.79 Safari/537.36"
-                }
-            });
-            console.time("timer");
-            const [teamsData, schedulesData] = await Promise.all([teamsFetch.then(res => res.json()), schedulesFetch.then(res => res.json())]);
-            // if (!res.ok) {
-            //     schedulesData = await res.text();
-            //     console.log(res.status);
-            //     throw new Error(JSON.stringify(schedulesData));
-            // } else {
-            //     schedulesData = await res.json();
-            // }
-
-            // firestore cant do array in array, make this an object
-            const preseason = {}
-            for (let i = 0; schedulesData.pre.length; i++) {
-                const games = schedulesData.pre[i];
-                if (games){
-                    newGames = games.map(x => { x.awayTeamId, x.homeTeamId })
-                    preseason[`week${i}`] = newGames
-                }
-            }
-            schedulesData.pre = preseason;
-            const regularseason = {}
-            for (let i = 0; schedulesData.reg.length; i++) {
-                const games = schedulesData.reg[i];
-                if (games) {
-                    newGames = games.map(x => { x.awayTeamId, x.homeTeamId })
-                    regularseason[`week${i}`] = newGames
-                }
-            }
-        
-            // if (!res2.ok) {
-            //     teamsData = await res2.text();
-            //     console.log(res2.status);
-            //     throw new Error(JSON.stringify(teamsData));
-            // } else {
-            //     teamsData = await res2.json();
-            // }
-            let teams = {}
-            Object.keys(teamsData).map((teamId) => {
-                teams[teamId] = {teamName: teamsData[teamId].displayName, abbr: teamsData[teamId].abbrName}
-            })
-            console.timeEnd("timer");
-            try {
-                await setDoc(doc(db, "leagues", guild_id), {
+            await fetch("https://www.nallapareddy.com/.netlify/functions/upload-background?", {
+                method: 'POST',
+                body: JSON.stringify({
                     guild_id: guild_id,
-                    teams: teams,
-                    schedules: schedulesData
-                });
-    
-                console.log(`doc written with id`)
-                return {
-                    statusCode: 200,
-                    headers: { 'Content-Type': 'application/json'},
-                    body: JSON.stringify({
-                        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-                        data: {
-                          content: 'loaded!'
-                        }
-                    })
-                  }
-            } catch (e) {
-                console.error('error adding document', e)
-                return {
-                    statusCode: 200,
-                    headers: { 'Content-Type': 'application/json'},
-                    body: JSON.stringify({
-                        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-                        data: {
-                          content: 'sorry it failed...'
-                        }
-                    })
-                  };
-            }
+                    schedulesUrl: schedulesUrl, 
+                    teamsUrl: teamsUrl
+                })
+            });
+            return {
+                statusCode: 200,
+                headers: { 'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+                    data: {
+                      content: 'received its uploading!'
+                    }
+                })
+              };
+
         } else if (name === "test") {
             console.log("test command received!")
             return {
