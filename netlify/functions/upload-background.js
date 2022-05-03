@@ -39,9 +39,7 @@ exports.handler = async function (event) {
     const preseason = {}
     for (let i = 0; i < schedulesData.pre.length; i++) {
         const games = schedulesData.pre[i];
-        console.log(games);
         if (games != null) {
-            console.log(`modifying week${i}`);
             newGames = games.map(x => { x.awayTeamId, x.homeTeamId })
             preseason[`week${i}`] = newGames
         }
@@ -63,9 +61,8 @@ exports.handler = async function (event) {
         teams[teamId] = {teamName: teamsData[teamId].displayName, abbr: teamsData[teamId].abbrName}
     })
     console.log("teams modified");
-    console.timeEnd("timer");
     try {
-        console.log("writing to firebase");
+        console.log("writing to firebase ", teams, schedules);
         await setDoc(doc(db, "leagues", guild_id), {
             guild_id: guild_id,
             teams: teams,
