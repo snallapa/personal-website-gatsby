@@ -94,9 +94,8 @@ async function HasGuildCommand(guildId, command) {
 
 async function HasGuildCommands(guildId, commands) {
     if (guildId === '') return;
-  
-    
-    return commands.map((c) => HasGuildCommand(guildId, c)).every(x => x);
+    const commandsInstalled = await Promise.all(commands.map((c) => HasGuildCommand(guildId, c)));
+    return commandsInstalled.every(x => x);
 }
 
 exports.handler = async function(event, context) {
