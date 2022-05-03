@@ -64,7 +64,7 @@ exports.handler = async function(event, context) {
                 }
             });
             if (!res.ok) {
-                const data = await res.json();
+                const data = await res.text();
                 console.log(res.status);
                 throw new Error(JSON.stringify(data));
             } else {
