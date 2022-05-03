@@ -71,7 +71,6 @@ exports.handler = async function(event, context) {
             });
             console.time("timer");
             const [res, res2] = await Promise.all([teamsFetch, schedulesFetch]);
-            console.timeEnd("timer");
             if (!res.ok) {
                 schedulesData = await res.text();
                 console.log(res.status);
@@ -83,13 +82,18 @@ exports.handler = async function(event, context) {
             // firestore cant do array in array, make this an object
             const preseason = {}
             for (let i = 0; schedulesData.pre.length; i++) {
-                preseason[`week${i}`] = schedulesData.pre[i]
+                const games = schedulesData.pre[i];
+                newGames = games.map(x => { x.awayTeamId, x.homeTeamId })
+                preseason[`week${i}`] = newGames
             }
             schedulesData.pre = preseason;
             const regularseason = {}
             for (let i = 0; schedulesData.reg.length; i++) {
-                regularseason[`week${i}`] = schedulesData.reg[i]
+                const games = schedulesData.reg[i];
+                newGames = games.map(x => { x.awayTeamId, x.homeTeamId })
+                regularseason[`week${i}`] = newGames
             }
+            
             schedulesData.reg = regularseason
             attachmentValue = options[1].value;
             fileUrl = resolved.attachments[attachmentValue].url;
@@ -100,11 +104,15 @@ exports.handler = async function(event, context) {
             } else {
                 teamsData = await res2.json();
             }
-
+            let teams = {}
+            Object.keys(teamsData).map((teamId, team) => {
+                teams[teamId] = {teamName: team.displayName, abbr: team.abbrName}
+            })
+            console.timeEnd("timer");
             try {
                 await setDoc(doc(db, "leagues", guild_id), {
                     guild_id: guild_id,
-                    teams: teamsData,
+                    teams: teams,
                     schedules: schedulesData
                 });
     
