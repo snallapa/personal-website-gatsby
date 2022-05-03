@@ -59,7 +59,8 @@ exports.handler = async function(event, context) {
             const schedulesUrl = resolved.attachments[attachmentValue].url;
             const teamsUrl = resolved.attachments[attachmentValue2].url; 
             console.log("sending request to background function");
-            const res = await fetch("https://www.nallapareddy.com/.netlify/functions/upload-background", {
+
+            const res = await fetch("https://nallapareddy.com/.netlify/functions/upload-background", {
                 method: 'POST',
                 body: JSON.stringify({
                     guild_id: guild_id,
