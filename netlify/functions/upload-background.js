@@ -34,6 +34,7 @@ exports.handler = async function (event) {
         }
     });
     const [teamsData, schedulesData] = await Promise.all([teamsFetch.then(res => res.json()), schedulesFetch.then(res => res.json())]);
+    console.log(teamsData);
     const preseason = {}
     for (let i = 0; schedulesData.pre.length; i++) {
         const games = schedulesData.pre[i];
@@ -58,12 +59,12 @@ exports.handler = async function (event) {
     })
     console.timeEnd("timer");
     try {
+        console.log("writing to firebase");
         await setDoc(doc(db, "leagues", guild_id), {
             guild_id: guild_id,
             teams: teams,
             schedules: schedulesData
         });
-
         console.log(`doc written with id`)
     } catch (e) {
         console.error('error adding document', e)
