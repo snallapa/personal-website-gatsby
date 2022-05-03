@@ -49,7 +49,7 @@ exports.handler = async function (event) {
     for (let i = 0; i < schedulesData.reg.length; i++) {
         const games = schedulesData.reg[i];
         if (games != null) {
-            newGames = games.map(x => { x.awayTeamId, x.homeTeamId })
+            newGames = games.map(x => ({awayTeamId: x.awayTeamId, homeTeamId: x.homeTeamId }));
             regularseason[`week${i}`] = newGames
         }
     }
