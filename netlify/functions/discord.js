@@ -83,15 +83,19 @@ exports.handler = async function(event, context) {
             const preseason = {}
             for (let i = 0; schedulesData.pre.length; i++) {
                 const games = schedulesData.pre[i];
-                newGames = games.map(x => { x.awayTeamId, x.homeTeamId })
-                preseason[`week${i}`] = newGames
+                if (games){
+                    newGames = games.map(x => { x.awayTeamId, x.homeTeamId })
+                    preseason[`week${i}`] = newGames
+                }
             }
             schedulesData.pre = preseason;
             const regularseason = {}
             for (let i = 0; schedulesData.reg.length; i++) {
                 const games = schedulesData.reg[i];
-                newGames = games.map(x => { x.awayTeamId, x.homeTeamId })
-                regularseason[`week${i}`] = newGames
+                if (games) {
+                    newGames = games.map(x => { x.awayTeamId, x.homeTeamId })
+                    regularseason[`week${i}`] = newGames
+                }
             }
             
             schedulesData.reg = regularseason
@@ -105,8 +109,8 @@ exports.handler = async function(event, context) {
                 teamsData = await res2.json();
             }
             let teams = {}
-            Object.keys(teamsData).map((teamId, team) => {
-                teams[teamId] = {teamName: team.displayName, abbr: team.abbrName}
+            Object.keys(teamsData).map((teamId) => {
+                teams[teamId] = {teamName: teamsData[teamId].displayName, abbr: teamsData[teamId].abbrName}
             })
             console.timeEnd("timer");
             try {
