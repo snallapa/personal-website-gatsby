@@ -69,7 +69,9 @@ exports.handler = async function(event, context) {
                     "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.79 Safari/537.36"
                 }
             });
+            console.time("timer");
             const [res, res2] = await Promise.all([teamsFetch, schedulesFetch]);
+            console.timeEnd("timer");
             if (!res.ok) {
                 schedulesData = await res.text();
                 console.log(res.status);
