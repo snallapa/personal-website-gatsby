@@ -37,7 +37,7 @@ exports.handler = async function (event) {
     console.log(schedulesData);
     console.log("modifying preseason");
     const preseason = {}
-    for (let i = 0; schedulesData.pre.length; i++) {
+    for (let i = 0; i < schedulesData.pre.length; i++) {
         const games = schedulesData.pre[i];
         console.log(games);
         if (games != null) {
@@ -49,7 +49,7 @@ exports.handler = async function (event) {
     console.log("preseason modified");
     schedulesData.pre = preseason;
     const regularseason = {}
-    for (let i = 0; schedulesData.reg.length; i++) {
+    for (let i = 0; i < schedulesData.reg.length; i++) {
         const games = schedulesData.reg[i];
         if (games != null) {
             newGames = games.map(x => { x.awayTeamId, x.homeTeamId })
