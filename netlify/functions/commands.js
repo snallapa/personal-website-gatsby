@@ -18,7 +18,7 @@ const MADDEN_LEAGUE_COMMAND = {
     }, 
     {
         type: 11,
-        name: 'stats.json',
+        name: 'teams.json',
         description: 'Upload your teams json from madden exporter',
         required: true
     }
