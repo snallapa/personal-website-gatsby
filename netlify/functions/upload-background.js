@@ -34,6 +34,8 @@ exports.handler = async function (event) {
         }
     });
     const [teamsData, schedulesData] = await Promise.all([teamsFetch.then(res => res.json()), schedulesFetch.then(res => res.json())]);
+    console.log(schedulesData);
+    console.log("modifying preseason");
     const preseason = {}
     for (let i = 0; schedulesData.pre.length; i++) {
         const games = schedulesData.pre[i];
