@@ -58,7 +58,8 @@ exports.handler = async function(event, context) {
             const attachmentValue2 = options[1].value
             const schedulesUrl = resolved.attachments[attachmentValue].url;
             const teamsUrl = resolved.attachments[attachmentValue2].url; 
-            await fetch("https://www.nallapareddy.com/.netlify/functions/upload-background?", {
+            console.log("sending request to background function");
+            const res = await fetch("https://www.nallapareddy.com/.netlify/functions/upload-background", {
                 method: 'POST',
                 body: JSON.stringify({
                     guild_id: guild_id,
@@ -66,6 +67,7 @@ exports.handler = async function(event, context) {
                     teamsUrl: teamsUrl
                 })
             });
+            console.log(res);
             return {
                 statusCode: 200,
                 headers: { 'Content-Type': 'application/json'},

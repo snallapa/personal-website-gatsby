@@ -19,6 +19,7 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 exports.handler = async function (event) {
+    console.log(event);
     const { guild_id, schedulesUrl, teamsUrl } = JSON.parse(event.body);
     const teamsFetch = fetch(teamsUrl, {
         headers: {
