@@ -44,7 +44,7 @@ const db = getFirestore(app);
 
 exports.handler = async function (event) {
     console.log(event);
-    const { guild_id, schedulesUrl, teamsUrl, token } = JSON.parse(event.body);
+    const { guild_id, schedulesUrl, teamsUrl, messageToken } = JSON.parse(event.body);
     const teamsFetch = fetch(teamsUrl, {
         headers: {
 
@@ -85,13 +85,13 @@ exports.handler = async function (event) {
     })
     console.log("teams modified");
     try {
-        console.log("writing to firebase ", teams, schedulesData);
+        console.log("writing to firebase ");
         await setDoc(doc(db, "leagues", guild_id), {
             guild_id: guild_id,
             teams: teams,
             schedules: schedulesData
         });
-        const res = await DiscordRequest(`webhooks/${process.env.APP_ID}/${token}/messages/@original`, {
+        const res = await DiscordRequest(`webhooks/${process.env.APP_ID}/${messageToken}/messages/@original`, {
             method: 'PATCH',
             body: {
                 "type": 4,
@@ -102,7 +102,7 @@ exports.handler = async function (event) {
         });
         console.log(res.ok);
     } catch (e) {
-        const res = await DiscordRequest(`webhooks/${process.env.APP_ID}/${token}/messages/@original`, {
+        const res = await DiscordRequest(`webhooks/${process.env.APP_ID}/${messageToken}/messages/@original`, {
             method: 'PATCH',
             body: {
                 "type": 4,
