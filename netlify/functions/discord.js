@@ -43,7 +43,7 @@ exports.handler = async function(event, context) {
         }
     }
     // console.log(event)
-    const { type, id, data } = JSON.parse(event.body);
+    const { type, id, data, token } = JSON.parse(event.body);
     if (type === InteractionType.PING) {
         return {
             statusCode: 200,
@@ -51,7 +51,7 @@ exports.handler = async function(event, context) {
           };
     }
     if (type === InteractionType.APPLICATION_COMMAND) {
-        const { guild_id, name, resolved, options, token} = data;
+        const { guild_id, name, resolved, options} = data;
         if (name === "import_league") {
             // let teamsData, schedulesData;
             const attachmentValue = options[0].value;
