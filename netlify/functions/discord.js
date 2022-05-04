@@ -106,7 +106,9 @@ exports.handler = async function(event, context) {
               };
 
         } else if (name === "create_game_channels") {
-            console.log(event);
+            const week = options[0].value;
+            const category = options[1].value;
+
             const docRef = doc(db, "leagues", guild_id);
             const docSnap = await getDoc(docRef);
             if (!docSnap.exists()) {
@@ -122,27 +124,44 @@ exports.handler = async function(event, context) {
                   }
             }
             const league = docSnap.data();
-            console.log(league);
-            const weeksGames = league.schedules.reg[`week${1}`];
+
+            const weeksGames = league.schedules.reg[`week${week}`];
             const teams = league.teams;
-            const game = weeksGames[0];
-            const res = await DiscordRequest(`guilds/${guild_id}/channels`, {
-                method: 'POST',
-                body: {
-                    type: 0,
-                    name: `${teams[game.awayTeamId].teamName}-vs-${teams[game.homeTeamId].teamName}`
-                }
-            })
-            return {
-                statusCode: 200,
-                headers: { 'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-                    data: {
-                      content: `created!`
+            const channelPromises = weeksGames.map(game => {
+                return DiscordRequest(`guilds/${guild_id}/channels`, {
+                    method: 'POST',
+                    body: {
+                        type: 0,
+                        name: `${teams[game.awayTeamId].teamName}-vs-${teams[game.homeTeamId].teamName}`,
+                        parent_id: category
                     }
-                })
-              };
+                });
+            });
+            const responses = await Promise.all(channelPromises);
+            if (responses.every(r => r.ok)) {
+                return {
+                    statusCode: 200,
+                    headers: { 'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+                        data: {
+                          content: `created!`
+                        }
+                    })
+                  };
+            } else {
+                return {
+                    statusCode: 200,
+                    headers: { 'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+                        data: {
+                          content: `hmm something went wrong!`
+                        }
+                    })
+                  };
+            }
+
         } else if (name === "test") {
             console.log("test command received!")
             return {
