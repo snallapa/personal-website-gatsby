@@ -2,6 +2,30 @@ import fetch from 'node-fetch';
 import { initializeApp } from "firebase/app";
 import { getFirestore , doc, setDoc, collection, addDoc } from "firebase/firestore";
 
+async function DiscordRequest(endpoint, options) {
+    // append endpoint to root API URL
+    const url = 'https://discord.com/api/v9/' + endpoint;
+    // Stringify payloads
+    if (options.body) options.body = JSON.stringify(options.body);
+    console.log(options);
+    // Use node-fetch to make requests
+    const res = await fetch(url, {
+        headers: {
+        Authorization: `Bot ${process.env.DISCORD_TOKEN}`,
+        'Content-Type': 'application/json; charset=UTF-8',
+        },
+        ...options
+    });
+    // throw API errors
+    if (!res.ok) {
+        const data = await res.json();
+        console.log(res.status);
+        throw new Error(JSON.stringify(data));
+    }
+    // return original response
+    return res;
+}
+
 const firebaseConfig = {
     apiKey: "AIzaSyDf9ZiTBWf-sWY007WsKktMPewcrs07CWw",
     authDomain: "championslounge-f0f36.firebaseapp.com",
@@ -20,7 +44,7 @@ const db = getFirestore(app);
 
 exports.handler = async function (event) {
     console.log(event);
-    const { guild_id, schedulesUrl, teamsUrl } = JSON.parse(event.body);
+    const { guild_id, schedulesUrl, teamsUrl, token } = JSON.parse(event.body);
     const teamsFetch = fetch(teamsUrl, {
         headers: {
 
@@ -67,8 +91,25 @@ exports.handler = async function (event) {
             teams: teams,
             schedules: schedulesData
         });
-        console.log(`doc written with id`)
+        const res = await DiscordRequest(`webhooks/${process.env.APP_ID}/${token}/messages/@original`, {
+            method: 'PATCH',
+            body: {
+                "type": 4,
+                "data": {
+                    "content": "saved! feel free to use other commands"
+                }
+            }
+        });
+        console.log(res.ok);
     } catch (e) {
-        console.error('error adding document', e)
+        const res = await DiscordRequest(`webhooks/${process.env.APP_ID}/${token}/messages/@original`, {
+            method: 'PATCH',
+            body: {
+                "type": 4,
+                "data": {
+                    "content": "something went wrong :("
+                }
+            }
+        });
     }
 }

@@ -51,7 +51,7 @@ exports.handler = async function(event, context) {
           };
     }
     if (type === InteractionType.APPLICATION_COMMAND) {
-        const { guild_id, name, resolved, options} = data;
+        const { guild_id, name, resolved, options, token} = data;
         if (name === "import_league") {
             // let teamsData, schedulesData;
             const attachmentValue = options[0].value;
@@ -65,17 +65,17 @@ exports.handler = async function(event, context) {
                 body: JSON.stringify({
                     guild_id: guild_id,
                     schedulesUrl: schedulesUrl, 
-                    teamsUrl: teamsUrl
+                    teamsUrl: teamsUrl,
+                    messageToken: token
                 })
             });
-            console.log(res);
             return {
                 statusCode: 200,
                 headers: { 'Content-Type': 'application/json'},
                 body: JSON.stringify({
-                    type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+                    type: InteractionResponseType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE,
                     data: {
-                      content: 'received its uploading!'
+                      content: 'got it! uploading...'
                     }
                 })
               };
