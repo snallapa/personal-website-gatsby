@@ -94,7 +94,7 @@ exports.handler = async function (event) {
         const res = await DiscordRequest(`webhooks/${process.env.APP_ID}/${messageToken}/messages/@original`, {
             method: 'PATCH',
             body: {
-                "content": "saved! feel free to use other commands"
+                "content": "uploaded :) feel free to use other commands"
             }
         });
         console.log(res.ok);

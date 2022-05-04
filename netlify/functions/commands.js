@@ -30,13 +30,13 @@ const MADDEN_CHANNELS_CREATE_COMMAND = {
     name: 'create_game_channels',
     description: 'Create game channels for the current week',
     options: [{
-        type: 4,
+        type: 4, // integer
         name: 'week',
         description: 'The week number to create for',
         required: true
     },
     {
-        type: 7,
+        type: 7, // channel
         name: 'category',
         description: 'category to create channels under',
         required: true,

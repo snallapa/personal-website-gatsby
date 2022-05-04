@@ -4,7 +4,8 @@ import {
     verifyKey
   } from 'discord-interactions';
 import { initializeApp } from "firebase/app";
-import { getFirestore , doc, setDoc, collection, addDoc } from "firebase/firestore";
+
+import { getFirestore , doc, getDoc} from "firebase/firestore";
 
 import fetch from 'node-fetch';
 
@@ -35,6 +36,30 @@ const app = initializeApp(firebaseConfig);
 
 // Initialize Cloud Firestore and get a reference to the service
 const db = getFirestore(app);
+
+async function DiscordRequest(endpoint, options) {
+    // append endpoint to root API URL
+    const url = 'https://discord.com/api/v9/' + endpoint;
+    // Stringify payloads
+    if (options.body) options.body = JSON.stringify(options.body);
+    console.log(options);
+    // Use node-fetch to make requests
+    const res = await fetch(url, {
+        headers: {
+        Authorization: `Bot ${process.env.DISCORD_TOKEN}`,
+        'Content-Type': 'application/json; charset=UTF-8',
+        },
+        ...options
+    });
+    // throw API errors
+    if (!res.ok) {
+        const data = await res.json();
+        console.log(res.status);
+        throw new Error(JSON.stringify(data));
+    }
+    // return original response
+    return res;
+}
 
 exports.handler = async function(event, context) {
     if (!verifier(event)) {
@@ -80,6 +105,44 @@ exports.handler = async function(event, context) {
                 })
               };
 
+        } else if (name === "create_game_channels") {
+            console.log(event);
+            const docRef = doc(db, "leagues", guild_id);
+            const docSnap = await getDoc(docRef);
+            if (!docSnap.exists()) {
+                return {
+                    statusCode: 200,
+                    headers: { 'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+                        data: {
+                          content: `no league found for ${guild_id}, try import_league first`
+                        }
+                    })
+                  }
+            }
+            const league = docSnap.data();
+            console.log(league);
+            const weeksGames = league.schedules.reg[`week${1}`];
+            const teams = league.teams;
+            const game = weeksGames[0];
+            const res = await DiscordRequest(`guilds/${guild_id}/channels`, {
+                method: 'POST',
+                body: {
+                    type: 0,
+                    name: `${teams[game.awayTeamId].teamName}-vs-${teams[game.homeTeamId].teamName}`
+                }
+            })
+            return {
+                statusCode: 200,
+                headers: { 'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+                    data: {
+                      content: `created!`
+                    }
+                })
+              };
         } else if (name === "test") {
             console.log("test command received!")
             return {
@@ -88,7 +151,7 @@ exports.handler = async function(event, context) {
                 body: JSON.stringify({
                     type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
                     data: {
-                      content: 'ayyye'
+                      content: 'bot is working!'
                     }
                 })
               };
