@@ -168,7 +168,6 @@ exports.handler = async function(event, context) {
                 method: 'GET',
             });
             const channels = await res.json();
-            console.log(channels);
             const gameChannelIds = channels.filter(c => {
                 // text channel, in right category, with `vs` in it
                 return c.type === 0 && c.parent_id && c.parent_id === category && c.name.includes("vs");
