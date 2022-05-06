@@ -62,6 +62,8 @@ const MADDEN_CHANNELS_CLEAR_COMMAND = {
     type: 1,
 };
 
+const COMMANDS = [TEST_COMMAND, MADDEN_LEAGUE_COMMAND, MADDEN_CHANNELS_CREATE_COMMAND, MADDEN_CHANNELS_CLEAR_COMMAND]
+
 async function DiscordRequest(endpoint, options) {
     // append endpoint to root API URL
     const url = 'https://discord.com/api/v9/' + endpoint;
@@ -98,6 +100,20 @@ async function InstallGuildCommand(guildId, command) {
     }
 }
 
+async function InstallGlobalCommand(command) {
+    // API endpoint to get and post guild commands
+    const endpoint = `applications/${process.env.APP_ID}/commands`;
+    console.log(command);
+    // install command
+    try {
+        const res = await DiscordRequest(endpoint, { method: 'POST', body: command });
+        return res.ok;
+    } catch (err) {
+        console.error(err);
+        return false;
+    }
+}
+
 async function HasGuildCommand(guildId, command) {
 // API endpoint to get and post guild commands
     const endpoint = `applications/${process.env.APP_ID}/guilds/${guildId}/commands`;
@@ -126,8 +142,20 @@ async function HasGuildCommands(guildId, commands) {
 
 exports.handler = async function(event, context) {
     const guildId = event.queryStringParameters.guild;
+    if (guildId === 'global') {
+        const responses = await Promise.all(COMMANDS.map(command => InstallGlobalCommand(command)));
+        if (responses.every(x => x)) {
+            return {
+                statusCode: 200
+            };
+        } else {
+            return {
+                statusCode: 400 
+            };
+        }
+    }
     console.log(event);
-    const hasGuild = await HasGuildCommands(guildId, [TEST_COMMAND, MADDEN_LEAGUE_COMMAND, MADDEN_CHANNELS_CREATE_COMMAND, MADDEN_CHANNELS_CLEAR_COMMAND]);
+    const hasGuild = await HasGuildCommands(guildId, COMMANDS);
     if (!hasGuild) {
         return {
             statusCode: 400
