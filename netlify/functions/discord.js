@@ -167,7 +167,7 @@ exports.handler = async function(event, context) {
             const res = await DiscordRequest(`guilds/${guild_id}/channels`, {
                 method: 'GET',
             });
-            const channels = res.json();
+            const channels = await res.json();
             console.log(channels);
             const gameChannelIds = channels.filter(c => {
                 // text channel, in right category, with `vs` in it
