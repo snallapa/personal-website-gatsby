@@ -46,6 +46,22 @@ const MADDEN_CHANNELS_CREATE_COMMAND = {
     type: 1,
 };
 
+
+const MADDEN_CHANNELS_CLEAR_COMMAND = {
+    name: 'clear_game_channels',
+    description: 'clear all game channels',
+    options: [
+    {
+        type: 7, // channel
+        name: 'category',
+        description: 'category to create channels under',
+        required: true,
+        channel_types: [4]
+    }
+    ],
+    type: 1,
+};
+
 async function DiscordRequest(endpoint, options) {
     // append endpoint to root API URL
     const url = 'https://discord.com/api/v9/' + endpoint;
@@ -111,7 +127,7 @@ async function HasGuildCommands(guildId, commands) {
 exports.handler = async function(event, context) {
     const guildId = event.queryStringParameters.guild;
     console.log(event);
-    const hasGuild = await HasGuildCommands(guildId, [TEST_COMMAND, MADDEN_LEAGUE_COMMAND, MADDEN_CHANNELS_CREATE_COMMAND]);
+    const hasGuild = await HasGuildCommands(guildId, [TEST_COMMAND, MADDEN_LEAGUE_COMMAND, MADDEN_CHANNELS_CREATE_COMMAND, MADDEN_CHANNELS_CLEAR_COMMAND]);
     if (!hasGuild) {
         return {
             statusCode: 400
