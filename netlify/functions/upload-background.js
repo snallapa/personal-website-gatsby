@@ -44,7 +44,7 @@ const db = getFirestore(app);
 
 exports.handler = async function (event) {
     console.log(event);
-    const { guildId, schedulesUrl, teamsUrl, messageToken } = JSON.parse(event.body);
+    const { guild_id, schedulesUrl, teamsUrl, messageToken } = JSON.parse(event.body);
     const teamsFetch = fetch(teamsUrl, {
         headers: {
 
@@ -86,8 +86,8 @@ exports.handler = async function (event) {
     console.log("teams modified");
     try {
         console.log("writing to firebase ");
-        await setDoc(doc(db, "leagues", guildId), {
-            guild_id: guildId,
+        await setDoc(doc(db, "leagues", guild_id), {
+            guild_id: guild_id,
             teams: teams,
             schedules: schedulesData
         });

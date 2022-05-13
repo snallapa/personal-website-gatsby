@@ -68,7 +68,7 @@ exports.handler = async function(event, context) {
         }
     }
     // console.log(event)
-    const { type, server_guild_id, data, token } = JSON.parse(event.body);
+    const { type, guild_id, data, token } = JSON.parse(event.body);
     if (type === InteractionType.PING) {
         return {
             statusCode: 200,
@@ -76,11 +76,11 @@ exports.handler = async function(event, context) {
           };
     }
     if (type === InteractionType.APPLICATION_COMMAND) {
-        const { guild_id, name, resolved, options} = data;
+        const {name, resolved, options} = data;
         // is this right guild_id
         if (name === "import_league") {
             console.log(guild_id);
-            console.log(server_guild_id);
+
             // let teamsData, schedulesData;
             const attachmentValue = options[0].value;
             const attachmentValue2 = options[1].value
@@ -90,7 +90,7 @@ exports.handler = async function(event, context) {
             const res = await fetch("https://nallapareddy.com/.netlify/functions/upload-background", {
                 method: 'POST',
                 body: JSON.stringify({
-                    guildId: server_guild_id,
+                    guild_id: guild_id,
                     schedulesUrl: schedulesUrl, 
                     teamsUrl: teamsUrl,
                     messageToken: token
