@@ -79,7 +79,8 @@ exports.handler = async function(event, context) {
         const { guild_id, name, resolved, options} = data;
         // is this right guild_id
         if (name === "import_league") {
-            console.log(event);
+            console.log(guild_id);
+            console.log(server_guild_id);
             // let teamsData, schedulesData;
             const attachmentValue = options[0].value;
             const attachmentValue2 = options[1].value
@@ -89,7 +90,7 @@ exports.handler = async function(event, context) {
             const res = await fetch("https://nallapareddy.com/.netlify/functions/upload-background", {
                 method: 'POST',
                 body: JSON.stringify({
-                    guild_id: server_guild_id,
+                    guildId: server_guild_id,
                     schedulesUrl: schedulesUrl, 
                     teamsUrl: teamsUrl,
                     messageToken: token
