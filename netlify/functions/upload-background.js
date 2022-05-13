@@ -91,6 +91,7 @@ exports.handler = async function (event) {
             teams: teams,
             schedules: schedulesData
         });
+
         const res = await DiscordRequest(`webhooks/${process.env.APP_ID}/${messageToken}/messages/@original`, {
             method: 'PATCH',
             body: {
@@ -99,6 +100,7 @@ exports.handler = async function (event) {
         });
         console.log(res.ok);
     } catch (e) {
+        console.log(e);
         const res = await DiscordRequest(`webhooks/${process.env.APP_ID}/${messageToken}/messages/@original`, {
             method: 'PATCH',
             body: {
