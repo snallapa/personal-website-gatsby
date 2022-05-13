@@ -78,6 +78,7 @@ exports.handler = async function(event, context) {
     if (type === InteractionType.APPLICATION_COMMAND) {
         const { guild_id, name, resolved, options} = data;
         if (name === "import_league") {
+            console.log(event);
             // let teamsData, schedulesData;
             const attachmentValue = options[0].value;
             const attachmentValue2 = options[1].value
