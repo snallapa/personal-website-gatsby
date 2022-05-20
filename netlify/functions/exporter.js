@@ -37,7 +37,7 @@ exports.handler = async function(event, context) {
             await setDoc(doc(db, "leagues", league), {
                 guild_id: league,
                 teams: teams,
-            });
+            }, { merge: true });
             console.log(`teams written with id`)
             return {
                 statusCode: 200
@@ -62,7 +62,7 @@ exports.handler = async function(event, context) {
                 await setDoc(doc(db, "leagues", league), {
                     guild_id: league,
                     schedules: schedules,
-                });
+                }, { merge: true });
                 console.log(`schedule written with id`)
                 return {
                     statusCode: 200
