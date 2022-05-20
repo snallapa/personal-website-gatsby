@@ -21,47 +21,31 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 exports.handler = async function(event, context) {
-    console.log(event)
-    const path = event.path
-    const paths = path.split("/");
-    console.log(paths)
-    const apiType = paths[6]
-    const username = paths[3]
-    const league = paths[5]
-    if (apiType == "leagueteams") {
-        // const { leagueTeamInfoList: teams } = JSON.parse(event.body)
+    // console.log(event)
+    const league = event.queryStringParameters.league;
+    const apiType = event.queryStringParameters.apiType;
+    const paths = apiType.split("/");
+    const currentPath = paths[paths.length - 1];
+
+    if (currentPath == "leagueteams") {
+        const { leagueTeamInfoList: teamsData } = JSON.parse(event.body)
+        let teams = {}
+        Object.keys(teamsData).map((teamId) => {
+            teams[teamId] = {teamName: teamsData[teamId].displayName, abbr: teamsData[teamId].abbrName}
+        })
+        console.log(teams);
         try {
             
-            await setDoc(doc(db, "leagues", username), {
-                username: username,
-                league: league,
-                // teams: teams
+            await setDoc(doc(db, "leagues", league), {
+                guild_id: guild_id,
+                teams: teams,
             });
-
             console.log(`doc written with id`)
             return {
                 statusCode: 200
             }
         } catch (e) {
             console.error('error adding document', e)
-            return {
-                statusCode: 200
-            }
-        }
-    }
-    if (apiType == "standings") {
-        const {teamStandingInfoList: standings} = JSON.parse(event.body)
-        try {
-            await setDoc(doc(db, "leagues", username), {
-                standings: standings
-            }, { merge: true });
-
-            console.log(`doc written with id ${docRef.id}`)
-            return {
-                statusCode: 200
-            }
-        } catch (e) {
-            console.error('error adding document')
             return {
                 statusCode: 200
             }
