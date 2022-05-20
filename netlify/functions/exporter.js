@@ -25,20 +25,17 @@ exports.handler = async function(event, context) {
     const league = event.queryStringParameters.league;
     const apiType = event.queryStringParameters.apiType;
     const paths = apiType.split("/");
-    const currentPath = paths[paths.length - 1];
+    // 0: empty, 1: console, 2: leagueId, 3: apiType, 4 onwards specific apis
+    const currentPath = paths[3];
     console.log(paths);
     if (currentPath == "leagueteams") {
         const { leagueTeamInfoList: teamsData } = JSON.parse(event.body)
-        console.log(teamsData);
         let teams = {}
-        Object.keys(teamsData).map((teamId) => {
-            teams[teamId] = {teamName: teamsData[teamId].displayName, abbr: teamsData[teamId].abbrName}
-        })
-        console.log(teams);
+        teamsData.foreach(t => teams[t.teamId] = {teamName: t.displayName, abbr: t.abbrName, username: t.userName});
         try {
             
             await setDoc(doc(db, "leagues", league), {
-                guild_id: guild_id,
+                guild_id: league,
                 teams: teams,
             });
             console.log(`doc written with id`)
@@ -50,6 +47,15 @@ exports.handler = async function(event, context) {
             return {
                 statusCode: 200
             }
+        }
+    }
+    if (currentPath == "week") {
+        const weekType = paths[4];
+        const weekNum = paths[5];
+        const weekStat = paths[6];
+        if (weekStat === "schedules") {
+            const { gameScheduleInfoList: schedules } = JSON.parse(body);
+            console.log(schedules);
         }
     }
     return {
