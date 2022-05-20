@@ -54,7 +54,7 @@ exports.handler = async function(event, context) {
         const weekNum = paths[5];
         const weekStat = paths[6];
         if (weekStat === "schedules") {
-            const { gameScheduleInfoList: schedules } = JSON.parse(body);
+            const { gameScheduleInfoList: schedules } = JSON.parse(event.body);
             console.log(schedules);
         }
     }
