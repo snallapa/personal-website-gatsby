@@ -85,7 +85,7 @@ exports.handler = async function(event, context) {
                 body: JSON.stringify({
                     type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
                     data: {
-                      content: `Use this Url to export your league to: https://nallapareddy.com/.netlify/functions/exporter?league=${guild_id}&apiType=`
+                      content: `Use this Url to export your league to: http://nallapareddy.com/.netlify/functions/exporter?league=${guild_id}&apiType=`
                     }
                 })
               };
