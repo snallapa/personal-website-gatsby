@@ -78,7 +78,18 @@ exports.handler = async function(event, context) {
     if (type === InteractionType.APPLICATION_COMMAND) {
         const {name, resolved, options} = data;
         // is this right guild_id
-        if (name === "import_league") {
+        if (name === "league_export") {
+            return {
+                statusCode: 200,
+                headers: { 'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+                    data: {
+                      content: `Use this Url to export your league to: https://nallapareddy.com/.netlify/functions/exporter?league=${guild_id}&apiType=`
+                    }
+                })
+              };
+        } else if (name === "import_league") { // not recommended anymore
             console.log(guild_id);
 
             // let teamsData, schedulesData;

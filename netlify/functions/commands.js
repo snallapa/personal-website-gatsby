@@ -26,6 +26,12 @@ const MADDEN_LEAGUE_COMMAND = {
     type: 1
 };
 
+const MADDEN_EXPORTER_COMMAND = {
+    name: 'league_export',
+    description: 'retrieve the Madden Companion App exporter url',
+    type: 1
+};
+
 const MADDEN_CHANNELS_CREATE_COMMAND = {
     name: 'create_game_channels',
     description: 'Create game channels for the current week',
@@ -62,7 +68,7 @@ const MADDEN_CHANNELS_CLEAR_COMMAND = {
     type: 1,
 };
 
-const COMMANDS = [TEST_COMMAND, MADDEN_LEAGUE_COMMAND, MADDEN_CHANNELS_CREATE_COMMAND, MADDEN_CHANNELS_CLEAR_COMMAND]
+const COMMANDS = [TEST_COMMAND, MADDEN_LEAGUE_COMMAND, MADDEN_CHANNELS_CREATE_COMMAND, MADDEN_CHANNELS_CLEAR_COMMAND, MADDEN_EXPORTER_COMMAND]
 
 async function DiscordRequest(endpoint, options) {
     // append endpoint to root API URL
