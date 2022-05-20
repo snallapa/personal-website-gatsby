@@ -26,9 +26,10 @@ exports.handler = async function(event, context) {
     const apiType = event.queryStringParameters.apiType;
     const paths = apiType.split("/");
     const currentPath = paths[paths.length - 1];
-
+    console.log(paths);
     if (currentPath == "leagueteams") {
         const { leagueTeamInfoList: teamsData } = JSON.parse(event.body)
+        console.log(teamsData);
         let teams = {}
         Object.keys(teamsData).map((teamId) => {
             teams[teamId] = {teamName: teamsData[teamId].displayName, abbr: teamsData[teamId].abbrName}
