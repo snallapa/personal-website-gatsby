@@ -38,7 +38,7 @@ exports.handler = async function(event, context) {
                 guild_id: league,
                 teams: teams,
             });
-            console.log(`doc written with id`)
+            console.log(`teams written with id`)
             return {
                 statusCode: 200
             }
@@ -54,8 +54,25 @@ exports.handler = async function(event, context) {
         const weekNum = paths[5];
         const weekStat = paths[6];
         if (weekStat === "schedules") {
-            const { gameScheduleInfoList: schedules } = JSON.parse(event.body);
-            console.log(schedules);
+            const { gameScheduleInfoList: schedulesRaw } = JSON.parse(event.body);
+            const schedules = {};
+            schedules[weekType] = {};
+            schedules[weekType][`week${weekNum}`] = schedulesRaw.map(game => ({awayTeamId: game.awayTeamId, homeTeamId: game.homeTeamId, awayScore: game.awayScore, homeScore: game.homeScore}))
+            try {
+                await setDoc(doc(db, "leagues", league), {
+                    guild_id: league,
+                    schedules: schedules,
+                });
+                console.log(`schedule written with id`)
+                return {
+                    statusCode: 200
+                }
+            } catch (e) {
+                console.error('error adding document', e)
+                return {
+                    statusCode: 200
+                }
+            }
         }
     }
     return {
