@@ -23,9 +23,14 @@ const db = getFirestore(app);
 exports.handler = async function(event, context) {
     // console.log(event)
     const league = event.queryStringParameters.league;
-    const apiType = event.queryStringParameters.apiType;
-    const paths = apiType.split("/");
+    const api = event.queryStringParameters.api;
+    const paths = api.split("/");
     // 0: empty, 1: console, 2: leagueId, 3: apiType, 4 onwards specific apis
+    if (paths.length < 4) {
+        return {
+            statusCode: 400
+        }
+    }
     const currentPath = paths[3];
     console.log(paths);
     if (currentPath == "leagueteams") {
