@@ -37,7 +37,7 @@ exports.handler = async function(event, context) {
         const { leagueTeamInfoList: teamsData } = JSON.parse(event.body)
         let teams = {}
         console.log(teamsData);
-        teamsData.forEach(t => teams[t.teamId] = {teamName: t.displayName, abbr: t.abbrName, username: t.userName, conference: t.conferenceName, division: t.divisionName});
+        teamsData.forEach(t => teams[t.teamId] = {teamName: t.displayName, abbr: t.abbrName, username: t.userName, division: t.divName, cityName: t.cityName});
         try {
             
             await setDoc(doc(db, "leagues", league), {
