@@ -274,99 +274,28 @@ exports.handler = async function(event, context) {
                       };
                 }
             }
-        }
-        else if (name === "create_game_channels") {
-            const week = options[0].value;
-            const category = options[1].value;
-
-            const docRef = doc(db, "leagues", guild_id);
-            const docSnap = await getDoc(docRef);
-            if (!docSnap.exists()) {
-                return {
-                    statusCode: 200,
-                    headers: { 'Content-Type': 'application/json'},
-                    body: JSON.stringify({
-                        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-                        data: {
-                          content: `no league found for ${guild_id}, try import_league first`
-                        }
-                    })
-                  }
-            }
-            const league = docSnap.data();
-
-            const weeksGames = league.schedules.reg[`week${week}`];
-            const teams = league.teams;
-            const channelPromises = weeksGames.map(game => {
-                return DiscordRequest(`guilds/${guild_id}/channels`, {
-                    method: 'POST',
-                    body: {
-                        type: 0,
-                        name: `${teams[game.awayTeamId].teamName}-vs-${teams[game.homeTeamId].teamName}`,
-                        parent_id: category
+        } else if (name === "create_game_channels") {
+            return {
+                statusCode: 200,
+                headers: { 'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+                    data: {
+                      content: 'this command has been changed. Use `/game_channels create` instead. See https://github.com/snallapa/snallabot for more information'
                     }
-                });
-            });
-            const responses = await Promise.all(channelPromises);
-            if (responses.every(r => r.ok)) {
-                return {
-                    statusCode: 200,
-                    headers: { 'Content-Type': 'application/json'},
-                    body: JSON.stringify({
-                        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-                        data: {
-                          content: `created!`
-                        }
-                    })
-                  };
-            } else {
-                return {
-                    statusCode: 200,
-                    headers: { 'Content-Type': 'application/json'},
-                    body: JSON.stringify({
-                        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-                        data: {
-                          content: `hmm something went wrong!`
-                        }
-                    })
-                  };
-            }
-
+                })
+              };
         } else if (name === "clear_game_channels") {
-            const category = options[0].value;
-            const res = await DiscordRequest(`guilds/${guild_id}/channels`, {
-                method: 'GET',
-            });
-            const channels = await res.json();
-            const gameChannelIds = channels.filter(c => {
-                // text channel, in right category, with `vs` in it
-                return c.type === 0 && c.parent_id && c.parent_id === category && c.name.includes("vs");
-                }).map(c => c.id);
-            const deletePromises = gameChannelIds.map(id => DiscordRequest(`/channels/${id}`, {method: 'DELETE'}));
-            const responses = await Promise.all(deletePromises);
-            if (responses.every(r => r.ok)) {
-                return {
-                    statusCode: 200,
-                    headers: { 'Content-Type': 'application/json'},
-                    body: JSON.stringify({
-                        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-                        data: {
-                          content: `done, all game channels were deleted!`
-                        }
-                    })
-                  };
-            } else {
-                return {
-                    statusCode: 200,
-                    headers: { 'Content-Type': 'application/json'},
-                    body: JSON.stringify({
-                        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-                        data: {
-                          content: `hmm something went wrong :(, not all of them were deleted`
-                        }
-                    })
-                  };
-            }
+            return {
+                statusCode: 200,
+                headers: { 'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+                    data: {
+                      content: 'this command has been changed. Use `/game_channels clear` instead. See https://github.com/snallapa/snallabot for more information'
+                    }
+                })
+              };
         } else if (name === "test") {
             console.log("test command received!")
             return {
