@@ -77,7 +77,7 @@ exports.handler = async function(event, context) {
     }
     if (type === InteractionType.APPLICATION_COMMAND) {
         const {name, resolved, options} = data;
-        // is this right guild_id
+
         if (name === "league_export") {
             return {
                 statusCode: 200,
@@ -118,7 +118,10 @@ exports.handler = async function(event, context) {
                 })
               };
 
-        } else if (name === "create_game_channels") {
+        } else if (name === "game_channels") {
+            console.log(event);
+        }
+        else if (name === "create_game_channels") {
             const week = options[0].value;
             const category = options[1].value;
 
