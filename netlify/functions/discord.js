@@ -123,7 +123,7 @@ exports.handler = async function(event, context) {
             const subcommand = command.name;
             if (subcommand === "configure") {
                 const category = command.options[0].value
-                await setDoc(doc(db, "leagues", league), {
+                await setDoc(doc(db, "leagues", guild_id), {
                     commands: {
                         game_channels: {
                             category: category
