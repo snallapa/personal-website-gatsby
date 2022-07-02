@@ -119,7 +119,161 @@ exports.handler = async function(event, context) {
               };
 
         } else if (name === "game_channels") {
-            console.log(event);
+            const command = options[0];
+            const subcommand = command.name;
+            if (subcommand === "configure") {
+                const category = command.options[0].value
+                await setDoc(doc(db, "leagues", league), {
+                    commands: {
+                        game_channels: {
+                            category: category
+                        }
+                    }
+                }, { merge: true });
+                console.log(`configured game channel category`)
+                return {
+                    statusCode: 200,
+                    headers: { 'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+                        data: {
+                          content: `configured! game channels command is ready for use`
+                        }
+                    })
+                  };
+            } else if (subcommand === "create") {
+                const week = command.options[0].value;
+                const docRef = doc(db, "leagues", guild_id);
+                const docSnap = await getDoc(docRef);
+                if (!docSnap.exists()) {
+                    return {
+                        statusCode: 200,
+                        headers: { 'Content-Type': 'application/json'},
+                        body: JSON.stringify({
+                            type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+                            data: {
+                              content: `no league found for ${guild_id}, try import_league first`
+                            }
+                        })
+                      }
+                }
+                const league = docSnap.data();
+                let category;
+                try {
+                    category = league.commands.game_channels.category
+                } catch (error) {
+                    return {
+                        statusCode: 200,
+                        headers: { 'Content-Type': 'application/json'},
+                        body: JSON.stringify({
+                            type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+                            data: {
+                              content: 'missing configuration, run `/game_channels configure` first'
+                            }
+                        })
+                      };
+                }
+                const weeksGames = league.schedules.reg[`week${week}`];
+                const teams = league.teams;
+                const channelPromises = weeksGames.map(game => {
+                    return DiscordRequest(`guilds/${guild_id}/channels`, {
+                        method: 'POST',
+                        body: {
+                            type: 0,
+                            name: `${teams[game.awayTeamId].teamName}-vs-${teams[game.homeTeamId].teamName}`,
+                            parent_id: category
+                        }
+                    });
+                });
+                const responses = await Promise.all(channelPromises);
+                if (responses.every(r => r.ok)) {
+                    return {
+                        statusCode: 200,
+                        headers: { 'Content-Type': 'application/json'},
+                        body: JSON.stringify({
+                            type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+                            data: {
+                              content: `created!`
+                            }
+                        })
+                      };
+                } else {
+                    return {
+                        statusCode: 200,
+                        headers: { 'Content-Type': 'application/json'},
+                        body: JSON.stringify({
+                            type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+                            data: {
+                              content: `hmm something went wrong!`
+                            }
+                        })
+                      };
+                }
+            } else if (subcommand === "clear") {
+                const docRef = doc(db, "leagues", guild_id);
+                const docSnap = await getDoc(docRef);
+                if (!docSnap.exists()) {
+                    return {
+                        statusCode: 200,
+                        headers: { 'Content-Type': 'application/json'},
+                        body: JSON.stringify({
+                            type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+                            data: {
+                              content: `no league found for ${guild_id}, try import_league first`
+                            }
+                        })
+                      }
+                }
+                const league = docSnap.data();
+                let category;
+                try {
+                    category = league.commands.game_channels.category
+                } catch (error) {
+                    return {
+                        statusCode: 200,
+                        headers: { 'Content-Type': 'application/json'},
+                        body: JSON.stringify({
+                            type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+                            data: {
+                              content: 'missing configuration, run `/game_channels configure` first'
+                            }
+                        })
+                      };
+                }
+                const res = await DiscordRequest(`guilds/${guild_id}/channels`, {
+                    method: 'GET',
+                });
+                const channels = await res.json();
+                const gameChannelIds = channels.filter(c => {
+                    // text channel, in right category, with `vs` in it
+                    return c.type === 0 && c.parent_id && c.parent_id === category && c.name.includes("vs");
+                    }).map(c => c.id);
+                const deletePromises = gameChannelIds.map(id => DiscordRequest(`/channels/${id}`, {method: 'DELETE'}));
+                const responses = await Promise.all(deletePromises);
+                if (responses.every(r => r.ok)) {
+                    return {
+                        statusCode: 200,
+                        headers: { 'Content-Type': 'application/json'},
+                        body: JSON.stringify({
+                            type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+                            data: {
+                              content: `done, all game channels were deleted!`
+                            }
+                        })
+                      };
+                } else {
+                    return {
+                        statusCode: 200,
+                        headers: { 'Content-Type': 'application/json'},
+                        body: JSON.stringify({
+                            type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+                            data: {
+                              content: `hmm something went wrong :(, not all of them were deleted`
+                            }
+                        })
+                      };
+                }
+            }
         }
         else if (name === "create_game_channels") {
             const week = options[0].value;
