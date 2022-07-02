@@ -36,7 +36,6 @@ exports.handler = async function(event, context) {
     if (currentPath == "leagueteams") {
         const { leagueTeamInfoList: teamsData } = JSON.parse(event.body)
         let teams = {}
-        console.log(teamsData);
         teamsData.forEach(t => teams[t.teamId] = {teamName: t.displayName, abbr: t.abbrName, username: t.userName, division: t.divName, cityName: t.cityName});
         try {
             
