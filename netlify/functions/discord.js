@@ -42,7 +42,6 @@ async function DiscordRequest(endpoint, options) {
     const url = 'https://discord.com/api/v9/' + endpoint;
     // Stringify payloads
     if (options.body) options.body = JSON.stringify(options.body);
-    console.log(options);
     // Use node-fetch to make requests
     const res = await fetch(url, {
         headers: {
@@ -323,6 +322,7 @@ exports.handler = async function(event, context) {
                     await setDoc(doc(db, "leagues", guild_id), league, { merge: true });
                     return respond("team assigned!");
                 } catch (e) {
+                    console.log(e);
                     return respond("could not assign team :(")
                 }
             } else if (subcommand === "open") {
@@ -343,6 +343,7 @@ exports.handler = async function(event, context) {
                 }
                 league.teams[teamKey].discordUser = "";
                 try {
+                    const content = createTeamsMessage(league.teams);
                     if (league.commands.teams.message) {
                         const messageId = league.commands.teams.message;
                         const channelId = league.commands.teams.channel;
@@ -371,6 +372,7 @@ exports.handler = async function(event, context) {
                     await setDoc(doc(db, "leagues", guild_id), league, { merge: true });
                     return respond("team freed!");
                 } catch (e) {
+                    console.log(e);
                     return respond("could not free team :(")
                 }
             }
