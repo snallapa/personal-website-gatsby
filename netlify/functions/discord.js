@@ -107,6 +107,7 @@ function formatWithDivision(teams) {
             return m;
         }, message)
     }, "")
+    message = message + "\n";
     message = message + `OPEN TEAMS: ${openTeams.map(t => t.teamName).join(", ")}`
     return message;
 }
@@ -125,6 +126,7 @@ function formatNormal(teams) {
         }
         return message + `${team}: ${dUser ? "<@" + dUser + ">" : "OPEN"}\n`;
     }, "");
+    message = message + "\n";
     message = message + `OPEN TEAMS: ${openTeams.map(t => t.teamName).join(", ")}`
     return message;
 }
