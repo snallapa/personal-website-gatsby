@@ -61,6 +61,19 @@ async function DiscordRequest(endpoint, options) {
     return res;
 }
 
+function respond(message) {
+    return {
+        statusCode: 200,
+        headers: { 'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+            data: {
+                content: message
+            }
+        }),
+      };
+}
+
 exports.handler = async function(event, context) {
     if (!verifier(event)) {
         return {
@@ -79,16 +92,7 @@ exports.handler = async function(event, context) {
         const {name, resolved, options} = data;
 
         if (name === "league_export") {
-            return {
-                statusCode: 200,
-                headers: { 'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-                    data: {
-                      content: `Use this Url to export your league to: http://nallapareddy.com/.netlify/functions/exporter?league=${guild_id}&api=`
-                    }
-                })
-              };
+            return respond(`Use this Url to export your league to: http://nallapareddy.com/.netlify/functions/exporter?league=${guild_id}&api=`);
         } else if (name === "import_league") { // not recommended anymore
             console.log(guild_id);
 

@@ -141,6 +141,60 @@ const MADDEN_CHANNELS_COMMANDS = {
     type: 1,
 };
 
+
+const MADDEN_TEAMS_COMMANDS = {
+    name: 'teams',
+    description: 'teams: assign, free, configure',
+    options: [{
+        type: 1, // sub command
+        name: 'assign',
+        description: 'assign a user to a team',
+        options: [
+            {
+                type: 3, // string
+                name: 'team',
+                description: 'the team city, name, or abbreviation. Ex: Buccaneers, TB, Tampa Bay',
+                required: true
+            },
+            {
+                type: 6, // string
+                name: 'user',
+                description: 'user',
+                required: true
+            }
+        ]
+    },
+    {
+        type: 1, // sub command
+        name: 'open',
+        description: 'open a team',
+        options: [
+            {
+                type: 3, // string
+                name: 'team',
+                description: 'the team city, name, or abbreviation. Ex: Buccaneers, TB, Tampa Bay',
+                required: true
+            }
+        ]
+    },
+    {
+        type: 1, // sub command
+        name: 'configure',
+        description: 'set channel',
+        options: [
+            {
+                type: 7, // channel
+                name: 'channel',
+                description: 'channel to send message in',
+                required: true,
+                channel_types: [0]
+            }
+        ]
+    }
+    ],
+    type: 1,
+};
+
 const COMMANDS = [TEST_COMMAND,
     MADDEN_LEAGUE_COMMAND,
     MADDEN_EXPORTER_COMMAND,
