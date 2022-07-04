@@ -74,6 +74,16 @@ function respond(message, statusCode = 200, interactionType = InteractionRespons
       };
 }
 
+function findTeam(teams, search_phrase) {
+    for (let key in teams) {
+        const currentTeam = teams[key];
+        if (currentTeam.abbr === search_phrase || currentTeam.cityName === search_phrase || currentTeam.teamName === search_phrase) {
+            return key;
+        }
+    }
+    throw "could not find team";
+}
+
 exports.handler = async function(event, context) {
     if (!verifier(event)) {
         return {
@@ -211,10 +221,51 @@ exports.handler = async function(event, context) {
                 return respond("configured! teams command is ready for use");
             } else if (subcommand === "assign") {
                 const team = command.options[0].value;
-                console.log(command);
-                return respond("still working");
+                const user = command.options[1].value;
+
+                const docRef = doc(db, "leagues", guild_id);
+                const docSnap = await getDoc(docRef);
+                if (!docSnap.exists()) {
+                    return respond(`no league found for ${guild_id}, export in MCA using league_export first`);
+                }
+                const league = docSnap.data();
+                const teams = league.teams;
+                let teamKey;
+                try {
+                    teamKey = findTeam(teams, team);
+                } catch (e) {
+                    return respond(`could not find the team ${team}! try using abbreviation, full name, or city name`);
+                }
+                league.teams[teamKey].discordUser = user;
+                try {
+                    await setDoc(doc(db, "leagues", guild_id), league, { merge: true });
+                    return respond("team assigned!");
+                } catch (e) {
+                    return respond("could not assign team :(")
+                }
             } else if (subcommand === "open") {
-                return respond("still working");
+                const team = command.options[0].value;
+
+                const docRef = doc(db, "leagues", guild_id);
+                const docSnap = await getDoc(docRef);
+                if (!docSnap.exists()) {
+                    return respond(`no league found for ${guild_id}, export in MCA using league_export first`);
+                }
+                const league = docSnap.data();
+                const teams = league.teams;
+                let teamKey;
+                try {
+                    teamKey = findTeam(teams, team);
+                } catch (e) {
+                    return respond(`could not find the team ${team}! try using abbreviation, full name, or city name`);
+                }
+                league.teams[teamKey].discordUser = "";
+                try {
+                    await setDoc(doc(db, "leagues", guild_id), league, { merge: true });
+                    return respond("team freed!");
+                } catch (e) {
+                    return respond("could not free team :(")
+                }
             }
         } else if (name === "create_game_channels") {
             return respond("this command has been changed. Use `/game_channels create` instead. See https://github.com/snallapa/snallabot for more information");
