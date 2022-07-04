@@ -196,6 +196,26 @@ exports.handler = async function(event, context) {
                     return respond("hmm something went wrong :(, not all of them were deleted");
                 }
             }
+        } else if (name === "teams") {
+            const command = options[0];
+            const subcommand = command.name;
+            if (subcommand === "configure") {
+                const channel = command.options[0].value
+                await setDoc(doc(db, "leagues", guild_id), {
+                    commands: {
+                        teams: {
+                            channel: channel
+                        }
+                    }
+                }, { merge: true });
+                return respond("configured! teams command is ready for use");
+            } else if (subcommand === "assign") {
+                const team = command.options[0].value;
+                console.log(command);
+                return respond("still working");
+            } else if (subcommand === "open") {
+                return respond("still working");
+            }
         } else if (name === "create_game_channels") {
             return respond("this command has been changed. Use `/game_channels create` instead. See https://github.com/snallapa/snallabot for more information");
         } else if (name === "clear_game_channels") {
