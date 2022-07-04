@@ -61,12 +61,12 @@ async function DiscordRequest(endpoint, options) {
     return res;
 }
 
-function respond(message) {
+function respond(message, statusCode = 200, interactionType = InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE) {
     return {
-        statusCode: 200,
+        statusCode: statusCode,
         headers: { 'Content-Type': 'application/json'},
         body: JSON.stringify({
-            type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+            type: interactionType,
             data: {
                 content: message
             }
@@ -134,48 +134,20 @@ exports.handler = async function(event, context) {
                         }
                     }
                 }, { merge: true });
-                console.log(`configured game channel category`)
-                return {
-                    statusCode: 200,
-                    headers: { 'Content-Type': 'application/json'},
-                    body: JSON.stringify({
-                        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-                        data: {
-                          content: `configured! game channels command is ready for use`
-                        }
-                    })
-                  };
+                return respond("configured! game channels command is ready for use");
             } else if (subcommand === "create") {
                 const week = command.options[0].value;
                 const docRef = doc(db, "leagues", guild_id);
                 const docSnap = await getDoc(docRef);
                 if (!docSnap.exists()) {
-                    return {
-                        statusCode: 200,
-                        headers: { 'Content-Type': 'application/json'},
-                        body: JSON.stringify({
-                            type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-                            data: {
-                              content: `no league found for ${guild_id}, try import_league first`
-                            }
-                        })
-                      }
+                    return respond(`no league found for ${guild_id}, export in MCA using league_export first`);
                 }
                 const league = docSnap.data();
                 let category;
                 try {
                     category = league.commands.game_channels.category
                 } catch (error) {
-                    return {
-                        statusCode: 200,
-                        headers: { 'Content-Type': 'application/json'},
-                        body: JSON.stringify({
-                            type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-                            data: {
-                              content: 'missing configuration, run `/game_channels configure` first'
-                            }
-                        })
-                      };
+                    return respond('missing configuration, run `/game_channels configure` first');
                 }
                 const weeksGames = league.schedules.reg[`week${week}`];
                 const teams = league.teams;
@@ -191,58 +163,22 @@ exports.handler = async function(event, context) {
                 });
                 const responses = await Promise.all(channelPromises);
                 if (responses.every(r => r.ok)) {
-                    return {
-                        statusCode: 200,
-                        headers: { 'Content-Type': 'application/json'},
-                        body: JSON.stringify({
-                            type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-                            data: {
-                              content: `created!`
-                            }
-                        })
-                      };
+                    return respond("created!");
                 } else {
-                    return {
-                        statusCode: 200,
-                        headers: { 'Content-Type': 'application/json'},
-                        body: JSON.stringify({
-                            type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-                            data: {
-                              content: `hmm something went wrong!`
-                            }
-                        })
-                      };
+                    return respond("something went wrong... maybe try again or contact owner");
                 }
             } else if (subcommand === "clear") {
                 const docRef = doc(db, "leagues", guild_id);
                 const docSnap = await getDoc(docRef);
                 if (!docSnap.exists()) {
-                    return {
-                        statusCode: 200,
-                        headers: { 'Content-Type': 'application/json'},
-                        body: JSON.stringify({
-                            type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-                            data: {
-                              content: `no league found for ${guild_id}, try import_league first`
-                            }
-                        })
-                      }
+                    return respond(`no league found for ${guild_id}, export in MCA using league_export first`);
                 }
                 const league = docSnap.data();
                 let category;
                 try {
                     category = league.commands.game_channels.category
                 } catch (error) {
-                    return {
-                        statusCode: 200,
-                        headers: { 'Content-Type': 'application/json'},
-                        body: JSON.stringify({
-                            type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-                            data: {
-                              content: 'missing configuration, run `/game_channels configure` first'
-                            }
-                        })
-                      };
+                    return respond('missing configuration, run `/game_channels configure` first');
                 }
                 const res = await DiscordRequest(`guilds/${guild_id}/channels`, {
                     method: 'GET',
@@ -255,67 +191,19 @@ exports.handler = async function(event, context) {
                 const deletePromises = gameChannelIds.map(id => DiscordRequest(`/channels/${id}`, {method: 'DELETE'}));
                 const responses = await Promise.all(deletePromises);
                 if (responses.every(r => r.ok)) {
-                    return {
-                        statusCode: 200,
-                        headers: { 'Content-Type': 'application/json'},
-                        body: JSON.stringify({
-                            type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-                            data: {
-                              content: `done, all game channels were deleted!`
-                            }
-                        })
-                      };
+                    return respond("done, all game channels were deleted!");
                 } else {
-                    return {
-                        statusCode: 200,
-                        headers: { 'Content-Type': 'application/json'},
-                        body: JSON.stringify({
-                            type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-                            data: {
-                              content: `hmm something went wrong :(, not all of them were deleted`
-                            }
-                        })
-                      };
+                    return respond("hmm something went wrong :(, not all of them were deleted");
                 }
             }
         } else if (name === "create_game_channels") {
-            return {
-                statusCode: 200,
-                headers: { 'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-                    data: {
-                      content: 'this command has been changed. Use `/game_channels create` instead. See https://github.com/snallapa/snallabot for more information'
-                    }
-                })
-              };
+            return respond("this command has been changed. Use `/game_channels create` instead. See https://github.com/snallapa/snallabot for more information");
         } else if (name === "clear_game_channels") {
-            return {
-                statusCode: 200,
-                headers: { 'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-                    data: {
-                      content: 'this command has been changed. Use `/game_channels clear` instead. See https://github.com/snallapa/snallabot for more information'
-                    }
-                })
-              };
+            return respond("this command has been changed. Use `/game_channels clear` instead. See https://github.com/snallapa/snallabot for more information");
         } else if (name === "test") {
             console.log("test command received!")
-            return {
-                statusCode: 200,
-                headers: { 'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-                    data: {
-                      content: 'bot is working!'
-                    }
-                })
-              };
+            return respond("bot is working!");
         }
     }
-    return {
-        statusCode: 400,
-        body: JSON.stringify({ type: "we should not have gotten here" }),
-      };
+    return respond("we should not have gotten here...", 400);
 }
