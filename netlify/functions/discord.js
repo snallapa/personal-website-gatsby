@@ -85,6 +85,89 @@ function findTeam(teams, search_phrase) {
     throw "could not find team";
 }
 
+function formatWithDivision(teams) {
+    const divisions = {}
+    for (let key in teams) {
+        const currentTeam = teams[key];
+        const currentDivision = currentTeam.division;
+        if (divisions.hasOwnProperty(currentDivision)) {
+            divisions[currentDivision].push(currentTeam);
+        } else {
+            divisions[currentDivision] = [currentTeam]
+        }
+    }
+    const openTeams = []
+    let message = Object.keys(divisions).sort().reduce((message, division) => {
+        message = message + `__**${division}**__\n`;
+        const teams = divisions[division];
+        return teams.reduce((m, t) => {
+            m = m + `${t.teamName}: ${t.discordUser ? "<@" + t.discordUser + ">" : "OPEN"}\n`;
+            if (!t.discordUser) {
+                openTeams.push(t);
+            }
+            return m;
+        }, message)
+    }, "")
+    message = message + `OPEN TEAMS: ${openTeams.map(t => t.teamName).join(", ")}`
+    return message;
+}
+
+function formatNormal(teams) {
+    const messageTeams = {}
+    for (let key in teams) {
+        const currentTeam = teams[key];
+        messageTeams[currentTeam.teamName] = currentTeam.discordUser;
+    }
+    const openTeams = []
+    let message = Object.keys(messageTeams).sort().reduce((message, team) => {
+        const dUser = messageTeams[team];
+        if (!dUser) {
+            openTeams.push(team);
+        }
+        return message + `${team}: ${dUser ? "<@" + dUser + ">" : "OPEN"}\n`;
+    }, "");
+    message = message + `OPEN TEAMS: ${openTeams.map(t => t.teamName).join(", ")}`
+    return message;
+}
+
+function createTeamsMessage(teams) {
+    const k = Object.keys(teams)[0];
+    if (teams[k].hasOwnProperty("division")) {
+        return formatWithDivision(teams);
+    } else {
+        return formatNormal(teams);
+    }
+}
+
+function sendTeamsMessage(league) {
+    const content = createTeamsMessage(league.teams);
+    if (league.commands.teams.message) {
+        const messageId = league.commands.teams.message;
+        const channelId = league.commands.teams.channel;
+        const res = await DiscordRequest(`channels/${channelId}/messages/${messageId}`, {
+            method: 'PATCH',
+            body: {
+                content: content,
+                allowed_mentions: {
+                    parse: []
+                }
+            }
+        });
+        const data = await res.json()
+        return data.id;
+    } else {
+        const channelId = league.commands.teams.channel;
+        const res = await DiscordRequest(`channels/${channelId}/messages`, {
+            method: 'POST',
+            body: {
+                content: content
+            }
+        });
+        const data = await res.json();
+        return data.id;
+    }
+}
+
 exports.handler = async function(event, context) {
     if (!verifier(event)) {
         return {
@@ -239,6 +322,9 @@ exports.handler = async function(event, context) {
                 }
                 league.teams[teamKey].discordUser = user;
                 try {
+                    // await setDoc(doc(db, "leagues", guild_id), league, { merge: true });
+                    const messageId = sendTeamsMessage(league);
+                    league.commands.teams.message = messageId;
                     await setDoc(doc(db, "leagues", guild_id), league, { merge: true });
                     return respond("team assigned!");
                 } catch (e) {
@@ -262,6 +348,8 @@ exports.handler = async function(event, context) {
                 }
                 league.teams[teamKey].discordUser = "";
                 try {
+                    const messageId = sendTeamsMessage(league);
+                    league.commands.teams.message = messageId;
                     await setDoc(doc(db, "leagues", guild_id), league, { merge: true });
                     return respond("team freed!");
                 } catch (e) {
