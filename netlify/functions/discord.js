@@ -75,9 +75,10 @@ function respond(message, statusCode = 200, interactionType = InteractionRespons
 }
 
 function findTeam(teams, search_phrase) {
+    const term = search_phrase.toLowerCase();
     for (let key in teams) {
         const currentTeam = teams[key];
-        if (currentTeam.abbr === search_phrase || currentTeam.cityName === search_phrase || currentTeam.teamName === search_phrase) {
+        if (currentTeam.abbr.toLowerCase() === term || currentTeam.cityName.toLowerCase() === term || currentTeam.teamName.toLowerCase() === term) {
             return key;
         }
     }
