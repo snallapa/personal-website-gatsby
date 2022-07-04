@@ -139,35 +139,6 @@ function createTeamsMessage(teams) {
     }
 }
 
-function sendTeamsMessage(league) {
-    const content = createTeamsMessage(league.teams);
-    if (league.commands.teams.message) {
-        const messageId = league.commands.teams.message;
-        const channelId = league.commands.teams.channel;
-        const res = await DiscordRequest(`channels/${channelId}/messages/${messageId}`, {
-            method: 'PATCH',
-            body: {
-                content: content,
-                allowed_mentions: {
-                    parse: []
-                }
-            }
-        });
-        const data = await res.json()
-        return data.id;
-    } else {
-        const channelId = league.commands.teams.channel;
-        const res = await DiscordRequest(`channels/${channelId}/messages`, {
-            method: 'POST',
-            body: {
-                content: content
-            }
-        });
-        const data = await res.json();
-        return data.id;
-    }
-}
-
 exports.handler = async function(event, context) {
     if (!verifier(event)) {
         return {
@@ -323,8 +294,32 @@ exports.handler = async function(event, context) {
                 league.teams[teamKey].discordUser = user;
                 try {
                     // await setDoc(doc(db, "leagues", guild_id), league, { merge: true });
-                    const messageId = sendTeamsMessage(league);
-                    league.commands.teams.message = messageId;
+                    const content = createTeamsMessage(league.teams);
+                    if (league.commands.teams.message) {
+                        const messageId = league.commands.teams.message;
+                        const channelId = league.commands.teams.channel;
+                        const res = await DiscordRequest(`channels/${channelId}/messages/${messageId}`, {
+                            method: 'PATCH',
+                            body: {
+                                content: content,
+                                allowed_mentions: {
+                                    parse: []
+                                }
+                            }
+                        });
+                        const data = await res.json()
+                        league.commands.teams.message = data.id;
+                    } else {
+                        const channelId = league.commands.teams.channel;
+                        const res = await DiscordRequest(`channels/${channelId}/messages`, {
+                            method: 'POST',
+                            body: {
+                                content: content
+                            }
+                        });
+                        const data = await res.json();
+                        league.commands.teams.message = data.id;
+                    }
                     await setDoc(doc(db, "leagues", guild_id), league, { merge: true });
                     return respond("team assigned!");
                 } catch (e) {
@@ -348,8 +343,31 @@ exports.handler = async function(event, context) {
                 }
                 league.teams[teamKey].discordUser = "";
                 try {
-                    const messageId = sendTeamsMessage(league);
-                    league.commands.teams.message = messageId;
+                    if (league.commands.teams.message) {
+                        const messageId = league.commands.teams.message;
+                        const channelId = league.commands.teams.channel;
+                        const res = await DiscordRequest(`channels/${channelId}/messages/${messageId}`, {
+                            method: 'PATCH',
+                            body: {
+                                content: content,
+                                allowed_mentions: {
+                                    parse: []
+                                }
+                            }
+                        });
+                        const data = await res.json()
+                        league.commands.teams.message = data.id;
+                    } else {
+                        const channelId = league.commands.teams.channel;
+                        const res = await DiscordRequest(`channels/${channelId}/messages`, {
+                            method: 'POST',
+                            body: {
+                                content: content
+                            }
+                        });
+                        const data = await res.json();
+                        league.commands.teams.message = data.id;
+                    }
                     await setDoc(doc(db, "leagues", guild_id), league, { merge: true });
                     return respond("team freed!");
                 } catch (e) {
