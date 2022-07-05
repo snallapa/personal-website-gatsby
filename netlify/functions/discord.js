@@ -288,7 +288,7 @@ exports.handler = async function(event, context) {
                     return c.type === 0 && c.parent_id && c.parent_id === category && c.name.includes("vs");
                     }).map(c => {
                         const channelId = c.id;
-                        const channelTeams = c.name.split("-vs-");
+                        const channelTeams = c.name.split("-vs-").map(t => t.replace("-", " "));
                         const user1 = findTeam(league.teams, channelTeams[0]).discordUser;
                         const user2 = findTeam(league.teams, channelTeams[1]).discordUser;
                         const content = `<@${user1}> <@${user2}>`
