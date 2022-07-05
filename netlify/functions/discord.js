@@ -81,7 +81,7 @@ function findTeam(teams, search_phrase) {
             return key;
         }
     }
-    throw "could not find team";
+    throw `could not find team ${search_phrase}`;
 }
 
 function formatWithDivision(teams) {
