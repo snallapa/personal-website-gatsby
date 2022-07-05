@@ -287,16 +287,18 @@ exports.handler = async function(event, context) {
                     // text channel, in right category, with `vs` in it
                     return c.type === 0 && c.parent_id && c.parent_id === category && c.name.includes("vs");
                     }).flatMap(c => {
+                        console.log(c.name);
                         const channelId = c.id;
                         const channelTeams = c.name.split("-vs-").map(t => t.replace("-", " "));
                         const content = channelTeams.map(t => {
-                            const user = findTeam(league.teams, t).discordUser;
+                            const user = league.teams[findTeam(league.teams, t)].discordUser;
                             if (user) {
                                 return `<@${user1}>`;
                             } else {
                                 return ""
                             }
                         }).join(" ").trim();
+                        // console.log(content);
                         if (content) {
                             return [DiscordRequest(`channels/${channelId}/messages`, {
                                 method: 'POST',
