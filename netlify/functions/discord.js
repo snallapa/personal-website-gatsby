@@ -261,6 +261,50 @@ exports.handler = async function(event, context) {
                 } else {
                     return respond("hmm something went wrong :(, not all of them were deleted");
                 }
+            } else if (subcommand === "notify") {
+                const docRef = doc(db, "leagues", guild_id);
+                const docSnap = await getDoc(docRef);
+                if (!docSnap.exists()) {
+                    return respond(`no league found for ${guild_id}, export in MCA using league_export first`);
+                }
+                const league = docSnap.data();
+                let category;
+                try {
+                    category = league.commands.game_channels.category
+                } catch (error) {
+                    return respond('missing configuration, run `/game_channels configure` first');
+                }
+                const res = await DiscordRequest(`guilds/${guild_id}/channels`, {
+                    method: 'GET',
+                });
+                const channels = await res.json();
+                const messagePromises = channels.filter(c => {
+                    // filter on optional parameter
+                    if (command.options && command.options[0]) {
+                        const channelId = command.options[0].value;
+                        return c.id === channelId;
+                    }
+                    // text channel, in right category, with `vs` in it
+                    return c.type === 0 && c.parent_id && c.parent_id === category && c.name.includes("vs");
+                    }).map(c => {
+                        const channelId = c.id;
+                        const channelTeams = c.name.split("-vs-");
+                        const user1 = findTeam(league.teams, channelTeams[0]).discordUser;
+                        const user2 = findTeam(league.teams, channelTeams[1]).discordUser;
+                        const content = `<@${user1}> <@${user2}>`
+                        return DiscordRequest(`channels/${channelId}/messages`, {
+                            method: 'POST',
+                            body: {
+                                content: content,
+                            }
+                        });
+                    });
+                const responses = await Promise.all(messagePromises);
+                if (responses.every(r => r.ok)) {
+                    return respond("all users notified!");
+                } else {
+                    return respond("hmm something went wrong :(, not all of them were notified");
+                }
             }
         } else if (name === "teams") {
             const command = options[0];
@@ -294,7 +338,6 @@ exports.handler = async function(event, context) {
                 }
                 league.teams[teamKey].discordUser = user;
                 try {
-                    // await setDoc(doc(db, "leagues", guild_id), league, { merge: true });
                     const content = createTeamsMessage(league.teams);
                     if (league.commands.teams.message) {
                         const messageId = league.commands.teams.message;
@@ -315,7 +358,10 @@ exports.handler = async function(event, context) {
                         const res = await DiscordRequest(`channels/${channelId}/messages`, {
                             method: 'POST',
                             body: {
-                                content: content
+                                content: content,
+                                allowed_mentions: {
+                                    parse: []
+                                }
                             }
                         });
                         const data = await res.json();

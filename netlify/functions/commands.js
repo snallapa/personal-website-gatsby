@@ -67,40 +67,7 @@ const MADDEN_CHANNELS_CLEAR_COMMAND = {
     type: 1,
 };
 
-const MADDEN_OPEN_TEAMS_CHANNEL = {
-    name: 'open_teams_channel',
-    description: 'sets the channel to keep track of open teams',
-    options: [
-    {
-        type: 7, // channel
-        name: 'channel',
-        description: 'channel to send the message in',
-        required: true,
-        channel_types: [0]
-    }
-    ],
-    type: 1,
-};
 
-const MADDEN_SET_TEAM = {
-    name: 'set_team',
-    description: 'sets the team',
-    options: [
-    {
-        type: 3, // string
-        name: 'team',
-        description: 'madden team',
-        required: true
-    },
-    {
-        type: 6, // user
-        name: 'user',
-        description: 'user assigning to the team',
-        required: true
-    }
-    ],
-    type: 1,
-};
 
 const MADDEN_CHANNELS_COMMANDS = {
     name: 'game_channels',
@@ -122,6 +89,20 @@ const MADDEN_CHANNELS_COMMANDS = {
         type: 1, // sub command
         name: 'clear',
         description: 'clear all game channels, ignoring FW'
+    },
+    {
+        type: 1, // sub command
+        name: 'notify',
+        description: 'notifies current participants, specify a game channel to notify one. otherwise notifies all of them',
+        options: [
+            {
+                type: 7, // channel
+                name: 'channel',
+                description: 'game channel to notify',
+                required: false,
+                channel_types: [0]
+            }
+        ]
     },
     {
         type: 1, // sub command
