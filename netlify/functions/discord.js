@@ -296,7 +296,7 @@ exports.handler = async function(event, context) {
                             } else {
                                 return ""
                             }
-                        }).join(" ");
+                        }).join(" ").trim();
                         if (content) {
                             return [DiscordRequest(`channels/${channelId}/messages`, {
                                 method: 'POST',
