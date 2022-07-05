@@ -289,9 +289,14 @@ exports.handler = async function(event, context) {
                     }).map(c => {
                         const channelId = c.id;
                         const channelTeams = c.name.split("-vs-").map(t => t.replace("-", " "));
-                        const user1 = findTeam(league.teams, channelTeams[0]).discordUser;
-                        const user2 = findTeam(league.teams, channelTeams[1]).discordUser;
-                        const content = `<@${user1}> <@${user2}>`
+                        const content = channelTeams.map(t => {
+                            const user = findTeam(league.teams, t).discordUser;
+                            if (user) {
+                                return `<@${user1}>`;
+                            } else {
+                                return ""
+                            }
+                        }).join(" ");
                         return DiscordRequest(`channels/${channelId}/messages`, {
                             method: 'POST',
                             body: {
