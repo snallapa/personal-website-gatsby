@@ -286,7 +286,7 @@ exports.handler = async function(event, context) {
                     }
                     // text channel, in right category, with `vs` in it
                     return c.type === 0 && c.parent_id && c.parent_id === category && c.name.includes("vs");
-                    }).map(c => {
+                    }).flatMap(c => {
                         const channelId = c.id;
                         const channelTeams = c.name.split("-vs-").map(t => t.replace("-", " "));
                         const content = channelTeams.map(t => {
@@ -297,12 +297,16 @@ exports.handler = async function(event, context) {
                                 return ""
                             }
                         }).join(" ");
-                        return DiscordRequest(`channels/${channelId}/messages`, {
-                            method: 'POST',
-                            body: {
-                                content: content,
-                            }
-                        });
+                        if (content) {
+                            return [DiscordRequest(`channels/${channelId}/messages`, {
+                                method: 'POST',
+                                body: {
+                                    content: content,
+                                }
+                            })];
+                        } else {
+                            return [];
+                        }
                     });
                 const responses = await Promise.all(messagePromises);
                 if (responses.every(r => r.ok)) {
