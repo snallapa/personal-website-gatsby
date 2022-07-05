@@ -293,7 +293,7 @@ exports.handler = async function(event, context) {
                         const content = channelTeams.map(t => {
                             const user = league.teams[findTeam(league.teams, t)].discordUser;
                             if (user) {
-                                return `<@${user1}>`;
+                                return `<@${user}>`;
                             } else {
                                 return ""
                             }
