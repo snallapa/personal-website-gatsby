@@ -383,14 +383,14 @@ exports.handler = async function(event, context) {
                                     }
                                 }
                             });
+                            const data = await res.json();
+                            league.commands.teams.message = data.id;
                         } catch (e) {
                             console.log(e);
                             league.commands.teams.message = "";
                             await setDoc(doc(db, "leagues", guild_id), league, { merge: true });
                             return respond("team assigned, but I couldnt send my message :(. This could mean a permissions issues on the bot or on the channel");
                         }
-                        const data = await res.json();
-                        league.commands.teams.message = data.id;
                     }
                     await setDoc(doc(db, "leagues", guild_id), league, { merge: true });
                     return respond("team assigned!");
