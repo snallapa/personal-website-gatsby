@@ -199,7 +199,7 @@ async function DiscordRequest(endpoint, options) {
         },
         ...options
     });
-    console.log(`response: ${res}, and okay ${res.ok}`);
+    // console.log(`response: ${res}, and okay ${res.ok}`);
     // throw API errors
     if (!res.ok) {
         const data = await res.json();
@@ -305,7 +305,7 @@ exports.handler = async function(event, context) {
             const commandIds = commands.filter(c => commandNames.includes(c.name)).map(c => c.id);
             responses = await Promise.all(commandIds.map(id => DeleteGlobalCommand(id)));
         }
-        if (responses.every(x => x)) {
+        if (responses.every(x => x.ok)) {
             return {
                 statusCode: 200,
                 headers: { 'Content-Type': 'application/json'},
@@ -334,7 +334,7 @@ exports.handler = async function(event, context) {
         const commandIds = commands.filter(c => commandNames.includes(c.name)).map(c => c.id);
         responses = await Promise.all(commandIds.map(id => DeleteGuildCommand(guildId, id)));
     }
-    if (responses.every(x => x)) {
+    if (responses.every(x => x.ok)) {
         return {
             statusCode: 200,
             headers: { 'Content-Type': 'application/json'},
