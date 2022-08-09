@@ -336,7 +336,7 @@ exports.handler = async function(event, context) {
             statusCode: 200,
             headers: { 'Content-Type': 'application/json'},
             body: JSON.stringify({
-                message: "success updating global command"
+                message: "success updating guild command"
             }),
         };
     } else {
@@ -344,7 +344,7 @@ exports.handler = async function(event, context) {
             statusCode: 400,
             headers: { 'Content-Type': 'application/json'},
             body: JSON.stringify({
-                message: "failed to update global command"
+                message: "failed to update guild command"
             }),
         };
     }
