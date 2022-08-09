@@ -183,6 +183,8 @@ const COMMANDS = [TEST_COMMAND,
     MADDEN_TEAMS_COMMANDS
 ]
 
+const DELETED_COMMANDS = [MADDEN_CHANNELS_CREATE_COMMAND, MADDEN_CHANNELS_CLEAR_COMMAND]
+
 async function DiscordRequest(endpoint, options) {
     // append endpoint to root API URL
     const url = 'https://discord.com/api/v9/' + endpoint;
@@ -289,15 +291,8 @@ exports.handler = async function(event, context) {
     console.log(event);
     const guildId = event.queryStringParameters.guild;
     const type = event.queryStringParameters.type || "install";
-    const commandFilter = event.queryStringParameters.filter || "all";
-    const applicationCommands = COMMANDS.filter(c => {
-        if (commandFilter === "all") {
-            return true;
-        } else {
-            const filters = commandFilter.split(",");
-            return filters.includes(c.name);
-        }
-    });
+    const commandFilter = event.queryStringParameters.filter || "current";
+    const applicationCommands = commandFilter === "current" ? COMMANDS : DELETED_COMMANDS;
 
     if (guildId === 'global') {
         const responses = await Promise.all(applicationCommands.map(command => {
