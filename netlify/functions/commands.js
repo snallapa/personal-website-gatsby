@@ -221,11 +221,10 @@ async function InstallGuildCommand(guildId, command) {
     }
 }
 
-async function DeleteGuildCommand(guildId, command) {
+async function DeleteGuildCommand(guildId, commandId) {
     // API endpoint to get and post guild commands
-    const endpoint = `applications/${process.env.APP_ID}/guilds/${guildId}/commands`;
-    console.log(command);
-    // install command
+    const endpoint = `applications/${process.env.APP_ID}/guilds/${guildId}/commands/${commandId}`;
+
     try {
         await DiscordRequest(endpoint, { method: 'DELETE' });
     } catch (err) {
@@ -233,10 +232,9 @@ async function DeleteGuildCommand(guildId, command) {
     }
 }
 
-async function DeleteGlobalCommand(command) {
+async function DeleteGlobalCommand(commandId) {
     // API endpoint to get and post guild commands
-    const endpoint = `applications/${process.env.APP_ID}/commands`;
-    console.log(command);
+    const endpoint = `applications/${process.env.APP_ID}/commands/${commandId}`;
     // install command
     try {
         const res = await DiscordRequest(endpoint, { method: 'DELETE' });
@@ -295,15 +293,17 @@ exports.handler = async function(event, context) {
     const applicationCommands = commandFilter === "current" ? COMMANDS : DELETED_COMMANDS;
 
     if (guildId === 'global') {
-        const responses = await Promise.all(applicationCommands.map(command => {
-            if (type === "install") {
-                return InstallGlobalCommand(command);
-            } else if (type === "delete") {
-                return DeleteGlobalCommand(command);
-            } else {
-                throw new Error("invalid type. valid types: install, delete");
-            }
-        }));
+        let responses;
+        if (type === "install") {
+            responses = await Promise.all(applicationCommands.map(command => InstallGlobalCommand(command)));
+        } else {
+            const endpoint = `applications/${process.env.APP_ID}/commands`
+            const res = await DiscordRequest(endpoint, { method: 'GET' });
+            const commands = await res.json();
+            const commandNames = applicationCommands.map(c => c.name);
+            const commandIds = commands.filter(c => commandNames.includes(c.name)).map(c => c.id);
+            responses = await Promise.all(commandIds.map(id => DeleteGlobalCommand(id)));
+        }
         if (responses.every(x => x)) {
             return {
                 statusCode: 200,
@@ -322,15 +322,17 @@ exports.handler = async function(event, context) {
             };
         }
     }
-    const responses = await Promise.all(applicationCommands.map(c => {
-        if (type === "install") {
-            return InstallGuildCommand(guildId, c);
-        } else if (type === "delete") {
-            return DeleteGuildCommand(guildId, c);
-        } else {
-            throw new Error()
-        }
-    }));
+    let responses;
+    if (type === "install") {
+        responses = await Promise.all(applicationCommands.map(command => InstallGuildCommand(guildId, command)));
+    } else {
+        const endpoint = `applications/${process.env.APP_ID}/guilds/${guildId}/commands`
+        const res = await DiscordRequest(endpoint, { method: 'GET' });
+        const commands = await res.json();
+        const commandNames = applicationCommands.map(c => c.name);
+        const commandIds = commands.filter(c => commandNames.includes(c.name)).map(c => c.id);
+        responses = await Promise.all(commandIds.map(id => DeleteGuildCommand(guildId, id)));
+    }
     if (responses.every(x => x)) {
         return {
             statusCode: 200,
