@@ -219,6 +219,32 @@ async function InstallGuildCommand(guildId, command) {
     }
 }
 
+async function DeleteGuildCommand(guildId, command) {
+    // API endpoint to get and post guild commands
+    const endpoint = `applications/${process.env.APP_ID}/guilds/${guildId}/commands`;
+    console.log(command);
+    // install command
+    try {
+        await DiscordRequest(endpoint, { method: 'DELETE' });
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+async function DeleteGlobalCommand(command) {
+    // API endpoint to get and post guild commands
+    const endpoint = `applications/${process.env.APP_ID}/commands`;
+    console.log(command);
+    // install command
+    try {
+        const res = await DiscordRequest(endpoint, { method: 'DELETE' });
+        return res.ok;
+    } catch (err) {
+        console.error(err);
+        return false;
+    }
+}
+
 async function InstallGlobalCommand(command) {
     // API endpoint to get and post guild commands
     const endpoint = `applications/${process.env.APP_ID}/commands`;
@@ -260,27 +286,72 @@ async function HasGuildCommands(guildId, commands) {
 }
 
 exports.handler = async function(event, context) {
+    console.log(event);
     const guildId = event.queryStringParameters.guild;
+    const type = event.queryStringParameters.type || "install";
+    const commandFilter = event.queryStringParameters.filter || "all";
+    const applicationCommands = COMMANDS.filter(c => {
+        if (commandFilter === "all") {
+            return true;
+        } else {
+            const filters = commandFilter.split(",");
+            return filters.includes(c.name);
+        }
+    });
+
     if (guildId === 'global') {
-        const responses = await Promise.all(COMMANDS.map(command => InstallGlobalCommand(command)));
+        const responses = await Promise.all(applicationCommands.map(command => {
+            if (type === "install") {
+                return InstallGlobalCommand(command);
+            } else if (type === "delete") {
+                return DeleteGlobalCommand(command);
+            } else {
+                throw new Error("invalid type. valid types: install, delete");
+            }
+        }));
         if (responses.every(x => x)) {
             return {
-                statusCode: 200
+                statusCode: 200,
+                headers: { 'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    message: "success updating global command"
+                }),
             };
         } else {
             return {
-                statusCode: 400 
+                statusCode: 400,
+                headers: { 'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    message: "failed to update global command"
+                }),
             };
         }
     }
-    console.log(event);
-    const hasGuild = await HasGuildCommands(guildId, COMMANDS);
-    if (!hasGuild) {
-        return {
-            statusCode: 400
+    const responses = await Promise.all(applicationCommands.map(c => {
+        if (type === "install") {
+            return InstallGuildCommand(guildId, c);
+        } else if (type === "delete") {
+            return DeleteGuildCommand(guildId, c);
+        } else {
+            throw new Error()
         }
+    }));
+    if (responses.every(x => x)) {
+        return {
+            statusCode: 200,
+            headers: { 'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                message: "success updating global command"
+            }),
+        };
+    } else {
+        return {
+            statusCode: 400,
+            headers: { 'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                message: "failed to update global command"
+            }),
+        };
     }
-    return {
-        statusCode: 200
-    }
+
 }
