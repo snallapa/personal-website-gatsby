@@ -199,7 +199,7 @@ async function DiscordRequest(endpoint, options) {
         },
         ...options
     });
-    // console.log(`response: ${res}, and okay ${res.ok}`);
+    // console.log(`response: ${res}, and okay ${res.oka}`);
     // throw API errors
     if (!res.ok) {
         const data = await res.json();
@@ -216,9 +216,11 @@ async function InstallGuildCommand(guildId, command) {
     console.log(command);
     // install command
     try {
-        await DiscordRequest(endpoint, { method: 'POST', body: command });
+        const res = await DiscordRequest(endpoint, { method: 'POST', body: command });
+        return res.ok;
     } catch (err) {
         console.error(err);
+        return false;
     }
 }
 
@@ -227,9 +229,11 @@ async function DeleteGuildCommand(guildId, commandId) {
     const endpoint = `applications/${process.env.APP_ID}/guilds/${guildId}/commands/${commandId}`;
 
     try {
-        await DiscordRequest(endpoint, { method: 'DELETE' });
+        const res = await DiscordRequest(endpoint, { method: 'DELETE' });
+        return res.ok;
     } catch (err) {
         console.error(err);
+        return false;
     }
 }
 
@@ -305,7 +309,7 @@ exports.handler = async function(event, context) {
             const commandIds = commands.filter(c => commandNames.includes(c.name)).map(c => c.id);
             responses = await Promise.all(commandIds.map(id => DeleteGlobalCommand(id)));
         }
-        if (responses.every(x => x.ok)) {
+        if (responses.every(x => x)) {
             return {
                 statusCode: 200,
                 headers: { 'Content-Type': 'application/json'},
@@ -334,7 +338,7 @@ exports.handler = async function(event, context) {
         const commandIds = commands.filter(c => commandNames.includes(c.name)).map(c => c.id);
         responses = await Promise.all(commandIds.map(id => DeleteGuildCommand(guildId, id)));
     }
-    if (responses.every(x => x.ok)) {
+    if (responses.every(x => x)) {
         return {
             statusCode: 200,
             headers: { 'Content-Type': 'application/json'},
