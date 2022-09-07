@@ -484,211 +484,211 @@ exports.handler = async function(event, context) {
                 }
             }
         } 
-        // else if (name === "streams") {
-        //     const command = options[0];
-        //     const subcommand = command.name;
-        //     if (subcommand === "configure") {
-        //         const channel = command.options[0].value
-        //         await setDoc(doc(db, "leagues", guild_id), {
-        //             commands: {
-        //                 streams: {
-        //                     channel: channel,
-        //                     counts: {}
-        //                 }
-        //             }
-        //         }, { merge: true });
-        //         return respond("configured! streams command is ready for use");
-        //     } else if (subcommand === "count") {
-        //         const user = command.options[0].value;
-        //         const docRef = doc(db, "leagues", guild_id);
-        //         const docSnap = await getDoc(docRef);
-        //         if (!docSnap.exists()) {
-        //             return respond(`no league found for ${guild_id}, export in MCA using league_export first`);
-        //         }
-        //         const league = docSnap.data();
-        //         if (!league.commands || !league.commands.streams || !league.commands.streams.channel) {
-        //             return respond("streams is not configured yet. Configure it first");
-        //         }
-        //         const currentUserCount = league.commands.streams.counts[user] || 0;
-        //         const newCount = command.options[1] ? command.options[1].value : currentUserCount + 1;
-        //         league.commands.streams.counts[user] = newCount;
-        //         const content = createStreamsMessage(league.commands.streams.counts);
-        //         try {
-        //             if (league.commands.streams.message) {
-        //                 const messageId = league.commands.streams.message;
-        //                 const channelId = league.commands.streams.channel;
-        //                 try {
-        //                     const res = await DiscordRequest(`channels/${channelId}/messages/${messageId}`, {
-        //                         method: 'PATCH',
-        //                         body: {
-        //                             content: content,
-        //                             allowed_mentions: {
-        //                                 parse: []
-        //                             }
-        //                         }
-        //                     });
-        //                     const data = await res.json();
-        //                     league.commands.streams.message = data.id;
-        //                 } catch (e) {
-        //                     console.log(e);
-        //                     league.commands.streams.message = "";
-        //                     await setDoc(doc(db, "leagues", guild_id), league, { merge: true });
-        //                     return respond("stream count updated, but I couldnt update my message :(. This could mean a permissions issues on the bot or on the channel");
-        //                 }
-        //             } else {
-        //                 const channelId = league.commands.streams.channel;
-        //                 try {
-        //                     const res = await DiscordRequest(`channels/${channelId}/messages`, {
-        //                         method: 'POST',
-        //                         body: {
-        //                             content: content,
-        //                             allowed_mentions: {
-        //                                 parse: []
-        //                             }
-        //                         }
-        //                     });
-        //                     const data = await res.json();
-        //                     league.commands.streams.message = data.id;
-        //                 } catch (e) {
-        //                     console.log(e);
-        //                     league.commands.streams.message = "";
-        //                     await setDoc(doc(db, "leagues", guild_id), league, { merge: true });
-        //                     return respond("stream count updated, but I couldnt send my message :(. This could mean a permissions issues on the bot or on the channel");
-        //                 }
-        //             }
-        //             await setDoc(doc(db, "leagues", guild_id), league, { merge: true });
-        //             return respond("stream count updated!");
-        //         } catch (e) {
-        //             console.log(e);
-        //             return respond("could not update stream count :(")
-        //         }
-        //     } else if (subcommand === "remove") {
-        //         const user = command.options[0].value;
-        //         const docRef = doc(db, "leagues", guild_id);
-        //         const docSnap = await getDoc(docRef);
-        //         if (!docSnap.exists()) {
-        //             return respond(`no league found for ${guild_id}, export in MCA using league_export first`);
-        //         }
-        //         const league = docSnap.data();
-        //         if (!league.commands || !league.commands.streams || !league.commands.streams.channel) {
-        //             return respond("streams is not configured yet. Configure it first");
-        //         }
-        //         delete league.commands.streams.counts[user];
-        //         const content = createStreamsMessage(league.commands.streams.counts);
-        //         try {
-        //             if (league.commands.streams.message) {
-        //                 const messageId = league.commands.streams.message;
-        //                 const channelId = league.commands.streams.channel;
-        //                 try {
-        //                     const res = await DiscordRequest(`channels/${channelId}/messages/${messageId}`, {
-        //                         method: 'PATCH',
-        //                         body: {
-        //                             content: content,
-        //                             allowed_mentions: {
-        //                                 parse: []
-        //                             }
-        //                         }
-        //                     });
-        //                     const data = await res.json();
-        //                     league.commands.streams.message = data.id;
-        //                 } catch (e) {
-        //                     console.log(e);
-        //                     league.commands.streams.message = "";
-        //                     await setDoc(doc(db, "leagues", guild_id), league, { merge: true });
-        //                     return respond("user removed from streams, but I couldnt update my message :(. This could mean a permissions issues on the bot or on the channel");
-        //                 }
-        //             } else {
-        //                 const channelId = league.commands.streams.channel;
-        //                 try {
-        //                     const res = await DiscordRequest(`channels/${channelId}/messages`, {
-        //                         method: 'POST',
-        //                         body: {
-        //                             content: content,
-        //                             allowed_mentions: {
-        //                                 parse: []
-        //                             }
-        //                         }
-        //                     });
-        //                     const data = await res.json();
-        //                     league.commands.streams.message = data.id;
-        //                 } catch (e) {
-        //                     console.log(e);
-        //                     league.commands.streams.message = "";
-        //                     await setDoc(doc(db, "leagues", guild_id), league, { merge: true });
-        //                     return respond("user removed from streams, but I couldnt send my message :(. This could mean a permissions issues on the bot or on the channel");
-        //                 }
-        //             }
-        //             await setDoc(doc(db, "leagues", guild_id), league, { merge: true });
-        //             return respond("user removed from streams!");
-        //         } catch (e) {
-        //             console.log(e);
-        //             return respond("could not remove user from streams :(");
-        //         }
-        //     } else if (subcommand === "reset") {
-        //         const docRef = doc(db, "leagues", guild_id);
-        //         const docSnap = await getDoc(docRef);
-        //         if (!docSnap.exists()) {
-        //             return respond(`no league found for ${guild_id}, export in MCA using league_export first`);
-        //         }
-        //         const league = docSnap.data();
-        //         if (!league.commands || !league.commands.streams || !league.commands.streams.channel) {
-        //             return respond("streams is not configured yet. Configure it first");
-        //         }
-        //         Object.keys(league.commands.streams.counts).forEach(user => {
-        //             league.commands.streams.counts[user] = 0;
-        //         });
-        //         const content = createStreamsMessage(league.commands.streams.counts);
-        //         try {
-        //             if (league.commands.streams.message) {
-        //                 const messageId = league.commands.streams.message;
-        //                 const channelId = league.commands.streams.channel;
-        //                 try {
-        //                     const res = await DiscordRequest(`channels/${channelId}/messages/${messageId}`, {
-        //                         method: 'PATCH',
-        //                         body: {
-        //                             content: content,
-        //                             allowed_mentions: {
-        //                                 parse: []
-        //                             }
-        //                         }
-        //                     });
-        //                     const data = await res.json();
-        //                     league.commands.streams.message = data.id;
-        //                 } catch (e) {
-        //                     console.log(e);
-        //                     league.commands.streams.message = "";
-        //                     await setDoc(doc(db, "leagues", guild_id), league, { merge: true });
-        //                     return respond("streams reset, but I couldnt update my message :(. This could mean a permissions issues on the bot or on the channel");
-        //                 }
-        //             } else {
-        //                 const channelId = league.commands.streams.channel;
-        //                 try {
-        //                     const res = await DiscordRequest(`channels/${channelId}/messages`, {
-        //                         method: 'POST',
-        //                         body: {
-        //                             content: content,
-        //                             allowed_mentions: {
-        //                                 parse: []
-        //                             }
-        //                         }
-        //                     });
-        //                     const data = await res.json();
-        //                     league.commands.streams.message = data.id;
-        //                 } catch (e) {
-        //                     console.log(e);
-        //                     league.commands.streams.message = "";
-        //                     await setDoc(doc(db, "leagues", guild_id), league, { merge: true });
-        //                     return respond("streams reset, but I couldnt send my message :(. This could mean a permissions issues on the bot or on the channel");
-        //                 }
-        //             }
-        //             await setDoc(doc(db, "leagues", guild_id), league, { merge: true });
-        //             return respond("streams reset!");
-        //         } catch (e) {
-        //             console.log(e);
-        //             return respond("could not reset streams :(");
-        //         }
-        //     }
-        // } 
+        else if (name === "streams") {
+            const command = options[0];
+            const subcommand = command.name;
+            if (subcommand === "configure") {
+                const channel = command.options[0].value
+                await setDoc(doc(db, "leagues", guild_id), {
+                    commands: {
+                        streams: {
+                            channel: channel,
+                            counts: {}
+                        }
+                    }
+                }, { merge: true });
+                return respond("configured! streams command is ready for use");
+            } else if (subcommand === "count") {
+                const user = command.options[0].value;
+                const docRef = doc(db, "leagues", guild_id);
+                const docSnap = await getDoc(docRef);
+                if (!docSnap.exists()) {
+                    return respond(`no league found for ${guild_id}, export in MCA using league_export first`);
+                }
+                const league = docSnap.data();
+                if (!league.commands || !league.commands.streams || !league.commands.streams.channel) {
+                    return respond("streams is not configured yet. Configure it first");
+                }
+                const currentUserCount = league.commands.streams.counts[user] || 0;
+                const newCount = command.options[1] ? command.options[1].value : currentUserCount + 1;
+                league.commands.streams.counts[user] = newCount;
+                const content = createStreamsMessage(league.commands.streams.counts);
+                try {
+                    if (league.commands.streams.message) {
+                        const messageId = league.commands.streams.message;
+                        const channelId = league.commands.streams.channel;
+                        try {
+                            const res = await DiscordRequest(`channels/${channelId}/messages/${messageId}`, {
+                                method: 'PATCH',
+                                body: {
+                                    content: content,
+                                    allowed_mentions: {
+                                        parse: []
+                                    }
+                                }
+                            });
+                            const data = await res.json();
+                            league.commands.streams.message = data.id;
+                        } catch (e) {
+                            console.log(e);
+                            league.commands.streams.message = "";
+                            await setDoc(doc(db, "leagues", guild_id), league, { merge: true });
+                            return respond("stream count updated, but I couldnt update my message :(. This could mean a permissions issues on the bot or on the channel");
+                        }
+                    } else {
+                        const channelId = league.commands.streams.channel;
+                        try {
+                            const res = await DiscordRequest(`channels/${channelId}/messages`, {
+                                method: 'POST',
+                                body: {
+                                    content: content,
+                                    allowed_mentions: {
+                                        parse: []
+                                    }
+                                }
+                            });
+                            const data = await res.json();
+                            league.commands.streams.message = data.id;
+                        } catch (e) {
+                            console.log(e);
+                            league.commands.streams.message = "";
+                            await setDoc(doc(db, "leagues", guild_id), league, { merge: true });
+                            return respond("stream count updated, but I couldnt send my message :(. This could mean a permissions issues on the bot or on the channel");
+                        }
+                    }
+                    await setDoc(doc(db, "leagues", guild_id), league, { merge: true });
+                    return respond("stream count updated!");
+                } catch (e) {
+                    console.log(e);
+                    return respond("could not update stream count :(")
+                }
+            } else if (subcommand === "remove") {
+                const user = command.options[0].value;
+                const docRef = doc(db, "leagues", guild_id);
+                const docSnap = await getDoc(docRef);
+                if (!docSnap.exists()) {
+                    return respond(`no league found for ${guild_id}, export in MCA using league_export first`);
+                }
+                const league = docSnap.data();
+                if (!league.commands || !league.commands.streams || !league.commands.streams.channel) {
+                    return respond("streams is not configured yet. Configure it first");
+                }
+                delete league.commands.streams.counts[user];
+                const content = createStreamsMessage(league.commands.streams.counts);
+                try {
+                    if (league.commands.streams.message) {
+                        const messageId = league.commands.streams.message;
+                        const channelId = league.commands.streams.channel;
+                        try {
+                            const res = await DiscordRequest(`channels/${channelId}/messages/${messageId}`, {
+                                method: 'PATCH',
+                                body: {
+                                    content: content,
+                                    allowed_mentions: {
+                                        parse: []
+                                    }
+                                }
+                            });
+                            const data = await res.json();
+                            league.commands.streams.message = data.id;
+                        } catch (e) {
+                            console.log(e);
+                            league.commands.streams.message = "";
+                            await setDoc(doc(db, "leagues", guild_id), league, { merge: true });
+                            return respond("user removed from streams, but I couldnt update my message :(. This could mean a permissions issues on the bot or on the channel");
+                        }
+                    } else {
+                        const channelId = league.commands.streams.channel;
+                        try {
+                            const res = await DiscordRequest(`channels/${channelId}/messages`, {
+                                method: 'POST',
+                                body: {
+                                    content: content,
+                                    allowed_mentions: {
+                                        parse: []
+                                    }
+                                }
+                            });
+                            const data = await res.json();
+                            league.commands.streams.message = data.id;
+                        } catch (e) {
+                            console.log(e);
+                            league.commands.streams.message = "";
+                            await setDoc(doc(db, "leagues", guild_id), league, { merge: true });
+                            return respond("user removed from streams, but I couldnt send my message :(. This could mean a permissions issues on the bot or on the channel");
+                        }
+                    }
+                    await setDoc(doc(db, "leagues", guild_id), league, { merge: true });
+                    return respond("user removed from streams!");
+                } catch (e) {
+                    console.log(e);
+                    return respond("could not remove user from streams :(");
+                }
+            } else if (subcommand === "reset") {
+                const docRef = doc(db, "leagues", guild_id);
+                const docSnap = await getDoc(docRef);
+                if (!docSnap.exists()) {
+                    return respond(`no league found for ${guild_id}, export in MCA using league_export first`);
+                }
+                const league = docSnap.data();
+                if (!league.commands || !league.commands.streams || !league.commands.streams.channel) {
+                    return respond("streams is not configured yet. Configure it first");
+                }
+                Object.keys(league.commands.streams.counts).forEach(user => {
+                    league.commands.streams.counts[user] = 0;
+                });
+                const content = createStreamsMessage(league.commands.streams.counts);
+                try {
+                    if (league.commands.streams.message) {
+                        const messageId = league.commands.streams.message;
+                        const channelId = league.commands.streams.channel;
+                        try {
+                            const res = await DiscordRequest(`channels/${channelId}/messages/${messageId}`, {
+                                method: 'PATCH',
+                                body: {
+                                    content: content,
+                                    allowed_mentions: {
+                                        parse: []
+                                    }
+                                }
+                            });
+                            const data = await res.json();
+                            league.commands.streams.message = data.id;
+                        } catch (e) {
+                            console.log(e);
+                            league.commands.streams.message = "";
+                            await setDoc(doc(db, "leagues", guild_id), league, { merge: true });
+                            return respond("streams reset, but I couldnt update my message :(. This could mean a permissions issues on the bot or on the channel");
+                        }
+                    } else {
+                        const channelId = league.commands.streams.channel;
+                        try {
+                            const res = await DiscordRequest(`channels/${channelId}/messages`, {
+                                method: 'POST',
+                                body: {
+                                    content: content,
+                                    allowed_mentions: {
+                                        parse: []
+                                    }
+                                }
+                            });
+                            const data = await res.json();
+                            league.commands.streams.message = data.id;
+                        } catch (e) {
+                            console.log(e);
+                            league.commands.streams.message = "";
+                            await setDoc(doc(db, "leagues", guild_id), league, { merge: true });
+                            return respond("streams reset, but I couldnt send my message :(. This could mean a permissions issues on the bot or on the channel");
+                        }
+                    }
+                    await setDoc(doc(db, "leagues", guild_id), league, { merge: true });
+                    return respond("streams reset!");
+                } catch (e) {
+                    console.log(e);
+                    return respond("could not reset streams :(");
+                }
+            }
+        } 
         // else if (name === "waitlist") {
         //     const command = options[0];
         //     const subcommand = command.name;
