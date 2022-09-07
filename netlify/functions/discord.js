@@ -734,11 +734,8 @@ exports.handler = async function(event, context) {
                     if (position > waitlist.length) {
                         return respond("invalid position, beyond the waitlist length");
                     }
-                    const newWaitlist = waitlist.slice(0, position - 1);
-                    const end = waitlist.slice(position - 1);
-                    newWaitlist.push(user);
-                    newWaitlist.push(...end);
-                    league.commands.waitlist = newWaitlist;
+                    waitlist.splice(position - 1, 0, user);
+                    league.commands.waitlist = waitlist;
                 } else {
                     waitlist.push(user);
                     league.commands.waitlist = waitlist;
