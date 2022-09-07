@@ -729,7 +729,7 @@ exports.handler = async function(event, context) {
                 }
                 const league = docSnap.data();
                 const waitlist = league.commands.waitlist || [];
-                if (options[1]) {
+                if (command.options[1]) {
                     const position = options[1].value;
                     if (position > waitlist.length) {
                         return respond("invalid position, beyond the waitlist length");
@@ -777,7 +777,7 @@ exports.handler = async function(event, context) {
                 if (waitlist.length === 0) {
                     return respond("waitlist is empty");
                 }
-                league.commands.waitlist = waitlist.filter((_, idx) => idx !== position);
+                league.commands.waitlist = waitlist.filter((_, idx) => idx !== (position - 1));
                 await setDoc(doc(db, "leagues", guild_id), league, { merge: true });
                 if (!league.commands || !league.commands.waitlist || league.commands.waitlist.length === 0) {
                     return respond("there is no one on the waitlist!");
