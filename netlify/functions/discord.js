@@ -730,7 +730,7 @@ exports.handler = async function(event, context) {
                 const league = docSnap.data();
                 const waitlist = league.commands.waitlist || [];
                 if (command.options[1]) {
-                    const position = options[1].value;
+                    const position = command.options[1].value;
                     if (position > waitlist.length) {
                         return respond("invalid position, beyond the waitlist length");
                     }
