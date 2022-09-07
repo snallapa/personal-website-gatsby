@@ -763,7 +763,7 @@ exports.handler = async function(event, context) {
                     return respondNoMention(createWaitlistMessage(league.commands.waitlist));
                 }
             } else if (subcommand === "pop") {
-                const position = command.options[0] ? command.options[0].value : 0;
+                const position = command.options[0] ? command.options[0].value : 1;
                 const docRef = doc(db, "leagues", guild_id);
                 const docSnap = await getDoc(docRef);
                 if (!docSnap.exists()) {
