@@ -177,7 +177,7 @@ const MADDEN_TEAMS_COMMANDS = {
 };
 
 const MADDEN_WAITLIST_COMMANDS = {
-    name: 'watilist',
+    name: 'waitlist',
     description: 'waitlist: list, add, remove, pop, notify',
     options: [{
         type: 1, // sub command
@@ -314,7 +314,7 @@ const COMMANDS = [TEST_COMMAND,
     MADDEN_WAITLIST_COMMANDS
 ]
 
-const DELETED_COMMANDS = [MADDEN_CHANNELS_CREATE_COMMAND, MADDEN_CHANNELS_CLEAR_COMMAND, MADDEN_WAITLIST_COMMANDS]
+const DELETED_COMMANDS = [MADDEN_CHANNELS_CREATE_COMMAND, MADDEN_CHANNELS_CLEAR_COMMAND]
 
 async function DiscordRequest(endpoint, options) {
     // append endpoint to root API URL
