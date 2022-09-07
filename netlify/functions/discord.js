@@ -690,6 +690,7 @@ exports.handler = async function(event, context) {
             }
         } 
         else if (name === "waitlist") {
+            console.log(event);
             const command = options[0];
             const subcommand = command.name;
             if (subcommand === "list") {
@@ -810,5 +811,5 @@ exports.handler = async function(event, context) {
             return respond("bot is working!");
         }
     }
-    return respond("we should not have gotten here...", 400);
+    return respond("we should not have gotten here...", statusCode = 400);
 }
