@@ -426,7 +426,9 @@ exports.handler = async function(event, context) {
     const guildId = event.queryStringParameters.guild;
     const type = event.queryStringParameters.type || "install";
     const commandFilter = event.queryStringParameters.filter || "current";
-    const applicationCommands = commandFilter === "current" ? COMMANDS : DELETED_COMMANDS;
+    const nameFilter = event.queryStringParameters.command || "";
+    const filteredCommands = commandFilter === "current" ? COMMANDS : DELETED_COMMANDS;
+    const applicationCommands = nameFilter ? filteredCommands : filteredCommands.filter(c => c.name === nameFilter);
 
     if (guildId === 'global') {
         let responses;
