@@ -161,7 +161,7 @@ const MADDEN_TEAMS_COMMANDS = {
     {
         type: 1, // sub command
         name: 'configure',
-        description: 'set channel',
+        description: 'sets channel',
         options: [
             {
                 type: 7, // channel
@@ -176,11 +176,142 @@ const MADDEN_TEAMS_COMMANDS = {
     type: 1,
 };
 
+const MADDEN_WAITLIST_COMMANDS = {
+    name: 'watilist',
+    description: 'waitlist: list, add, remove, pop, notify',
+    options: [{
+        type: 1, // sub command
+        name: 'list',
+        description: 'lists the current users in the waitlist',
+        options: []
+    },
+    {
+        type: 1, // sub command
+        name: 'add',
+        description: 'adds a user to the waitlist',
+        options: [
+            {
+                type: 6, // user
+                name: 'user',
+                description: 'user to add to the waitlist',
+                required: true
+            },
+            {
+                type: 4, // integer
+                name: 'position',
+                description: 'adds this user at that waitlist position, pushing the rest back',
+                required: false
+            }
+        ]
+    },
+    {
+        type: 1, // sub command
+        name: 'remove',
+        description: 'removes a user from the waitlist ',
+        options: [
+            {
+                type: 6, // user
+                name: 'user',
+                description: 'user to remove',
+                required: true
+            }
+        ]
+    },
+    {
+        type: 1, // sub command
+        name: 'pop',
+        description: 'removes a user by their position, default to first in line',
+        options: [
+            {
+                type: 4, // integer
+                name: 'position',
+                description: 'position to remove, defaults to the user on the top',
+                required: false
+            }
+        ]
+    },
+    {
+        type: 1, // sub command
+        name: 'notify',
+        description: 'notify top waitlist positions that a team is open',
+        options: [
+            {
+                type: 4, // integer
+                name: 'top',
+                description: 'the number of waitlist people to notify, defaults to 1',
+                required: false
+            }
+        ]
+    }
+    ],
+    type: 1,
+};
+
+const MADDEN_STREAMS_COMMANDS = {
+    name: 'streams',
+    description: 'streams: configure, count, remove, reset',
+    options: [{
+        type: 1, // sub command
+        name: 'configure',
+        description: 'sets channel',
+        options: [
+            {
+                type: 7, // channel
+                name: 'channel',
+                description: 'channel to send message in',
+                required: true,
+                channel_types: [0]
+            }
+        ]
+    },
+    {
+        type: 1, // sub command
+        name: 'count',
+        description: 'ups the stream count by 1, optionally override the count',
+        options: [
+            {
+                type: 6, // user
+                name: 'user',
+                description: 'user to count the stream for',
+                required: true
+            },
+            {
+                type: 4, // integer
+                name: 'override',
+                description: 'set the user count instead of incrementing',
+                required: false
+            }
+        ]
+    },
+    {
+        type: 1, // sub command
+        name: 'remove',
+        description: 'removes the user stream counts',
+        options: [
+            {
+                type: 6, // user
+                name: 'user',
+                description: 'user to remove',
+                required: true
+            }
+        ]
+    },
+    {
+        type: 1, // sub command
+        name: 'reset',
+        description: 'DANGER resets all users to 0',
+        options: []
+    }
+    ],
+    type: 1,
+};
+
 const COMMANDS = [TEST_COMMAND,
     MADDEN_LEAGUE_COMMAND,
     MADDEN_EXPORTER_COMMAND,
     MADDEN_CHANNELS_COMMANDS,
-    MADDEN_TEAMS_COMMANDS
+    MADDEN_TEAMS_COMMANDS,
+    MADDEN_WAITLIST_COMMANDS
 ]
 
 const DELETED_COMMANDS = [MADDEN_CHANNELS_CREATE_COMMAND, MADDEN_CHANNELS_CLEAR_COMMAND]
