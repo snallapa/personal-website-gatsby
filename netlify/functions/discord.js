@@ -728,7 +728,7 @@ exports.handler = async function(event, context) {
                     return respond(`no league found for ${guild_id}, export in MCA using league_export first`);
                 }
                 const league = docSnap.data();
-                league.commands.waitlist = league.commands.waitlist || [];
+                const waitlist = league.commands.waitlist || [];
                 if (options[1]) {
                     const position = options[1].value;
                     if (position > waitlist.length) {
@@ -740,7 +740,8 @@ exports.handler = async function(event, context) {
                     newWaitlist.push(...end);
                     league.commands.waitlist = newWaitlist;
                 } else {
-                    league.commands.wailist.push(user);
+                    waitlist.push(user);
+                    league.commands.waitlist = waitlist;
                 }
                 await setDoc(doc(db, "leagues", guild_id), league, { merge: true });
                 if (!league.commands || !league.commands.waitlist || league.commands.waitlist.length === 0) {
