@@ -75,10 +75,10 @@ function respond(message, statusCode = 200, interactionType = InteractionRespons
 
 function respondNoMention(message) {
     return {
-        statusCode: statusCode,
+        statusCode: 200,
         headers: { 'Content-Type': 'application/json'},
         body: JSON.stringify({
-            type: interactionType,
+            type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
             data: {
                 content: message,
                 allowed_mentions: {
