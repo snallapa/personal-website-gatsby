@@ -697,6 +697,7 @@ exports.handler = async function(event, context) {
                     return respond(`no league found for ${guild_id}, export in MCA using league_export first`);
                 }
                 const league = docSnap.data();
+                console.log(league);
                 if (!league.commands || !league.commands.waitlist || league.commands.waitlist.length === 0) {
                     return respond("there is no one on the waitlist!");
                 } else {
