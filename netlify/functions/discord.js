@@ -703,7 +703,7 @@ exports.handler = async function(event, context) {
                 if (!league.commands || !league.commands.waitlist || league.commands.waitlist.length === 0) {
                     return respond("there is no one on the waitlist!");
                 } else {
-                    return respond(createWaitlistMessage(league.commands.waitlist), data={
+                    return respond("ok", data={
                         allowed_mentions: {
                         parse: []
                     }});
