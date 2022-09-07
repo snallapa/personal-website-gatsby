@@ -693,23 +693,21 @@ exports.handler = async function(event, context) {
             const command = options[0];
             const subcommand = command.name;
             if (subcommand === "list") {
-                console.log(guild_id);
-                console.log(event);
                 const docRef = doc(db, "leagues", guild_id);
                 const docSnap = await getDoc(docRef);
                 if (!docSnap.exists()) {
                     return respond(`no league found for ${guild_id}, export in MCA using league_export first`);
                 }
                 const league = docSnap.data();
-                console.log(league);
-                if (!league.commands || !league.commands.waitlist || league.commands.waitlist.length === 0) {
-                    return respond("there is no one on the waitlist!");
-                } else {
-                    return respond(createWaitlistMessage(league.commands.waitlist), data={
-                        allowed_mentions: {
-                        parse: []
-                    }});
-                }
+                // if (!league.commands || !league.commands.waitlist || league.commands.waitlist.length === 0) {
+                //     return respond("there is no one on the waitlist!");
+                // } else {
+                //     return respond(createWaitlistMessage(league.commands.waitlist), data={
+                //         allowed_mentions: {
+                //         parse: []
+                //     }});
+                // }
+                return respond("ok");
             } 
             // else if (subcommand === "add") {
             //     const user = command.options[0].value;
