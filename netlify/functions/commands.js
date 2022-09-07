@@ -428,7 +428,7 @@ exports.handler = async function(event, context) {
     const commandFilter = event.queryStringParameters.filter || "current";
     const nameFilter = event.queryStringParameters.command || "";
     const filteredCommands = commandFilter === "current" ? COMMANDS : DELETED_COMMANDS;
-    const applicationCommands = nameFilter ? filteredCommands : filteredCommands.filter(c => c.name === nameFilter);
+    const applicationCommands = nameFilter ? filteredCommands.filter(c => c.name === nameFilter) : filteredCommands;
 
     if (guildId === 'global') {
         let responses;
