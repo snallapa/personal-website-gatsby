@@ -609,7 +609,7 @@ exports.handler = async function(event, context) {
                         } catch (e) {
                             console.log(e);
                             league.commands.streams.message = "";
-                            await setDoc(doc(db, "leagues", guild_id), league, { merge: true });
+                            await setDoc(doc(db, "leagues", guild_id), league);
                             return respond("user removed from streams, but I couldnt update my message :(. This could mean a permissions issues on the bot or on the channel");
                         }
                     } else {
@@ -629,11 +629,11 @@ exports.handler = async function(event, context) {
                         } catch (e) {
                             console.log(e);
                             league.commands.streams.message = "";
-                            await setDoc(doc(db, "leagues", guild_id), league, { merge: true });
+                            await setDoc(doc(db, "leagues", guild_id), league);
                             return respond("user removed from streams, but I couldnt send my message :(. This could mean a permissions issues on the bot or on the channel");
                         }
                     }
-                    await setDoc(doc(db, "leagues", guild_id), league, { merge: true });
+                    await setDoc(doc(db, "leagues", guild_id), league);
                     return respond("user removed from streams!");
                 } catch (e) {
                     console.log(e);
