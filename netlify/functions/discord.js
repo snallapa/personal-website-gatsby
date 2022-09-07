@@ -691,6 +691,8 @@ exports.handler = async function(event, context) {
             const command = options[0];
             const subcommand = command.name;
             if (subcommand === "list") {
+                console.log(guild_id);
+                console.log(event);
                 const docRef = doc(db, "leagues", guild_id);
                 const docSnap = await getDoc(docRef);
                 if (!docSnap.exists()) {
