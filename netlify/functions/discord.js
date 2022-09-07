@@ -250,6 +250,10 @@ exports.handler = async function(event, context) {
                     return respond(`missing week ${week}. Please export the week in MCA (select ALL WEEKS in the app!)`);
                 }
 
+                if (week > 18) {
+                    return respond(`sorry I dont know about playoffs :(`);
+                }
+
                 const weeksGames = league.schedules.reg[`week${week}`];
                 const teams = league.teams;
                 const channelPromises = weeksGames.map(game => {
@@ -711,10 +715,13 @@ exports.handler = async function(event, context) {
 
                 const docRef = doc(db, "leagues", guild_id);
                 const docSnap = await getDoc(docRef);
+                let league;
                 if (!docSnap.exists()) {
-                    return respond(`no league found for ${guild_id}, export in MCA using league_export first`);
+                    league = {commands: {waitlist: []}};
+                    await setDoc(doc(db, "leagues", guild_id), league, { merge: true });
+                } else {
+                    league = docSnap.data();
                 }
-                const league = docSnap.data();
                 if (!league.commands || !league.commands.waitlist || league.commands.waitlist.length === 0) {
                     return respond("there is no one on the waitlist!");
                 } else {
@@ -724,10 +731,13 @@ exports.handler = async function(event, context) {
                 const user = command.options[0].value;
                 const docRef = doc(db, "leagues", guild_id);
                 const docSnap = await getDoc(docRef);
+                let league;
                 if (!docSnap.exists()) {
-                    return respond(`no league found for ${guild_id}, export in MCA using league_export first`);
+                    league = {commands: {waitlist: []}};
+                    await setDoc(doc(db, "leagues", guild_id), league, { merge: true });
+                } else {
+                    league = docSnap.data();
                 }
-                const league = docSnap.data();
                 const waitlist = league.commands.waitlist || [];
                 if (command.options[1]) {
                     const position = command.options[1].value;
@@ -750,10 +760,13 @@ exports.handler = async function(event, context) {
                 const user = command.options[0].value;
                 const docRef = doc(db, "leagues", guild_id);
                 const docSnap = await getDoc(docRef);
+                let league;
                 if (!docSnap.exists()) {
-                    return respond(`no league found for ${guild_id}, export in MCA using league_export first`);
+                    league = {commands: {waitlist: []}};
+                    await setDoc(doc(db, "leagues", guild_id), league, { merge: true });
+                } else {
+                    league = docSnap.data();
                 }
-                const league = docSnap.data();
                 const waitlist = league.commands.waitlist || [];
                 league.commands.waitlist = waitlist.filter(w => w !== user);
                 await setDoc(doc(db, "leagues", guild_id), league, { merge: true });
@@ -766,10 +779,13 @@ exports.handler = async function(event, context) {
                 const position = command.options[0] ? command.options[0].value : 1;
                 const docRef = doc(db, "leagues", guild_id);
                 const docSnap = await getDoc(docRef);
+                let league;
                 if (!docSnap.exists()) {
-                    return respond(`no league found for ${guild_id}, export in MCA using league_export first`);
+                    league = {commands: {waitlist: []}};
+                    await setDoc(doc(db, "leagues", guild_id), league, { merge: true });
+                } else {
+                    league = docSnap.data();
                 }
-                const league = docSnap.data();
                 const waitlist = league.commands.waitlist || [];
                 if (waitlist.length === 0) {
                     return respond("waitlist is empty");
@@ -785,10 +801,13 @@ exports.handler = async function(event, context) {
                 const top = command.options[0] ? command.options[0].value : 1;
                 const docRef = doc(db, "leagues", guild_id);
                 const docSnap = await getDoc(docRef);
+                let league;
                 if (!docSnap.exists()) {
-                    return respond(`no league found for ${guild_id}, export in MCA using league_export first`);
+                    league = {commands: {waitlist: []}};
+                    await setDoc(doc(db, "leagues", guild_id), league, { merge: true });
+                } else {
+                    league = docSnap.data();
                 }
-                const league = docSnap.data();
                 const waitlist = league.commands.waitlist || [];
                 if (waitlist.length === 0) {
                     return respond("waitlist is empty");
