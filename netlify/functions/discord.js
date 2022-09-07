@@ -758,11 +758,7 @@ exports.handler = async function(event, context) {
                 }
                 const league = docSnap.data();
                 const waitlist = league.commands.waitlist || [];
-                const index = waitlist.indexOf(user);
-                if (index === -1) {
-                    return respond("user is not part of the waitlist");
-                }
-                waitlist.pop(index);
+                league.commands.waitlist = waitlist.filter(w => w !== user);
                 await setDoc(doc(db, "leagues", guild_id), league, { merge: true });
                 if (!league.commands || !league.commands.waitlist || league.commands.waitlist.length === 0) {
                     return respond("there is no one on the waitlist!");
@@ -781,7 +777,7 @@ exports.handler = async function(event, context) {
                 if (waitlist.length === 0) {
                     return respond("waitlist is empty");
                 }
-                waitlist.pop(position);
+                league.commands.waitlist = waitlist.filter((_, idx) => idx !== position);
                 await setDoc(doc(db, "leagues", guild_id), league, { merge: true });
                 if (!league.commands || !league.commands.waitlist || league.commands.waitlist.length === 0) {
                     return respond("there is no one on the waitlist!");
