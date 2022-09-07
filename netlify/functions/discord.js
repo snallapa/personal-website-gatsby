@@ -708,7 +708,7 @@ exports.handler = async function(event, context) {
             const command = options[0];
             const subcommand = command.name;
             if (subcommand === "list") {
-                console.log(guild_id);
+
                 const docRef = doc(db, "leagues", guild_id);
                 const docSnap = await getDoc(docRef);
                 if (!docSnap.exists()) {
@@ -728,7 +728,7 @@ exports.handler = async function(event, context) {
                     return respond(`no league found for ${guild_id}, export in MCA using league_export first`);
                 }
                 const league = docSnap.data();
-                const waitlist = league.commands.waitlist || [];
+                league.commands.waitlist = league.commands.waitlist || [];
                 if (options[1]) {
                     const position = options[1].value;
                     if (position > waitlist.length) {
@@ -811,5 +811,5 @@ exports.handler = async function(event, context) {
             return respond("bot is working!");
         }
     }
-    return respond("we should not have gotten here...", statusCode = 400);
+    return respond("we should not have gotten here... this command is broken contact owner");
 }
