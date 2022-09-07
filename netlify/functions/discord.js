@@ -689,118 +689,119 @@ exports.handler = async function(event, context) {
         //         }
         //     }
         // } 
-        else if (name === "waitlist") {
-            const command = options[0];
-            const subcommand = command.name;
-            if (subcommand === "list") {
-                console.log(guild_id);
-                console.log(event);
-                const docRef = doc(db, "leagues", guild_id);
-                const docSnap = await getDoc(docRef);
-                if (!docSnap.exists()) {
-                    return respond(`no league found for ${guild_id}, export in MCA using league_export first`);
-                }
-                const league = docSnap.data();
-                console.log(league);
-                if (!league.commands || !league.commands.waitlist || league.commands.waitlist.length === 0) {
-                    return respond("there is no one on the waitlist!");
-                } else {
-                    return respond(createWaitlistMessage(league.commands.waitlist), data={
-                        allowed_mentions: {
-                        parse: []
-                    }});
-                }
-            } else if (subcommand === "add") {
-                const user = command.options[0].value;
-                const docRef = doc(db, "leagues", guild_id);
-                const docSnap = await getDoc(docRef);
-                if (!docSnap.exists()) {
-                    return respond(`no league found for ${guild_id}, export in MCA using league_export first`);
-                }
-                const league = docSnap.data();
-                const waitlist = league.commands.waitlist || [];
-                if (options[1]) {
-                    const position = options[1].value;
-                    if (position > waitlist.length) {
-                        return respond("invalid position, beyond the waitlist length");
-                    }
-                    const newWaitlist = waitlist.slice(0, position - 1);
-                    const end = waitlist.slice(position - 1);
-                    newWaitlist.push(user);
-                    newWaitlist.push(...end);
-                    league.commands.waitlist = newWaitlist;
-                } else {
-                    league.commands.wailist.push(user);
-                }
-                await setDoc(doc(db, "leagues", guild_id), league, { merge: true });
-                if (!league.commands || !league.commands.waitlist || league.commands.waitlist.length === 0) {
-                    return respond("there is no one on the waitlist!");
-                } else {
-                    return respond(createWaitlistMessage(league.commands.waitlist), data={
-                        allowed_mentions: {
-                        parse: []
-                    }});
-                }
-            } else if (subcommand === "remove") {
-                const user = command.options[0].value;
-                const docRef = doc(db, "leagues", guild_id);
-                const docSnap = await getDoc(docRef);
-                if (!docSnap.exists()) {
-                    return respond(`no league found for ${guild_id}, export in MCA using league_export first`);
-                }
-                const league = docSnap.data();
-                const waitlist = league.commands.waitlist || [];
-                const index = waitlist.indexOf(user);
-                if (index === -1) {
-                    return respond("user is not part of the waitlist");
-                }
-                waitlist.pop(index);
-                await setDoc(doc(db, "leagues", guild_id), league, { merge: true });
-                if (!league.commands || !league.commands.waitlist || league.commands.waitlist.length === 0) {
-                    return respond("there is no one on the waitlist!");
-                } else {
-                    return respond(createWaitlistMessage(league.commands.waitlist), data={
-                        allowed_mentions: {
-                        parse: []
-                    }});
-                }
-            } else if (subcommand === "pop") {
-                const position = command.options[0] ? command.options[0].value : 0;
-                const docRef = doc(db, "leagues", guild_id);
-                const docSnap = await getDoc(docRef);
-                if (!docSnap.exists()) {
-                    return respond(`no league found for ${guild_id}, export in MCA using league_export first`);
-                }
-                const league = docSnap.data();
-                const waitlist = league.commands.waitlist || [];
-                if (waitlist.length === 0) {
-                    return respond("waitlist is empty");
-                }
-                waitlist.pop(position);
-                await setDoc(doc(db, "leagues", guild_id), league, { merge: true });
-                if (!league.commands || !league.commands.waitlist || league.commands.waitlist.length === 0) {
-                    return respond("there is no one on the waitlist!");
-                } else {
-                    return respond(createWaitlistMessage(league.commands.waitlist), data={
-                        allowed_mentions: {
-                        parse: []
-                    }});
-                }
-            } else if (subcommand === "notify") {
-                const top = command.options[0] ? command.options[0].value : 1;
-                const docRef = doc(db, "leagues", guild_id);
-                const docSnap = await getDoc(docRef);
-                if (!docSnap.exists()) {
-                    return respond(`no league found for ${guild_id}, export in MCA using league_export first`);
-                }
-                const league = docSnap.data();
-                const waitlist = league.commands.waitlist || [];
-                if (waitlist.length === 0) {
-                    return respond("waitlist is empty");
-                }
-                return respond(notifyWaitlist(league.commands.waitlist, top));
-            }
-        } else if (name === "create_game_channels") {
+        // else if (name === "waitlist") {
+        //     const command = options[0];
+        //     const subcommand = command.name;
+        //     if (subcommand === "list") {
+        //         console.log(guild_id);
+        //         console.log(event);
+        //         const docRef = doc(db, "leagues", guild_id);
+        //         const docSnap = await getDoc(docRef);
+        //         if (!docSnap.exists()) {
+        //             return respond(`no league found for ${guild_id}, export in MCA using league_export first`);
+        //         }
+        //         const league = docSnap.data();
+        //         console.log(league);
+        //         if (!league.commands || !league.commands.waitlist || league.commands.waitlist.length === 0) {
+        //             return respond("there is no one on the waitlist!");
+        //         } else {
+        //             return respond(createWaitlistMessage(league.commands.waitlist), data={
+        //                 allowed_mentions: {
+        //                 parse: []
+        //             }});
+        //         }
+        //     } else if (subcommand === "add") {
+        //         const user = command.options[0].value;
+        //         const docRef = doc(db, "leagues", guild_id);
+        //         const docSnap = await getDoc(docRef);
+        //         if (!docSnap.exists()) {
+        //             return respond(`no league found for ${guild_id}, export in MCA using league_export first`);
+        //         }
+        //         const league = docSnap.data();
+        //         const waitlist = league.commands.waitlist || [];
+        //         if (options[1]) {
+        //             const position = options[1].value;
+        //             if (position > waitlist.length) {
+        //                 return respond("invalid position, beyond the waitlist length");
+        //             }
+        //             const newWaitlist = waitlist.slice(0, position - 1);
+        //             const end = waitlist.slice(position - 1);
+        //             newWaitlist.push(user);
+        //             newWaitlist.push(...end);
+        //             league.commands.waitlist = newWaitlist;
+        //         } else {
+        //             league.commands.wailist.push(user);
+        //         }
+        //         await setDoc(doc(db, "leagues", guild_id), league, { merge: true });
+        //         if (!league.commands || !league.commands.waitlist || league.commands.waitlist.length === 0) {
+        //             return respond("there is no one on the waitlist!");
+        //         } else {
+        //             return respond(createWaitlistMessage(league.commands.waitlist), data={
+        //                 allowed_mentions: {
+        //                 parse: []
+        //             }});
+        //         }
+        //     } else if (subcommand === "remove") {
+        //         const user = command.options[0].value;
+        //         const docRef = doc(db, "leagues", guild_id);
+        //         const docSnap = await getDoc(docRef);
+        //         if (!docSnap.exists()) {
+        //             return respond(`no league found for ${guild_id}, export in MCA using league_export first`);
+        //         }
+        //         const league = docSnap.data();
+        //         const waitlist = league.commands.waitlist || [];
+        //         const index = waitlist.indexOf(user);
+        //         if (index === -1) {
+        //             return respond("user is not part of the waitlist");
+        //         }
+        //         waitlist.pop(index);
+        //         await setDoc(doc(db, "leagues", guild_id), league, { merge: true });
+        //         if (!league.commands || !league.commands.waitlist || league.commands.waitlist.length === 0) {
+        //             return respond("there is no one on the waitlist!");
+        //         } else {
+        //             return respond(createWaitlistMessage(league.commands.waitlist), data={
+        //                 allowed_mentions: {
+        //                 parse: []
+        //             }});
+        //         }
+        //     } else if (subcommand === "pop") {
+        //         const position = command.options[0] ? command.options[0].value : 0;
+        //         const docRef = doc(db, "leagues", guild_id);
+        //         const docSnap = await getDoc(docRef);
+        //         if (!docSnap.exists()) {
+        //             return respond(`no league found for ${guild_id}, export in MCA using league_export first`);
+        //         }
+        //         const league = docSnap.data();
+        //         const waitlist = league.commands.waitlist || [];
+        //         if (waitlist.length === 0) {
+        //             return respond("waitlist is empty");
+        //         }
+        //         waitlist.pop(position);
+        //         await setDoc(doc(db, "leagues", guild_id), league, { merge: true });
+        //         if (!league.commands || !league.commands.waitlist || league.commands.waitlist.length === 0) {
+        //             return respond("there is no one on the waitlist!");
+        //         } else {
+        //             return respond(createWaitlistMessage(league.commands.waitlist), data={
+        //                 allowed_mentions: {
+        //                 parse: []
+        //             }});
+        //         }
+        //     } else if (subcommand === "notify") {
+        //         const top = command.options[0] ? command.options[0].value : 1;
+        //         const docRef = doc(db, "leagues", guild_id);
+        //         const docSnap = await getDoc(docRef);
+        //         if (!docSnap.exists()) {
+        //             return respond(`no league found for ${guild_id}, export in MCA using league_export first`);
+        //         }
+        //         const league = docSnap.data();
+        //         const waitlist = league.commands.waitlist || [];
+        //         if (waitlist.length === 0) {
+        //             return respond("waitlist is empty");
+        //         }
+        //         return respond(notifyWaitlist(league.commands.waitlist, top));
+        //     }
+        // } 
+        else if (name === "create_game_channels") {
             return respond("this command has been changed. Use `/game_channels create` instead. See https://github.com/snallapa/snallabot for more information");
         } else if (name === "clear_game_channels") {
             return respond("this command has been changed. Use `/game_channels clear` instead. See https://github.com/snallapa/snallabot for more information");
