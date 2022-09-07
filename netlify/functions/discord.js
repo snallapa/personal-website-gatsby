@@ -60,7 +60,7 @@ async function DiscordRequest(endpoint, options) {
     return res;
 }
 
-function respond(message, statusCode = 200, interactionType = InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE, data = {}) {
+function respond(message, statusCode = 200, interactionType = InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE) {
     return {
         statusCode: statusCode,
         headers: { 'Content-Type': 'application/json'},
@@ -68,7 +68,22 @@ function respond(message, statusCode = 200, interactionType = InteractionRespons
             type: interactionType,
             data: {
                 content: message,
-                ...data
+            }
+        }),
+      };
+}
+
+function respondNoMention(message) {
+    return {
+        statusCode: statusCode,
+        headers: { 'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            type: interactionType,
+            data: {
+                content: message,
+                allowed_mentions: {
+                    parse: []
+                }
             }
         }),
       };
@@ -703,10 +718,7 @@ exports.handler = async function(event, context) {
                 if (!league.commands || !league.commands.waitlist || league.commands.waitlist.length === 0) {
                     return respond("there is no one on the waitlist!");
                 } else {
-                    return respond("ok", data = {
-                        allowed_mentions: {
-                        parse: []
-                    }});
+                    return respondNoMention(createWaitlistMessage(league.commands.waitlist));
                 }
             } 
             // else if (subcommand === "add") {
