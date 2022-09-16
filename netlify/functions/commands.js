@@ -122,6 +122,19 @@ const MADDEN_CHANNELS_COMMANDS = {
     type: 1,
 };
 
+const MADDEN_SCHEDULE_COMMAND = {
+    name: 'schedule',
+    description: 'Shows the schedule for that week',
+    options: [{
+        type: 4, // integer
+        name: 'week',
+        description: 'The week number to get the schedule for',
+        required: true
+    },
+    ],
+    type: 1,
+};
+
 
 const MADDEN_TEAMS_COMMANDS = {
     name: 'teams',
@@ -313,7 +326,7 @@ const COMMANDS = [TEST_COMMAND,
     MADDEN_TEAMS_COMMANDS,
     MADDEN_WAITLIST_COMMANDS,
     MADDEN_STREAMS_COMMANDS,
-
+    MADDEN_SCHEDULE_COMMAND
 ]
 
 const DELETED_COMMANDS = [MADDEN_CHANNELS_CREATE_COMMAND, MADDEN_CHANNELS_CLEAR_COMMAND]

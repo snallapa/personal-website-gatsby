@@ -502,8 +502,7 @@ exports.handler = async function(event, context) {
                     return respond("could not free team :(")
                 }
             }
-        } 
-        else if (name === "streams") {
+        } else if (name === "streams") {
             const command = options[0];
             const subcommand = command.name;
             if (subcommand === "configure") {
@@ -707,8 +706,7 @@ exports.handler = async function(event, context) {
                     return respond("could not reset streams :(");
                 }
             }
-        } 
-        else if (name === "waitlist") {
+        } else if (name === "waitlist") {
             const command = options[0];
             const subcommand = command.name;
             if (subcommand === "list") {
@@ -814,7 +812,27 @@ exports.handler = async function(event, context) {
                 }
                 return respond(notifyWaitlist(league.commands.waitlist, top));
             }
-        } 
+        } else if (name === "schedule") {
+            const week = options[0].value;
+            const docRef = doc(db, "leagues", guild_id);
+            const docSnap = await getDoc(docRef);
+            if (!docSnap.exists()) {
+                return respond(`no league found for ${guild_id}, export in MCA using league_export first`);
+            }
+            const league = docSnap.data();
+            if (!league.schedules.reg || !league.schedules.reg[`week${week}`]) {
+                return respond(`missing week ${week}. Please export the week in MCA (select ALL WEEKS in the app!)`);
+            }
+            if (week > 18) {
+                return respond(`sorry I dont know about playoffs :(`);
+            }
+
+            const weeksGames = league.schedules.reg[`week${week}`];
+            const teams = league.teams;
+            const gamesContent = weeksGames.map(game => `${teams[game.awayTeamId].teamName}-vs-${teams[game.homeTeamId].teamName}`).join("\n");
+            const scheduleContent = `__**Week ${week}**__\n${gamesContent}`;
+            return respond(scheduleContent);
+        }
         else if (name === "create_game_channels") {
             return respond("this command has been changed. Use `/game_channels create` instead. See https://github.com/snallapa/snallabot for more information");
         } else if (name === "clear_game_channels") {
