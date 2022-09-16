@@ -829,7 +829,7 @@ exports.handler = async function(event, context) {
 
             const weeksGames = league.schedules.reg[`week${week}`];
             const teams = league.teams;
-            const gamesContent = weeksGames.map(game => `${teams[game.awayTeamId].teamName}-vs-${teams[game.homeTeamId].teamName}`).join("\n");
+            const gamesContent = weeksGames.map(game => `${teams[game.awayTeamId].teamName} vs ${teams[game.homeTeamId].teamName}`).join("\n");
             const scheduleContent = `__**Week ${week}**__\n${gamesContent}`;
             return respond(scheduleContent);
         }
