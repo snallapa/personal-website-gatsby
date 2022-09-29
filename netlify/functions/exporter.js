@@ -21,7 +21,7 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 exports.handler = async function(event, context) {
-    // console.log(event)
+    console.log(event)
     const league = event.queryStringParameters.league;
     const api = event.queryStringParameters.api;
     const paths = api.split("/");
