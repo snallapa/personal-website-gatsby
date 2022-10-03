@@ -35,7 +35,8 @@ export default () => {
             headers : {
                 'User-Agent': 'ProtoHttp 1.3/DS 15.1.2.2.0 (Android)',
                 'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
-                'Accept': 'application/json;charset=utf-8'
+                'Accept': 'application/json;charset=utf-8',
+                'Access-Control-Allow-Origin': 'https://nallapareddy.com'
             },
             body: `client_secret=U02zL2khwlgFdODLWCyLPmccOc5EiPBBYcEwCqKDTWBrZj2Fwcx4b4Zd9rsA6lHLkIU4qlVvNh84olij&grant_type=authorization_code&code=${code}&redirect_uri=http://127.0.0.1/success&release_type=prod&client_id=MaddenCompanionApp19`
         });
