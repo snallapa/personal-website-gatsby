@@ -165,7 +165,7 @@ export default () => {
             ...state,
             loading: "LOADING"
         });
-        await login();
+        login();
     }
 
     return (
