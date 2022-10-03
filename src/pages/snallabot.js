@@ -23,14 +23,13 @@ const CORS = `https://thawing-atoll-70735.herokuapp.com/`;
 
 
 export default () => {
-    const code = params.get("code");
     const [state, setState] = useState({
         loading: "",
         blazeSession: "",
         code: ""
     });
 
-    const login = async () => {
+    const login = async (code) => {
         const res1 = await fetch(`${CORS}https://accounts.ea.com/connect/token`, {
             method: 'POST', 
             headers : {
@@ -165,7 +164,8 @@ export default () => {
             ...state,
             loading: "LOADING"
         });
-        login();
+        const parsedCode = state.code.replace("http://127.0.0.1/success?code", "");
+        login(parsedCode);
     }
 
     return (
