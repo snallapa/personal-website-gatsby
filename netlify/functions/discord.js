@@ -189,7 +189,7 @@ exports.handler = async function(event, context) {
         const {name, resolved, options} = data;
 
         if (name === "league_export") {
-            return respond(`Type this URL carefully into your app (no spaces exactly as shown here): http://nallapareddy.com/.netlify/functions/exporter?league=${guild_id}&api=`);
+            return respond(`Type this URL carefully into your app (no spaces exactly as shown here): http://snallabot.herokuapp.com/${guild_id}`);
         } else if (name === "import_league") { // not recommended anymore
             console.log(guild_id);
 
