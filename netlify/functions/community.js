@@ -203,10 +203,12 @@ exports.handler = async function(event, context) {
             const week = data.week.number;
             const games = data.events;
 
-            if (!polls.nfl || !polls.nfl.channel) {
-                return respond ("run setup nfl polls first and configure channel");
+            let channel;
+            try {
+                channel = polls.nfl.channel;
+            } catch (error) {
+                return respond('missing configuration, run `/setup_nfl_polls` first');
             }
-            const channel = polls.nfl.channel;
 
             if (!polls.nfl[`week${week}`]) {
                 // create the poll messages
@@ -215,7 +217,7 @@ exports.handler = async function(event, context) {
                     return {
                         id,
                         message: formatGame(g),
-                        
+
                     }
                 });
                 const messagePromises = gameMessages.map(g => {
