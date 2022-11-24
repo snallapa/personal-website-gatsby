@@ -75,6 +75,8 @@ async function DiscordRequestRateLimit(endpoint, options) {
         ...options
     });
 
+    console.log(res);
+
     if (res.status === 429) {
         return res;
     }
@@ -266,6 +268,7 @@ exports.handler = async function(event, context) {
                         polls.nfl[`week${week}`][currentGame.id] = messageId
                         messageCount = messageCount + 1;
                     } catch (e) {
+                        console.log(e);
                         const rateLimit = await e.json();
                         await new Promise(r => setTimeout(r, rateLimit["retry_after"] * 1000));
                     }
