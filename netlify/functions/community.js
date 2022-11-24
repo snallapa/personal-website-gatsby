@@ -250,6 +250,7 @@ exports.handler = async function(event, context) {
 
                     }
                 });
+                polls.nfl[`week${week}`] = {};
                 let messageCount = 0;
                 while (messageCount < gameMessages.length) {
                     const currentGame = gameMessages[messageCount];
