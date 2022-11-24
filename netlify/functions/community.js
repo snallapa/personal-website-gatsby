@@ -146,7 +146,7 @@ exports.handler = async function(event, context) {
             return respond("bot is working!");
         } else if (name === "setup_nfl_polls") {
             const channel = options[0].value
-            await setDoc(doc(db, "leagues", guild_id), {
+            await setDoc(doc(db, "polls", guild_id), {
                 polls: {
                     nfl: {
                         channel: channel
