@@ -106,6 +106,10 @@ exports.handler = async function(event, context) {
     }
     if (type === InteractionType.APPLICATION_COMMAND) {;
         const {name, resolved, options} = data;
+        if (name === "test_community") {
+            console.log("test command received!")
+            return respond("bot is working!");
+        }
 
     }
     return respond("we should not have gotten here... this command is broken contact owner");
