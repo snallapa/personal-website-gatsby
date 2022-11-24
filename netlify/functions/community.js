@@ -163,10 +163,8 @@ exports.handler = async function(event, context) {
         } else if (name === "setup_nfl_polls") {
             const channel = options[0].value
             await setDoc(doc(db, "polls", guild_id), {
-                polls: {
-                    nfl: {
-                        channel: channel
-                    }
+                nfl: {
+                    channel: channel
                 }
             }, { merge: true });
             const res = await DiscordRequest(`/guilds/${guild_id}/emojis`, { method: 'GET' });
