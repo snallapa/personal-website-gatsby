@@ -145,12 +145,20 @@ exports.handler = async function(event, context) {
             console.log("test command received!")
             return respond("bot is working!");
         } else if (name === "setup_nfl_polls") {
+            const channel = options[0].value
+            await setDoc(doc(db, "leagues", guild_id), {
+                polls: {
+                    nfl: {
+                        channel: channel
+                    }
+                }
+            }, { merge: true });
             const res = await DiscordRequest(`/guilds/${guild_id}/emojis`, { method: 'GET' });
             const currentEmoji = await res.json();
             const currentEmojiNames = currentEmoji.map(e => e.name);
             const teams = Object.keys(nfl_emojis).filter(t => !currentEmojiNames.includes(`snallabot_${t}`));
             if (teams.length === 0) {
-                return respond("all emojis are already setup!");
+                return respond("all emojis are already setup, channel is configured!");
             }
             const emojiPromises = teams.map(t => {
                 return DiscordRequest(`guilds/${guild_id}/emojis`, {
@@ -163,14 +171,16 @@ exports.handler = async function(event, context) {
             });
             const responses = await Promise.all(emojiPromises);
             if (responses.every(r => r.ok)) {
-                return respond("setup all my emojis!");
+                return respond("setup all my emojis and configured channel!");
             } else {
                 return respond("something went wrong... not all emojis were setup");
             }
         } else if (name === "manual_update") {
             const res = await fetch("http://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard");
             const data = await res.json();
-            console.log(data);
+            const week = data.week.number;
+            const games = data.events;
+
             return respond("testing");
         }
 
