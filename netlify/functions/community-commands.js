@@ -7,7 +7,13 @@ const TEST_COMMAND = {
     type: 1,
 };
 
-const COMMANDS = [TEST_COMMAND]
+const SETUP_COMMAND = {
+    name: 'setup_polls',
+    description: 'setup the community for game polls',
+    type: 1,
+};
+
+const COMMANDS = [TEST_COMMAND, SETUP_COMMAND]
 
 const DELETED_COMMANDS = []
 
