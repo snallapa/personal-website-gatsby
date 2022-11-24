@@ -248,18 +248,6 @@ exports.handler = async function(event, context) {
 
                     }
                 });
-                const messagePromises = gameMessages.map(g => {
-                    return DiscordRequest(`channels/${channel}/messages`, {
-                        method: 'POST',
-                        body: {
-                            content: g.message,
-                            allowed_mentions: {
-                                parse: []
-                            }
-                        }
-                    });
-                });
-
                 let messageCount = 0;
                 while (messageCount < gameMessages.length) {
                     const currentGame = gameMessages[messageCount];
