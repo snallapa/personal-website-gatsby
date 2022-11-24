@@ -198,6 +198,7 @@ exports.handler = async function(event, context) {
                 return respond(`no community found for ${guild_id}, do /setup_nfl_polls first`);
             }
             const polls = docSnap.data();
+            console.log(polls);
             const res = await fetch("http://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard");
             const data = await res.json();
             const week = data.week.number;
