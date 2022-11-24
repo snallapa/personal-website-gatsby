@@ -170,6 +170,7 @@ exports.handler = async function(event, context) {
         } else if (name === "manual_update") {
             const res = await fetch("http://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard");
             const data = await res.json();
+            console.log(data);
             return respond("testing");
         }
 
