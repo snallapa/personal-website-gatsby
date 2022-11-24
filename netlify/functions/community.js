@@ -150,7 +150,7 @@ exports.handler = async function(event, context) {
             const currentEmojiNames = currentEmoji.map(e => e.name);
             const teams = Object.keys(nfl_emojis).filter(t => !currentEmojiNames.includes(`snallabot_${t}`));
             if (teams.length === 0) {
-                return respond("all emojis are setup!");
+                return respond("all emojis are already setup!");
             }
             const emojiPromises = teams.map(t => {
                 return DiscordRequest(`guilds/${guild_id}/emojis`, {
@@ -167,6 +167,10 @@ exports.handler = async function(event, context) {
             } else {
                 return respond("something went wrong... not all emojis were setup");
             }
+        } else if (name === "manual_update") {
+            const res = await fetch("http://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard");
+            const data = await res.json();
+            return respond("testing");
         }
 
     }

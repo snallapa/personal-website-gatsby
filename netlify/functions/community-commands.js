@@ -11,9 +11,24 @@ const SETUP_COMMAND = {
     name: 'setup_nfl_polls',
     description: 'setup the community for nfl game polls',
     type: 1,
+    options: [
+        {
+            type: 7, // channel
+            name: 'channel',
+            description: 'channel to create polls in',
+            required: true,
+            channel_types: [0]
+        }
+    ]
 };
 
-const COMMANDS = [TEST_COMMAND, SETUP_COMMAND]
+const UPDATE_COMMAND = {
+    name: 'manual_update',
+    description: 'manual update poll scores',
+    type: 1,
+};
+
+const COMMANDS = [TEST_COMMAND, SETUP_COMMAND, UPDATE_COMMAND]
 
 const DELETED_COMMANDS = []
 
