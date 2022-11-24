@@ -8,8 +8,8 @@ const TEST_COMMAND = {
 };
 
 const SETUP_COMMAND = {
-    name: 'setup_polls',
-    description: 'setup the community for game polls',
+    name: 'setup_nfl_polls',
+    description: 'setup the community for nfl game polls',
     type: 1,
 };
 
