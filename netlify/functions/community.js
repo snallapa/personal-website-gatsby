@@ -263,24 +263,24 @@ exports.handler = async function(event, context) {
                 let messageCount = 0;
                 while (messageCount < gameMessages.length) {
                     const currentGame = gameMessages[messageCount];
-                    const m = await DiscordRequestRateLimit(`channels/${channel}/messages`, {
-                        method: 'POST',
-                        body: {
-                            content: currentGame.message,
-                            allowed_mentions: {
-                                parse: []
+                    try {
+                        const m = await DiscordRequestRateLimit(`channels/${channel}/messages`, {
+                            method: 'POST',
+                            body: {
+                                content: currentGame.message,
+                                allowed_mentions: {
+                                    parse: []
+                                }
                             }
-                        }
-                    });
-                    if (m.status === 429) {
-                        const rateLimit = await m.json();
+                        });
+                        const jsonRes = await m.json();
+                        const messageId = jsonRes.id;
+                        polls.nfl[`week${week}`][currentGame.id] = messageId
+                        messageCount = messageCount + 1;
+                    } catch (e) {
+                        const rateLimit = await e.json();
                         await new Promise(r => setTimeout(r, rateLimit["retry_after"] * 1000));
-                        continue;
                     }
-                    const jsonRes = await m.json();
-                    const messageId = jsonRes.id;
-                    polls.nfl[`week${week}`][currentGame.id] = messageId
-                    messageCount = messageCount + 1;
                 }
                 await setDoc(doc(db, "polls", guild_id), polls, { merge: true });
                 return respond("game polls created!");
