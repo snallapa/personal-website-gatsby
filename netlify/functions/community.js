@@ -145,7 +145,7 @@ exports.handler = async function(event, context) {
             console.log("test command received!")
             return respond("bot is working!");
         } else if (name === "setup_nfl_polls") {
-            const res = await DiscordRequest(`/guilds/${guild.id}/emojis`, { method: 'GET' });
+            const res = await DiscordRequest(`/guilds/${guild_id}/emojis`, { method: 'GET' });
             const currentEmoji = await res.json();
             const currentEmojiNames = currentEmoji.map(e => e.name);
             const teams = Object.keys(nfl_emojis).filter(t => !currentEmojiNames.includes(`snallabot_${t}`));
