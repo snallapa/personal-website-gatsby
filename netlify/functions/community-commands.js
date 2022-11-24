@@ -38,7 +38,7 @@ async function DiscordRequest(endpoint, options) {
 
 async function InstallGuildCommand(guildId, command) {
     // API endpoint to get and post guild commands
-    const endpoint = `applications/${process.env.APP_ID}/guilds/${guildId}/commands`;
+    const endpoint = `applications/${process.env.APP_ID_COMMUNITY}/guilds/${guildId}/commands`;
     console.log(command);
     // install command
     try {
@@ -52,7 +52,7 @@ async function InstallGuildCommand(guildId, command) {
 
 async function DeleteGuildCommand(guildId, commandId) {
     // API endpoint to get and post guild commands
-    const endpoint = `applications/${process.env.APP_ID}/guilds/${guildId}/commands/${commandId}`;
+    const endpoint = `applications/${process.env.APP_ID_COMMUNITY}/guilds/${guildId}/commands/${commandId}`;
 
     try {
         const res = await DiscordRequest(endpoint, { method: 'DELETE' });
@@ -65,7 +65,7 @@ async function DeleteGuildCommand(guildId, commandId) {
 
 async function DeleteGlobalCommand(commandId) {
     // API endpoint to get and post guild commands
-    const endpoint = `applications/${process.env.APP_ID}/commands/${commandId}`;
+    const endpoint = `applications/${process.env.APP_ID_COMMUNITY}/commands/${commandId}`;
     // install command
     try {
         const res = await DiscordRequest(endpoint, { method: 'DELETE' });
@@ -78,7 +78,7 @@ async function DeleteGlobalCommand(commandId) {
 
 async function InstallGlobalCommand(command) {
     // API endpoint to get and post guild commands
-    const endpoint = `applications/${process.env.APP_ID}/commands`;
+    const endpoint = `applications/${process.env.APP_ID_COMMUNITY}/commands`;
     console.log(command);
     // install command
     try {
@@ -92,7 +92,7 @@ async function InstallGlobalCommand(command) {
 
 async function HasGuildCommand(guildId, command) {
 // API endpoint to get and post guild commands
-    const endpoint = `applications/${process.env.APP_ID}/guilds/${guildId}/commands`;
+    const endpoint = `applications/${process.env.APP_ID_COMMUNITY}/guilds/${guildId}/commands`;
     try {
         const res = await DiscordRequest(endpoint, { method: 'GET' });
         const data = await res.json();
@@ -130,7 +130,7 @@ exports.handler = async function(event, context) {
         if (type === "install") {
             responses = await Promise.all(applicationCommands.map(command => InstallGlobalCommand(command)));
         } else {
-            const endpoint = `applications/${process.env.APP_ID}/commands`
+            const endpoint = `applications/${process.env.APP_ID_COMMUNITY}/commands`
             const res = await DiscordRequest(endpoint, { method: 'GET' });
             const commands = await res.json();
             const commandNames = applicationCommands.map(c => c.name);
@@ -159,7 +159,7 @@ exports.handler = async function(event, context) {
     if (type === "install") {
         responses = await Promise.all(applicationCommands.map(command => InstallGuildCommand(guildId, command)));
     } else {
-        const endpoint = `applications/${process.env.APP_ID}/guilds/${guildId}/commands`
+        const endpoint = `applications/${process.env.APP_ID_COMMUNITY}/guilds/${guildId}/commands`
         const res = await DiscordRequest(endpoint, { method: 'GET' });
         const commands = await res.json();
         const commandNames = applicationCommands.map(c => c.name);
