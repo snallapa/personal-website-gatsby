@@ -148,7 +148,10 @@ exports.handler = async function(event, context) {
             const res = await DiscordRequest(`/guilds/${guild.id}/emojis`, { method: 'GET' });
             const currentEmoji = await res.json();
             const currentEmojiNames = currentEmoji.map(e => e.name);
-            const teams = Object.keys(nfl_emojis).filter(t => !currentEmojiNames.includes(t));
+            const teams = Object.keys(nfl_emojis).filter(t => !currentEmojiNames.includes(`snallabot_${t}`));
+            if (teams.length === 0) {
+                return respond("all emojis are setup!");
+            }
             const emojiPromises = teams.map(t => {
                 return DiscordRequest(`guilds/${guild_id}/emojis`, {
                     method: 'POST',
