@@ -50,6 +50,35 @@ async function DiscordRequest(endpoint, options) {
         },
         ...options
     });
+
+    // throw API errors
+    if (!res.ok) {
+        const data = await res.json();
+        console.log(res);
+        throw new Error(JSON.stringify(data));
+    }
+    // return original response
+    return res;
+}
+
+async function DiscordRequestRateLimit(endpoint, options) {
+    // append endpoint to root API URL
+    const url = 'https://discord.com/api/v9/' + endpoint;
+    // Stringify payloads
+    if (options.body) options.body = JSON.stringify(options.body);
+    // Use node-fetch to make requests
+    const res = await fetch(url, {
+        headers: {
+        Authorization: `Bot ${process.env.DISCORD_TOKEN_COMMUNITY}`,
+        'Content-Type': 'application/json; charset=UTF-8',
+        },
+        ...options
+    });
+
+    if (res.status === 429) {
+        return res;
+    }
+
     // throw API errors
     if (!res.ok) {
         const data = await res.json();
@@ -231,12 +260,28 @@ exports.handler = async function(event, context) {
                     });
                 });
 
-                const responses = await Promise.all(messagePromises);
-                const jsonResponses = await Promise.all(responses.map(r => r.json()));
-                const messageIds = jsonResponses.map(d => d.id);
-                gameMessages.forEach((g, i) => {
-                    polls.nfl[`week${week}`][g.id] = messageIds[i]
-                });
+                let messageCount = 0;
+                while (messageCount < gameMessages.length) {
+                    const currentGame = gameMessages[messageCount];
+                    const m = await DiscordRequestRateLimit(`channels/${channel}/messages`, {
+                        method: 'POST',
+                        body: {
+                            content: currentGame.message,
+                            allowed_mentions: {
+                                parse: []
+                            }
+                        }
+                    });
+                    if (m.status === 429) {
+                        const rateLimit = await m.json();
+                        await new Promise(r => setTimeout(r, rateLimit["retry_after"] * 1000));
+                        continue;
+                    }
+                    const jsonRes = await m.json();
+                    const messageId = jsonRes.id;
+                    polls.nfl[`week${week}`][currentGame.id] = messageId
+                    messageCount = messageCount + 1;
+                }
                 await setDoc(doc(db, "polls", guild_id), polls, { merge: true });
                 return respond("game polls created!");
             } else {
