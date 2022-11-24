@@ -268,9 +268,10 @@ exports.handler = async function(event, context) {
                         polls.nfl[`week${week}`][currentGame.id] = messageId
                         messageCount = messageCount + 1;
                     } catch (e) {
-                        console.log(e);
-                        const rateLimit = await e.json();
-                        await new Promise(r => setTimeout(r, rateLimit["retry_after"] * 1000));
+                        const error = JSON.parse(e.message);
+                        if (error["retry_after"]) {
+                            await new Promise(r => setTimeout(r, error["retry_after"] * 1000));
+                        }
                     }
                 }
                 await setDoc(doc(db, "polls", guild_id), polls, { merge: true });
