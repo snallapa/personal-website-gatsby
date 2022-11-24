@@ -153,7 +153,7 @@ exports.handler = async function(event, context) {
                 return DiscordRequest(`guilds/${guild_id}/emojis`, {
                     method: 'POST',
                     body: {
-                        name: `snall${t}`,
+                        name: `snallabot_${t}`,
                         image: emojis[t]
                     }
                 });
