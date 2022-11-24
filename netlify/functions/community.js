@@ -254,7 +254,7 @@ exports.handler = async function(event, context) {
                 while (messageCount < gameMessages.length) {
                     const currentGame = gameMessages[messageCount];
                     try {
-                        const m = await DiscordRequestRateLimit(`channels/${channel}/messages`, {
+                        const m = await DiscordRequest(`channels/${channel}/messages`, {
                             method: 'POST',
                             body: {
                                 content: currentGame.message,
