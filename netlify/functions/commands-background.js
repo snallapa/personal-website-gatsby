@@ -156,8 +156,8 @@ exports.handler = async function(event, context) {
                 });
                 const jsonRes = await m.json();
                 const messageId = jsonRes.id;
-                reactions.push({messageId, emoji: currentGame.homeEmoji});
                 reactions.push({messageId, emoji: currentGame.awayEmoji});
+                reactions.push({messageId, emoji: currentGame.homeEmoji});
                 polls.nfl[`week${week}`][currentGame.id] = messageId
                 messageCount = messageCount + 1;
             } catch (e) {
