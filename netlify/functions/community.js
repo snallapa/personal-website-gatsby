@@ -193,9 +193,17 @@ exports.handler = async function(event, context) {
             return respond("bot is working!");
         } else if (name === "setup_nfl_polls") {
             const channel = options[0].value
+            const auto = options[1] ? options[1].value : false;
             await setDoc(doc(db, "polls", guild_id), {
                 nfl: {
                     channel: channel
+                }
+            }, { merge: true });
+            const guilds = {};
+            guilds[guild_id] = auto;
+            await setDoc(doc(db, "polls", "guild_updates"), {
+                nfl: {
+                    guilds
                 }
             }, { merge: true });
             const res = await DiscordRequest(`/guilds/${guild_id}/emojis`, { method: 'GET' });

@@ -18,6 +18,12 @@ const SETUP_COMMAND = {
             description: 'channel to create polls in',
             required: true,
             channel_types: [0]
+        },
+        {
+            type: 5, // boolean
+            name: 'auto_update',
+            description: 'set to true to auto update polls every 10 minutes',
+            required: false
         }
     ]
 };
