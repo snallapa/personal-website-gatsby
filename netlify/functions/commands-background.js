@@ -83,16 +83,19 @@ function formatGame(g) {
     const homeTeam = comp.competitors.find(c => c.homeAway === "home");
     const awayTeam = comp.competitors.find(c => c.homeAway === "away");
     const status = comp.status.type.name;
+    const schedule = comp.status.type.shortDetail;
     if (status === "STATUS_FINAL") {
         if (homeTeam.winner) {
-            return `${awayTeam.team.displayName} ${awayTeam.score} - **${homeTeam.score} ${homeTeam.team.displayName}** **FINAL**`
+            return `${awayTeam.team.displayName} ${awayTeam.score} - **${homeTeam.score} ${homeTeam.team.displayName}** **__FINAL__**`;
         } else if (awayTeam.winner) {
-            return `**${awayTeam.team.displayName} ${awayTeam.score}** - ${homeTeam.score} ${homeTeam.team.displayName} **FINAL**`
+            return `**${awayTeam.team.displayName} ${awayTeam.score}** - ${homeTeam.score} ${homeTeam.team.displayName} **__FINAL__**`;
         } else {
-            return `${awayTeam.team.displayName} ${awayTeam.score} - ${homeTeam.score} ${homeTeam.team.displayName} **FINAL**`
+            return `${awayTeam.team.displayName} ${awayTeam.score} - ${homeTeam.score} ${homeTeam.team.displayName} **__FINAL__**`;
         }
+    } else if (status === "STATUS_SCHEDULED") {
+        return `${awayTeam.team.displayName} - ${homeTeam.team.displayName} ${schedule}`;
     }
-    return `${awayTeam.team.displayName} ${awayTeam.score} - ${homeTeam.score} ${homeTeam.team.displayName}`
+    return `${awayTeam.team.displayName} ${awayTeam.score} - ${homeTeam.score} ${homeTeam.team.displayName}`;
 }
 
 exports.handler = async function(event, context) {
