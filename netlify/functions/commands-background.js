@@ -122,10 +122,16 @@ exports.handler = async function(event, context) {
 
     const gameMessages = games.sort((a,b) => (new Date(a.date) - new Date(b.date))).map(g => {
         const id = g.id;
+        const comp = g.competitions[0];
+        const homeTeam = comp.competitors.find(c => c.homeAway === "home");
+        const awayTeam = comp.competitors.find(c => c.homeAway === "away");
+        const awayEmoji = `snallabot_${awayTeam.team.abbreviation.toLowerCase()}`;
+        const homeEmoji = `snallabot_${homeTeam.team.abbreviation.toLowerCase()}`;
         return {
             id,
             message: formatGame(g),
-
+            awayEmoji,
+            homeEmoji
         }
     });
 
@@ -148,6 +154,24 @@ exports.handler = async function(event, context) {
                 });
                 const jsonRes = await m.json();
                 const messageId = jsonRes.id;
+                const r1 = await DiscordRequest(`channels/${channel}/messages/${messageId}/reactions/${currentGame.awayEmoji}/@me`, {
+                    method: 'PUT',
+                    body: {
+                        content: currentGame.message,
+                        allowed_mentions: {
+                            parse: []
+                        }
+                    }
+                });
+                const r2 = await DiscordRequest(`channels/${channel}/messages/${messageId}/reactions/${currentGame.homeEmoji}/@me`, {
+                    method: 'PUT',
+                    body: {
+                        content: currentGame.message,
+                        allowed_mentions: {
+                            parse: []
+                        }
+                    }
+                });
                 polls.nfl[`week${week}`][currentGame.id] = messageId
                 messageCount = messageCount + 1;
             } catch (e) {
