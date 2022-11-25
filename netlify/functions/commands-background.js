@@ -174,7 +174,7 @@ exports.handler = async function(event, context) {
         tries = 0;
         while (reactionCount < reactions.length && tries < 100) {
             const currentReaction = reactions[reactionCount];
-            const emoji = polls.nfl.emojis[currentReaction.emoji];
+            const emoji = `${currentReaction.emoji}%3A${polls.nfl.emojis[currentReaction.emoji]}`;
             try {
                 await DiscordRequest(`channels/${channel}/messages/${currentReaction.messageId}/reactions/${emoji}/@me`, {
                     method: 'PUT'
