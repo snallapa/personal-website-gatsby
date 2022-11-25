@@ -103,7 +103,16 @@ exports.handler = async function(event, context) {
 
     if (!polls.nfl[`week${week}`]) {
         // create the poll messages
-
+        // header for games
+        const _ = await DiscordRequest(`channels/${channel}/messages`, {
+            method: 'POST',
+            body: {
+                content: `**__Week ${week} Games__**`,
+                allowed_mentions: {
+                    parse: []
+                }
+            }
+        });
         polls.nfl[`week${week}`] = {};
         let messageCount = 0;
         const reactions = [];
