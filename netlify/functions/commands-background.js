@@ -165,6 +165,7 @@ exports.handler = async function(event, context) {
                 const error = JSON.parse(e.message);
                 if (error["retry_after"]) {
                     await new Promise(r => setTimeout(r, error["retry_after"] * 1000));
+                    console.log(`game messages retries: ${tries}`);
                 }
             }
         }
@@ -173,7 +174,7 @@ exports.handler = async function(event, context) {
         while (reactionCount < reactions.length && tries < 100) {
             const currentReaction = reactions[reactionCount];
             try {
-                await DiscordRequest(`channels/${channel}/messages/${currentReaction.messageId}/reactions/${currentReaction.awayEmoji}/@me`, {
+                await DiscordRequest(`channels/${channel}/messages/${currentReaction.messageId}/reactions/%3A${currentReaction.awayEmoji}%3A/@me`, {
                     method: 'PUT'
                 });
                 reactionCount = reactionCount + 1;
@@ -184,6 +185,7 @@ exports.handler = async function(event, context) {
                 if (error["retry_after"]) {
                     await new Promise(r => setTimeout(r, error["retry_after"] * 1000));
                 }
+                console.log(`reaction tries: ${tries}`);
             }
 
         }
