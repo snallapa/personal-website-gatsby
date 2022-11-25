@@ -227,64 +227,26 @@ exports.handler = async function(event, context) {
                 return respond(`no community found for ${guild_id}, do /setup_nfl_polls first`);
             }
             const polls = docSnap.data();
-            console.log(polls);
-            const res = await fetch("http://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard");
-            const data = await res.json();
-            const week = data.week.number;
-            const games = data.events;
-
-            let channel;
+            // fail this early
             try {
-                channel = polls.nfl.channel;
+                const channel = polls.nfl.channel;
             } catch (error) {
                 return respond('missing configuration, run `/setup_nfl_polls` first');
             }
 
-            if (!polls.nfl[`week${week}`]) {
-                // create the poll messages
-                const gameMessages = games.map(g => {
-                    const id = g.id;
-                    return {
-                        id,
-                        message: formatGame(g),
-
-                    }
-                });
-                polls.nfl[`week${week}`] = {};
-                let messageCount = 0;
-                while (messageCount < gameMessages.length) {
-                    const currentGame = gameMessages[messageCount];
-                    try {
-                        const m = await DiscordRequest(`channels/${channel}/messages`, {
-                            method: 'POST',
-                            body: {
-                                content: currentGame.message,
-                                allowed_mentions: {
-                                    parse: []
-                                }
-                            }
-                        });
-                        const jsonRes = await m.json();
-                        const messageId = jsonRes.id;
-                        polls.nfl[`week${week}`][currentGame.id] = messageId
-                        messageCount = messageCount + 1;
-                    } catch (e) {
-                        console.log(e);
-                        const error = JSON.parse(e.message);
-                        if (error["retry_after"]) {
-                            await new Promise(r => setTimeout(r, error["retry_after"] * 1000));
-                        }
-                    }
-                }
-                await setDoc(doc(db, "polls", guild_id), polls, { merge: true });
-                return respond("game polls created!");
+            const res = await fetch("https://nallapareddy.com/.netlify/functions/commands-background", {
+                method: 'POST',
+                body: JSON.stringify({
+                    guild_id: guild_id
+                })
+            });
+            if (res.ok) {
+                return respond("creating polls shortly!");
             } else {
-                // update the poll messages
+                console.log(res);
+                return respond("something went wrong :( I am not sure if polls will be created maybe ask owner");
             }
-
-            return respond("testing");
         }
-
     }
     return respond("we should not have gotten here... this command is broken contact owner");
 }
