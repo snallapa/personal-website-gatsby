@@ -199,10 +199,21 @@ exports.handler = async function(event, context) {
                 }
             }, { merge: true });
             const res = await DiscordRequest(`/guilds/${guild_id}/emojis`, { method: 'GET' });
+            const emojisData = {}
             const currentEmoji = await res.json();
+            currentEmoji.forEach(e => {
+                const name = e.name;
+                const id = e.id;
+                emojisData[name] = id;
+            })
             const currentEmojiNames = currentEmoji.map(e => e.name);
             const teams = Object.keys(nfl_emojis).filter(t => !currentEmojiNames.includes(`snallabot_${t}`));
             if (teams.length === 0) {
+                await setDoc(doc(db, "polls", guild_id), {
+                    nfl: {
+                        emojis: emojisData
+                    }
+                }, { merge: true });
                 return respond("all emojis are already setup, channel is configured!");
             }
             const emojiPromises = teams.map(t => {
@@ -215,6 +226,17 @@ exports.handler = async function(event, context) {
                 });
             });
             const responses = await Promise.all(emojiPromises);
+            const emojiRes = await Promise.all(responses.map(r.json()));
+            emojiRes.forEach(e => {
+                const name = e.name;
+                const id = e.id;
+                emojisData[name] = id;
+            });
+            await setDoc(doc(db, "polls", guild_id), {
+                nfl: {
+                    emojis: emojisData
+                }
+            }, { merge: true });
             if (responses.every(r => r.ok)) {
                 return respond("setup all my emojis and configured channel!");
             } else {

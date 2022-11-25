@@ -156,7 +156,8 @@ exports.handler = async function(event, context) {
                 });
                 const jsonRes = await m.json();
                 const messageId = jsonRes.id;
-                reactions.push({messageId, homeEmoji: currentGame.homeEmoji, awayEmoji: currentGame.awayEmoji});
+                reactions.push({messageId, emoji: currentGame.homeEmoji});
+                reactions.push({messageId, emoji: currentGame.awayEmoji});
                 polls.nfl[`week${week}`][currentGame.id] = messageId
                 messageCount = messageCount + 1;
             } catch (e) {
@@ -173,8 +174,9 @@ exports.handler = async function(event, context) {
         tries = 0;
         while (reactionCount < reactions.length && tries < 100) {
             const currentReaction = reactions[reactionCount];
+            const emoji = polls.nfl.emojis[currentReaction.emoji];
             try {
-                await DiscordRequest(`channels/${channel}/messages/${currentReaction.messageId}/reactions/%3A${currentReaction.awayEmoji}%3A/@me`, {
+                await DiscordRequest(`channels/${channel}/messages/${currentReaction.messageId}/reactions/${emoji}/@me`, {
                     method: 'PUT'
                 });
                 reactionCount = reactionCount + 1;
