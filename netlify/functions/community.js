@@ -226,7 +226,7 @@ exports.handler = async function(event, context) {
                 });
             });
             const responses = await Promise.all(emojiPromises);
-            const emojiRes = await Promise.all(responses.map(r.json()));
+            const emojiRes = await Promise.all(responses.map(r => r.json()));
             emojiRes.forEach(e => {
                 const name = e.name;
                 const id = e.id;
