@@ -40,4 +40,7 @@ exports.handler = async function(event, context) {
     } else {
         console.log("updates were not sent succesfully");
     }
+    return {
+        statusCode: 200,
+    };
 }
