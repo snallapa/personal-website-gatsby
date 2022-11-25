@@ -117,16 +117,18 @@ exports.handler = async function(event, context) {
         return respond('missing configuration, run `/setup_nfl_polls` first');
     }
 
+    const gameMessages = games.sort((a,b) => (new Date(b.date) - new Date(a.date))).map(g => {
+        const id = g.id;
+        return {
+            id,
+            message: formatGame(g),
+
+        }
+    });
+
     if (!polls.nfl[`week${week}`]) {
         // create the poll messages
-        const gameMessages = games.map(g => {
-            const id = g.id;
-            return {
-                id,
-                message: formatGame(g),
 
-            }
-        });
         polls.nfl[`week${week}`] = {};
         let messageCount = 0;
         while (messageCount < gameMessages.length) {
@@ -153,9 +155,34 @@ exports.handler = async function(event, context) {
                 }
             }
         }
-        
-        return respond("game polls created!");
+        await setDoc(doc(db, "polls", guild_id), polls, { merge: true });
+        console.log("set game messages for current week");
     } else {
         // update the poll messages
+        let messageCount = 0;
+        while (messageCount < gameMessages.length) {
+            const currentGame = gameMessages[messageCount];
+            try {
+                const m = await DiscordRequest(`channels/${channel}/messages/${polls.nfl[`week${week}`][currentGame.id]}`, {
+                    method: 'PATCH',
+                    body: {
+                        content: currentGame.message,
+                        allowed_mentions: {
+                            parse: []
+                        }
+                    }
+                });
+                const jsonRes = await m.json();
+                const messageId = jsonRes.id;
+                polls.nfl[`week${week}`][currentGame.id] = messageId
+                messageCount = messageCount + 1;
+            } catch (e) {
+                console.log(e);
+                const error = JSON.parse(e.message);
+                if (error["retry_after"]) {
+                    await new Promise(r => setTimeout(r, error["retry_after"] * 1000));
+                }
+            }
+        }
     }
 }
