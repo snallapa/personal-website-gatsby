@@ -140,7 +140,9 @@ exports.handler = async function(event, context) {
 
         polls.nfl[`week${week}`] = {};
         let messageCount = 0;
-        while (messageCount < gameMessages.length) {
+        const reactions = [];
+        let tries = 0;
+        while (messageCount < gameMessages.length && tries < 40) {
             const currentGame = gameMessages[messageCount];
             try {
                 const m = await DiscordRequest(`channels/${channel}/messages`, {
@@ -154,33 +156,36 @@ exports.handler = async function(event, context) {
                 });
                 const jsonRes = await m.json();
                 const messageId = jsonRes.id;
-                const r1 = await DiscordRequest(`channels/${channel}/messages/${messageId}/reactions/${currentGame.awayEmoji}/@me`, {
-                    method: 'PUT',
-                    body: {
-                        content: currentGame.message,
-                        allowed_mentions: {
-                            parse: []
-                        }
-                    }
-                });
-                const r2 = await DiscordRequest(`channels/${channel}/messages/${messageId}/reactions/${currentGame.homeEmoji}/@me`, {
-                    method: 'PUT',
-                    body: {
-                        content: currentGame.message,
-                        allowed_mentions: {
-                            parse: []
-                        }
-                    }
-                });
+                reactions.push({messageId, homeEmoji: currentGame.homeEmoji, awayEmoji: currentGame.awayEmoji});
                 polls.nfl[`week${week}`][currentGame.id] = messageId
                 messageCount = messageCount + 1;
             } catch (e) {
+                tries = tries + 1;
                 console.log(e);
                 const error = JSON.parse(e.message);
                 if (error["retry_after"]) {
                     await new Promise(r => setTimeout(r, error["retry_after"] * 1000));
                 }
             }
+        }
+        let reactionCount = 0;
+        tries = 0;
+        while (reactionCount < reactions.length && tries < 100) {
+            const currentReaction = reactions[reactionCount];
+            try {
+                await DiscordRequest(`channels/${channel}/messages/${currentReaction.messageId}/reactions/${currentReaction.awayEmoji}/@me`, {
+                    method: 'PUT'
+                });
+                reactionCount = reactionCount + 1;
+            } catch (e) {
+                tries = tries + 1;
+                console.log(e);
+                const error = JSON.parse(e.message);
+                if (error["retry_after"]) {
+                    await new Promise(r => setTimeout(r, error["retry_after"] * 1000));
+                }
+            }
+
         }
         await setDoc(doc(db, "polls", guild_id), polls, { merge: true });
         console.log("set game messages for current week");
