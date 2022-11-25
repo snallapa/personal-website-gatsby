@@ -1,8 +1,3 @@
-import {
-    InteractionType,
-    InteractionResponseType,
-    verifyKey
-  } from 'discord-interactions';
 import { initializeApp } from "firebase/app";
 
 import { getFirestore , doc, getDoc, setDoc} from "firebase/firestore";
@@ -49,35 +44,6 @@ async function DiscordRequest(endpoint, options) {
     return res;
 }
 
-function respond(message, statusCode = 200, interactionType = InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE) {
-    return {
-        statusCode: statusCode,
-        headers: { 'Content-Type': 'application/json'},
-        body: JSON.stringify({
-            type: interactionType,
-            data: {
-                content: message,
-            }
-        }),
-      };
-}
-
-function respondNoMention(message) {
-    return {
-        statusCode: 200,
-        headers: { 'Content-Type': 'application/json'},
-        body: JSON.stringify({
-            type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-            data: {
-                content: message,
-                allowed_mentions: {
-                    parse: []
-                }
-            }
-        }),
-      };
-}
-
 function formatGame(g) {
     const comp = g.competitions[0];
     const homeTeam = comp.competitors.find(c => c.homeAway === "home");
@@ -104,7 +70,7 @@ exports.handler = async function(event, context) {
     const docRef = doc(db, "polls", guild_id);
     const docSnap = await getDoc(docRef);
     if (!docSnap.exists()) {
-        return respond(`no community found for ${guild_id}, do /setup_nfl_polls first`);
+        console.log(`no community found for ${guild_id}, do /setup_nfl_polls first`);
     }
     const polls = docSnap.data();
     console.log(polls);
@@ -117,7 +83,7 @@ exports.handler = async function(event, context) {
     try {
         channel = polls.nfl.channel;
     } catch (error) {
-        return respond('missing configuration, run `/setup_nfl_polls` first');
+        return console.log('missing configuration, run `/setup_nfl_polls` first');
     }
 
     const gameMessages = games.sort((a,b) => (new Date(a.date) - new Date(b.date))).map(g => {
@@ -196,7 +162,8 @@ exports.handler = async function(event, context) {
     } else {
         // update the poll messages
         let messageCount = 0;
-        while (messageCount < gameMessages.length) {
+        let tries = 0;
+        while (messageCount < gameMessages.length && tries < 100) {
             const currentGame = gameMessages[messageCount];
             try {
                 const m = await DiscordRequest(`channels/${channel}/messages/${polls.nfl[`week${week}`][currentGame.id]}`, {
@@ -218,6 +185,7 @@ exports.handler = async function(event, context) {
                 if (error["retry_after"]) {
                     await new Promise(r => setTimeout(r, error["retry_after"] * 1000));
                 }
+                tries = tries + 1;
             }
         }
     }

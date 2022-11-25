@@ -3,4 +3,4 @@
 
 # update every ten minutes
 [functions."updater-scheduled"]
-schedule = "0/10 * * * *"
+schedule = "0/20 * * * *"
