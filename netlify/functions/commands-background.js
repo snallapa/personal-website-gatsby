@@ -117,7 +117,7 @@ exports.handler = async function(event, context) {
         return respond('missing configuration, run `/setup_nfl_polls` first');
     }
 
-    const gameMessages = games.sort((a,b) => (new Date(b.date) - new Date(a.date))).map(g => {
+    const gameMessages = games.sort((a,b) => (new Date(a.date) - new Date(b.date))).map(g => {
         const id = g.id;
         return {
             id,
