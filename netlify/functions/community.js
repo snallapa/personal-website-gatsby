@@ -202,7 +202,7 @@ exports.handler = async function(event, context) {
                 return respond('missing configuration, run `/setup_nfl_polls` first');
             }
 
-            const res = await fetch("https://nallapareddy.com/.netlify/functions/commands-background", {
+            const res = await fetch("https://nallapareddy.com/.netlify/functions/community-background", {
                 method: 'POST',
                 body: JSON.stringify({
                     guild_id: guild_id

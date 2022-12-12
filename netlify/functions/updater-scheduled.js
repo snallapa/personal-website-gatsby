@@ -27,7 +27,7 @@ exports.handler = async function(event, context) {
     const updateData = docSnap.data();
     const guilds = Object.keys(updateData.nfl.guilds);
     const updates = guilds.filter(g => updateData.nfl.guilds[g]).map(g => {
-        return fetch("https://nallapareddy.com/.netlify/functions/commands-background", {
+        return fetch("https://nallapareddy.com/.netlify/functions/community-background", {
             method: 'POST',
             body: JSON.stringify({
                 guild_id: g
