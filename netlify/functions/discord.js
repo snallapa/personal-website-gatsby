@@ -362,13 +362,19 @@ exports.handler = async function(event, context) {
             const subcommand = command.name;
             if (subcommand === "configure") {
                 const channel = command.options[0].value
+                const autoUpdate = command.options[1] ? command.options[1].value : false;
                 await setDoc(doc(db, "leagues", guild_id), {
                     commands: {
                         teams: {
-                            channel: channel
+                            channel: channel,
+                            autoUpdate: autoUpdate
                         }
                     }
                 }, { merge: true });
+                const update = {}
+                update["teams"] = {};
+                update["teams"][guild_id] = autoUpdate;
+                await setDoc(doc(db, "leagues", "guild_updates"), update, { merge: true });
                 return respond("configured! teams command is ready for use");
             } else if (subcommand === "assign") {
                 const team = command.options[0].value;
@@ -388,6 +394,14 @@ exports.handler = async function(event, context) {
                     return respond(`could not find the team ${team}! try using abbreviation, full name, or city name`);
                 }
                 league.teams[teamKey].discordUser = user;
+                let roleMessage = "";
+                if (command.options[2]) {
+                    const roleId = command.options[2].value;
+                    league.teams[teamKey].trackingRole = roleId;
+                    if (!league.commands.teams.channel) {
+                        roleMessage = "\nRole saved, you can turn on automatic tracking with the /teams configure command";
+                    }
+                }
                 try {
                     const content = createTeamsMessage(league.teams);
                     if (league.commands.teams.message) {
@@ -433,7 +447,7 @@ exports.handler = async function(event, context) {
                         }
                     }
                     await setDoc(doc(db, "leagues", guild_id), league, { merge: true });
-                    return respond("team assigned!");
+                    return respond("team assigned!" + roleMessage);
                 } catch (e) {
                     console.log(e);
                     return respond("could not assign team :(")

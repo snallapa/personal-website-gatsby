@@ -155,6 +155,12 @@ const MADDEN_TEAMS_COMMANDS = {
                 name: 'user',
                 description: 'user',
                 required: true
+            },
+            {
+                type: 8, // string
+                name: 'role',
+                description: 'role to track on',
+                required: false
             }
         ]
     },
@@ -182,6 +188,12 @@ const MADDEN_TEAMS_COMMANDS = {
                 description: 'channel to send message in',
                 required: true,
                 channel_types: [0]
+            },
+            {
+                type: 5, // channel
+                name: 'auto_update',
+                description: 'auto assign teams based on a new role',
+                required: false,
             }
         ]
     }

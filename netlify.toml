@@ -1,6 +1,9 @@
 [functions]
   node_bundler = "esbuild"
 
-# update every ten minutes
+# update every 20 minutes
 [functions."updater-scheduled"]
 schedule = "0/20 * * * *"
+
+[functions."snallabot-scheduled"]
+schedule = "0/10 * * * *"
