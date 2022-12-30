@@ -114,6 +114,7 @@ exports.handler = async function(event, context) {
     const league = docSnap.data();
     const res = await DiscordRequest(`guilds/${guild_id}/members?limit=1000`);
     const users = await res.json();
+    console.log(users);
     const teamIds = Object.keys(league.teams);
     teamIds.forEach(tId => {
         const team = league.teams[tId];
