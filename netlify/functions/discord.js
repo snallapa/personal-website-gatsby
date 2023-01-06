@@ -398,7 +398,7 @@ exports.handler = async function(event, context) {
                 if (command.options[2]) {
                     const roleId = command.options[2].value;
                     league.teams[teamKey].trackingRole = roleId;
-                    if (!league.commands.teams.channel) {
+                    if (!league.commands.teams.autoUpdate) {
                         roleMessage = "\nRole saved, you can turn on automatic tracking with the /teams configure command";
                     }
                 }
