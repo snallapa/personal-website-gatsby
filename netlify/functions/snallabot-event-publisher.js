@@ -53,7 +53,7 @@ async function DiscordRequest(endpoint, options) {
 
 async function publishGuildTeamEvent(guild_id) {
     try {
-        const res = await DiscordRequest(`guilds/${g}/members?limit=1000`, {
+        const res = await DiscordRequest(`guilds/${guild_id}/members?limit=1000`, {
             method: "GET"
         });
         const users = await res.json();
