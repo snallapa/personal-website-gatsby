@@ -26,22 +26,29 @@ async function DiscordRequest(endpoint, options) {
     // Stringify payloads
     if (options.body) options.body = JSON.stringify(options.body);
     // Use node-fetch to make requests
-    const res = await fetch(url, {
-        headers: {
-        Authorization: `Bot ${process.env.DISCORD_TOKEN}`,
-        'Content-Type': 'application/json; charset=UTF-8',
-        },
-        ...options
-    });
-
-    // throw API errors
-    if (!res.ok) {
-        const data = await res.json();
-        console.log(res);
-        throw new Error(JSON.stringify(data));
+    let tries = 0;
+    const maxTries = 5;
+    while (tries < maxTries) {
+        const res = await fetch(url, {
+            headers: {
+            Authorization: `Bot ${process.env.DISCORD_TOKEN}`,
+            'Content-Type': 'application/json; charset=UTF-8',
+            },
+            ...options
+        });
+        if (!res.ok) {
+            const data = await res.json();
+            if (data["retry_after"]) {
+                tries = tries + 1;
+                await new Promise(r => setTimeout(r, error["retry_after"] * 1000));
+            } else {
+                console.log(res);
+                throw new Error(JSON.stringify(data));
+            }
+        } else {
+            return res;
+        }
     }
-    // return original response
-    return res;
 }
 
 
@@ -104,7 +111,7 @@ function createTeamsMessage(teams) {
 
 exports.handler = async function(event, context) {
     // console.log(event)
-    const { guild_id } = JSON.parse(event.body);
+    const { guild_id, users } = JSON.parse(event.body);
     const docRef = doc(db, "leagues", guild_id);
     const docSnap = await getDoc(docRef);
     if (!docSnap.exists()) {
@@ -112,11 +119,6 @@ exports.handler = async function(event, context) {
         return;
     }
     const league = docSnap.data();
-    const res = await DiscordRequest(`guilds/${guild_id}/members?limit=1000`, {
-        method: "GET"
-    });
-    const users = await res.json();
-    console.log(users);
     const teamIds = Object.keys(league.teams);
     teamIds.forEach(tId => {
         const team = league.teams[tId];
@@ -125,7 +127,7 @@ exports.handler = async function(event, context) {
             if (teamUser.length !== 1) {
                 console.log("found multiple roles for this team, not assigning");
             }
-            league.teams[tId].discordUser = teamUser[0].user.id;
+            league.teams[tId].discordUser = teamUser[0].id;
         }
     });
     const content = createTeamsMessage(league.teams);
