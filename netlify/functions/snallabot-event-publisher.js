@@ -58,7 +58,7 @@ async function publishGuildTeamEvent(guild_id) {
         });
         const users = await res.json();
         const userWithRoles = users.map(u => ({ id: u.user.id, roles: u.roles }));
-        const _ = await fetch("https://nallapareddy.com/.netlify/functions/teams-background", {
+        const backgroundRes = await fetch("https://nallapareddy.com/.netlify/functions/teams-background", {
             method: 'POST',
             body: JSON.stringify({
                 guild_id: guild_id,
@@ -66,8 +66,10 @@ async function publishGuildTeamEvent(guild_id) {
             })
         });
         console.log(`guild ${guild_id} team publish successfully`);
+        return backgroundRes;
     } catch (e) {
         console.error(`guild ${guild_id} team publish unsuccessful error: ${e}`);
+        return { ok: false };
     }
 }
 
