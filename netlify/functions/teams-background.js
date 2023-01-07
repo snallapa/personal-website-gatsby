@@ -124,10 +124,12 @@ exports.handler = async function(event, context) {
         const team = league.teams[tId];
         if (team.trackingRole) {
             const teamUser = users.filter(u => u.roles.includes(team.trackingRole));
-            if (teamUser.length !== 1) {
-                console.log("found multiple roles for this team, not assigning");
-            } else {
+            if (teamUser.length === 0) {
+                league.teams[tId].discordUser = "";
+            } else if (teamUser.length === 1) {
                 league.teams[tId].discordUser = teamUser[0].id;
+            } else {
+                console.log("found multiple roles for this team, not assigning");
             }
         }
     });
