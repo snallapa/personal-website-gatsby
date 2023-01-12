@@ -178,7 +178,7 @@ exports.handler = async function (event, context) {
         if (!currentState.events.includes("REACTED")) {
             try {
                 currentState.events.push("REACTED");
-                return react(cId, currentState.message);
+                return react(cId, currentState.message).then(_ => currentState);
                 
             } catch (e) {
                 console.error(`guild ${guild_id} failed to react error: ${e}`);
@@ -221,7 +221,7 @@ exports.handler = async function (event, context) {
                         const result = decideResult(homeUsers, awayUsers);
                         return forceWin(league.commands.game_channels.fwChannel, cId, result).then(_ => {
                             currentState.events.push("DONE");
-                            return currentState;
+                            return Promise.resolve(currentState);
                         });
                     } catch (e) {
                         console.warn(`FW requested but no home or away option chosen. Doing nothing ${guild_id}, ${channelId}`);
