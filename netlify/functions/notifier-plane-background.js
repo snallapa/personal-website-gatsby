@@ -61,11 +61,11 @@ async function DiscordRequest(endpoint, options) {
 }
 
 const reactions = {
-    "sch": "%3Aalarm_clock%3A",
-    "gg": "%3Atrophy%3A",
-    "home": "%3Ahouse%3A",
-    "away": "%3Aairplane_departure%3A",
-    "fw": "%3Atrack_next%3A"
+    "sch": "%E2%8F%B0",
+    "gg": "%F0%9F%8F%86",
+    "home": "%F0%9F%8F%A0",
+    "away": "%F0%9F%9B%AB",
+    "fw": "%E2%8F%AD%EF%B8%8F"
 }
 
 async function react(channelId, messageId) {
