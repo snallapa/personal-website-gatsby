@@ -358,14 +358,16 @@ exports.handler = async function(event, context) {
                 const responses = await Promise.all(messagePromises);
                 if (responses.every(r => r.ok)) {
                     const messages = await Promise.all(responses.map(r => r.json()))
+                    console.log(messages);
                     const currentTime = new Date().getTime();
+                    league.commands.game_channels.channels = league.commands.game_channels.channels || {};
                     league.commands.game_channels.channels = messages.reduce((acc, m) => { 
                         if (acc[m.channelId]) {
                             acc[m.channelId].lastNotified = currentTime
                         } else {
                             acc[m.channelId] = { message: m.id, lastNotified : currentTime };
                         }
-                    }, league.commands.game_channels.channels|| {});
+                    }, league.commands.game_channels.channels);
                     await setDoc(doc(db, "leagues", guild_id), league, { merge: true });
                     return respond("all users notified!");
                 } else {
