@@ -80,7 +80,10 @@ async function publishChannelEvent(guild_id) {
         });
         const users = await res.json();
         const userWithRoles = users.map(u => ({ id: u.user.id, roles: u.roles }));
-        const channels = await res.json();
+        const channelRes = await DiscordRequest(`guilds/${guild_id}/channels`, {
+            method: 'GET',
+        });
+        const channels = await channelRes.json();
         const channelIds = channels.filter(c => {
             // text channel, in right category, with `vs` in it
             return c.type === 0 && c.parent_id && c.parent_id === category && c.name.includes("vs");
@@ -95,7 +98,7 @@ async function publishChannelEvent(guild_id) {
         });
         return backgroundRes;
     } catch (e) {
-        console.error(`guild ${guild_id} team publish unsuccessful error: ${e}`);
+        console.error(`guild ${guild_id} game channel    publish unsuccessful error: ${e}`);
         return { ok: false };
     }
 }

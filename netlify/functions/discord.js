@@ -358,7 +358,6 @@ exports.handler = async function(event, context) {
                 const responses = await Promise.all(messagePromises);
                 if (responses.every(r => r.ok)) {
                     const messages = await Promise.all(responses.map(r => r.json()))
-                    console.log(messages);
                     const currentTime = new Date().getTime();
                     league.commands.game_channels.channels = league.commands.game_channels.channels || {};
                     league.commands.game_channels.channels = messages.reduce((acc, m) => { 
