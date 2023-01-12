@@ -100,9 +100,10 @@ async function publishChannelEvent(guild_id) {
                 users: userWithRoles
             })
         });
+        console.log(`guild ${guild_id} game channel publish successfully`);
         return backgroundRes;
     } catch (e) {
-        console.error(`guild ${guild_id} game channel    publish unsuccessful error: ${e}`);
+        console.error(`guild ${guild_id} game channel publish unsuccessful error: ${e}`);
         return { ok: false };
     }
 }
