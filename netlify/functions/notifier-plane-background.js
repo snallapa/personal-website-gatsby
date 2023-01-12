@@ -168,7 +168,7 @@ exports.handler = async function (event, context) {
             return Promise.resolve({});
         }
         currentState.events = currentState.events || [];
-        if (currentState.event.includes("DONE")) {
+        if (currentState.events.includes("DONE")) {
             return Promise.resolve(currentState);
         }
         // first if we havent reacted, we must react
