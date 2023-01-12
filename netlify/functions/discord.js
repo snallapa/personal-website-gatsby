@@ -362,10 +362,12 @@ exports.handler = async function(event, context) {
                     const currentTime = new Date().getTime();
                     league.commands.game_channels.channels = league.commands.game_channels.channels || {};
                     league.commands.game_channels.channels = messages.reduce((acc, m) => { 
-                        if (acc[m.channelId]) {
-                            acc[m.channelId].lastNotified = currentTime
+                        console.log(acc);
+                        console.log(m);
+                        if (acc[m.channel_id]) {
+                            acc[m.channel_id].lastNotified = currentTime
                         } else {
-                            acc[m.channelId] = { message: m.id, lastNotified : currentTime };
+                            acc[m.channel_id] = { message: m.id, lastNotified : currentTime };
                         }
                     }, league.commands.game_channels.channels);
                     await setDoc(doc(db, "leagues", guild_id), league, { merge: true });
