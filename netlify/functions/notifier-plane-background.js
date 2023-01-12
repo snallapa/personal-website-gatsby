@@ -72,7 +72,7 @@ async function react(channelId, messageId) {
     try {
         const reactionPromises = Object.keys(reactions).map(reaction => {
             const currentReaction = reactions[reaction];
-            return DiscordRequest(`/channels/${channel.id}/messages/${channel.info.messageId}/reactions/${currentReaction}/@me`, {method: 'PUT'})
+            return DiscordRequest(`/channels/${channelId}/messages/${messageId}/reactions/${currentReaction}/@me`, {method: 'PUT'})
         })
         await Promise.all(reactionPromises)
     } catch (e) {
@@ -83,7 +83,7 @@ async function react(channelId, messageId) {
 
 async function getReactedUsers(channelId, messageId, reaction) {
     try {
-        return DiscordRequest(`/channels/${channel.id}/messages/${channel.info.messageId}/reactions/${reactions[reaction]}`, { method: 'GET' })
+        return DiscordRequest(`/channels/${channelId}/messages/${messageId}/reactions/${reactions[reaction]}`, { method: 'GET' })
             .then(r => r.json());
     } catch (e) {
         console.error(`get reaction failed for ${channelId}, ${messageId}, and ${reaction}`);
@@ -172,7 +172,7 @@ exports.handler = async function (event, context) {
             return Promise.resolve(currentState);
         }
         // first if we havent reacted, we must react
-        if (currentState.events.includes("REACTED")) {
+        if (!currentState.events.includes("REACTED")) {
             try {
                 currentState.events.push("REACTED");
                 return react(cId, currentState.message);
