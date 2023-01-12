@@ -117,6 +117,38 @@ const MADDEN_CHANNELS_COMMANDS = {
                 channel_types: [4]
             }
         ]
+    },
+    {
+        type: 1, // sub command
+        name: 'configure_notifier',
+        description: 'configures snallabot notifier',
+        options: [
+            {
+                type: 7, // channel
+                name: 'fw',
+                description: 'channel to post force wins under',
+                required: true,
+                channel_types: [0]
+            },
+            {
+                type: 4, // integer
+                name: 'ping',
+                description: 'number of hours to wait before pinging again',
+                required: true
+            },
+            {
+                type: 8, // role
+                name: 'fw_admin',
+                description: 'admin role to confirm force wins',
+                required: false
+            }
+        ]
+    },
+    {
+        type: 1, // sub command
+        name: 'off_notifier',
+        description: 'turns off snallabot notifier',
+        options: []
     }
     ],
     type: 1,
@@ -157,7 +189,7 @@ const MADDEN_TEAMS_COMMANDS = {
                 required: true
             },
             {
-                type: 8, // string
+                type: 8, // role
                 name: 'role',
                 description: 'role to track on',
                 required: false

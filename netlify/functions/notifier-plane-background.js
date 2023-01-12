@@ -161,12 +161,13 @@ exports.handler = async function (event, context) {
     const promises = currentChannels.map(cId => {
         const currentState = league.commands.game_channels.channels[cId];
         if (!currentState) {
-            return Promise.resolve();
+            return Promise.resolve({});
         }
+        currentState.events = currentState.events || [];
         // first if we havent reacted, we must react
-        if (!currentState.reacted) {
+        if (currentState.events.includes("REACTED")) {
             try {
-                currentState.reacted = true;
+                currentState.events.push("REACTED");
                 return react(cId, currentState.message);
                 
             } catch (e) {
@@ -180,7 +181,8 @@ exports.handler = async function (event, context) {
             const awayUsers = getReactedUsers(cId, currentState.message, "away");
             const fwUsers = getReactedUsers(cId, currentState.message, "fw");
             if (ggUsers.length > 1) {
-                return DiscordRequest(`/channels/${cId}`, { method: 'DELETE' });
+                currentState.events.push("DONE");
+                return DiscordRequest(`/channels/${cId}`, { method: 'DELETE' }).then(_ => currentState);
             }
             if (fwUsers > 1) {
                 if (league.commands.game_channels.adminRole) {
@@ -188,22 +190,31 @@ exports.handler = async function (event, context) {
                     if (fwUsers.filter(u => admins.includes(u.id)).length >= 1) {
                         try {
                             const result = decideResult(homeUsers, awayUsers);
-                            return forceWin(league.commands.game_channels.fwChannel, cId, result);
+                            return forceWin(league.commands.game_channels.fwChannel, cId, result).then(_ => {
+                                currentState.events.push("DONE");
+                                return currentState;
+                            });
                         } catch (e) {
                             console.warn(`FW requested but no home or away option chosen. Doing nothing ${guild_id}, ${channelId}`);
-                            return Promise.resolve();
+                            return Promise.resolve(currentState);
                         }
-                    } else {
+                    } else if(currentState.events.includes("FW_REQUESTED")) {
                         const message = `FW requested <@&${league.commands.game_channels.adminRole}>`;
-                        return DiscordRequest(`/channels/${cId}/messages`, { method: 'POST', body: { content: message } });
+                        return DiscordRequest(`/channels/${cId}/messages`, { method: 'POST', body: { content: message } }).then(_ => {
+                            currentState.events.push("FW_REQUESTED");
+                            return currentState;
+                        });
                     }
                 } else {
                     try {
                         const result = decideResult(homeUsers, awayUsers);
-                        return forceWin(league.commands.game_channels.fwChannel, cId, result);
+                        return forceWin(league.commands.game_channels.fwChannel, cId, result).then(_ => {
+                            currentState.events.push("DONE");
+                            return currentState;
+                        });
                     } catch (e) {
                         console.warn(`FW requested but no home or away option chosen. Doing nothing ${guild_id}, ${channelId}`);
-                        return Promise.resolve();
+                        return Promise.resolve(currentState);
                     }
 
                 }
@@ -216,7 +227,7 @@ exports.handler = async function (event, context) {
                 const hoursSince = (now - last) / 36e5;
                 if (hoursSince > waitPing) {
                     currentState.lastNotified = new Date().getTime();
-                    return ping(cId, league.teams);
+                    return ping(cId, league.teams).then(_ => currentState);
                 }
             }
         }
