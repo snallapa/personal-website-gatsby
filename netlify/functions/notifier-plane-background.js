@@ -142,6 +142,83 @@ async function ping(gameChannel, teams) {
     return true;
 }
 
+async function updateChannel(cId, league) {
+    const currentState = league.commands.game_channels.channels[cId];
+    if (!currentState) {
+        return {};
+    }
+    currentState.events = currentState.events || [];
+    if (currentState.events.includes("DONE")) {
+        return currentState;
+    }
+    // first if we havent reacted, we must react
+    if (!currentState.events.includes("REACTED")) {
+        try {
+            currentState.events.push("REACTED");
+            await react(cId, currentState.message);
+            return currentState;
+        } catch (e) {
+            console.error(`guild ${guild_id} failed to react error: ${e}`);
+            return currentState;
+        }
+    } else {
+        const ggUsers = await getReactedUsers(cId, currentState.message, "gg");
+        const scheduledUsers = await getReactedUsers(cId, currentState.message, "sch");
+        const homeUsers = await getReactedUsers(cId, currentState.message, "home");
+        const awayUsers = await getReactedUsers(cId, currentState.message, "away");
+        const fwUsers = await getReactedUsers(cId, currentState.message, "fw");
+        if (ggUsers.length > 1) {
+            currentState.events.push("DONE");
+            await DiscordRequest(`/channels/${cId}`, { method: 'DELETE' });
+            return currentState;
+        }
+        if (fwUsers.length > 1) {
+            if (league.commands.game_channels.adminRole) {
+                const admins = users.filter(u => u.roles.includes(league.commands.game_channels.adminRole)).map(u => u.id);
+                if (fwUsers.filter(u => admins.includes(u.id)).length >= 1) {
+                    try {
+                        const result = decideResult(homeUsers, awayUsers);
+                        await forceWin(league.commands.game_channels.fwChannel, cId, result);
+                        currentState.events.push("DONE");
+                        return currentState;
+                    } catch (e) {
+                        console.warn(`FW requested but no home or away option chosen. Doing nothing ${guild_id}, ${channelId}`);
+                        return currentState;
+                    }
+                } else if(currentState.events.includes("FW_REQUESTED")) {
+                    const message = `FW requested <@&${league.commands.game_channels.adminRole}>`;
+                    await DiscordRequest(`/channels/${cId}/messages`, { method: 'POST', body: { content: message } });
+                    currentState.events.push("FW_REQUESTED");
+                    return currentState;
+                }
+            } else {
+                try {
+                    const result = decideResult(homeUsers, awayUsers);
+                    await forceWin(league.commands.game_channels.fwChannel, cId, result);
+                    currentState.events.push("DONE");
+                    return currentState;
+                } catch (e) {
+                    console.warn(`FW requested but no home or away option chosen. Doing nothing ${guild_id}, ${channelId}`);
+                    return currentState;
+                }
+
+            }
+        }
+
+        if (scheduledUsers.length === 1) {
+            const waitPing = league.commands.game_channels.waitPing || 12;
+            const now = new Date();
+            const last = new Date(currentState.lastNotified);
+            const hoursSince = (now - last) / 36e5;
+            if (hoursSince > waitPing) {
+                currentState.lastNotified = new Date().getTime();
+                await ping(cId, league.teams);
+                return currentState;
+            }
+        }
+    }
+}
+
 exports.handler = async function (event, context) {
     const { guild_id, currentChannels, users } = JSON.parse(event.body);
 
@@ -165,84 +242,7 @@ exports.handler = async function (event, context) {
     const updatedSnap = await getDoc(docRef);
     league = updatedSnap.data();
 
-    const promises = currentChannels.map(cId => {
-        const currentState = league.commands.game_channels.channels[cId];
-        if (!currentState) {
-            return Promise.resolve({});
-        }
-        currentState.events = currentState.events || [];
-        if (currentState.events.includes("DONE")) {
-            return Promise.resolve(currentState);
-        }
-        // first if we havent reacted, we must react
-        if (!currentState.events.includes("REACTED")) {
-            try {
-                currentState.events.push("REACTED");
-                return react(cId, currentState.message).then(_ => currentState);
-                
-            } catch (e) {
-                console.error(`guild ${guild_id} failed to react error: ${e}`);
-                return Promise.resolve(currentState);
-            }
-        } else {
-            const ggUsers = getReactedUsers(cId, currentState.message, "gg");
-            const scheduledUsers = getReactedUsers(cId, currentState.message, "sch");
-            const homeUsers = getReactedUsers(cId, currentState.message, "home");
-            const awayUsers = getReactedUsers(cId, currentState.message, "away");
-            const fwUsers = getReactedUsers(cId, currentState.message, "fw");
-            console.log(ggUsers);
-            if (ggUsers.length > 1) {
-                currentState.events.push("DONE");
-                return DiscordRequest(`/channels/${cId}`, { method: 'DELETE' }).then(_ => currentState);
-            }
-            if (fwUsers.length > 1) {
-                if (league.commands.game_channels.adminRole) {
-                    const admins = users.filter(u => u.roles.includes(league.commands.game_channels.adminRole)).map(u => u.id);
-                    if (fwUsers.filter(u => admins.includes(u.id)).length >= 1) {
-                        try {
-                            const result = decideResult(homeUsers, awayUsers);
-                            return forceWin(league.commands.game_channels.fwChannel, cId, result).then(_ => {
-                                currentState.events.push("DONE");
-                                return currentState;
-                            });
-                        } catch (e) {
-                            console.warn(`FW requested but no home or away option chosen. Doing nothing ${guild_id}, ${channelId}`);
-                            return Promise.resolve(currentState);
-                        }
-                    } else if(currentState.events.includes("FW_REQUESTED")) {
-                        const message = `FW requested <@&${league.commands.game_channels.adminRole}>`;
-                        return DiscordRequest(`/channels/${cId}/messages`, { method: 'POST', body: { content: message } }).then(_ => {
-                            currentState.events.push("FW_REQUESTED");
-                            return currentState;
-                        });
-                    }
-                } else {
-                    try {
-                        const result = decideResult(homeUsers, awayUsers);
-                        return forceWin(league.commands.game_channels.fwChannel, cId, result).then(_ => {
-                            currentState.events.push("DONE");
-                            return Promise.resolve(currentState);
-                        });
-                    } catch (e) {
-                        console.warn(`FW requested but no home or away option chosen. Doing nothing ${guild_id}, ${channelId}`);
-                        return Promise.resolve(currentState);
-                    }
-
-                }
-            }
-
-            if (scheduledUsers.length === 1) {
-                const waitPing = league.commands.game_channels.waitPing || 12;
-                const now = new Date();
-                const last = new Date(currentState.lastNotified);
-                const hoursSince = (now - last) / 36e5;
-                if (hoursSince > waitPing) {
-                    currentState.lastNotified = new Date().getTime();
-                    return ping(cId, league.teams).then(_ => currentState);
-                }
-            }
-        }
-    });
+    const promises = currentChannels.map(cId => updateChannel(cId, league));
     const res = await Promise.all(promises);
     await setDoc(doc(db, "leagues", guild_id), league, { merge: true });
 }
