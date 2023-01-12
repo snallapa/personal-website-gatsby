@@ -362,13 +362,12 @@ exports.handler = async function(event, context) {
                     const currentTime = new Date().getTime();
                     league.commands.game_channels.channels = league.commands.game_channels.channels || {};
                     league.commands.game_channels.channels = messages.reduce((acc, m) => { 
-                        console.log(acc);
-                        console.log(m);
                         if (acc[m.channel_id]) {
                             acc[m.channel_id].lastNotified = currentTime
                         } else {
                             acc[m.channel_id] = { message: m.id, lastNotified : currentTime };
                         }
+                        return acc;
                     }, league.commands.game_channels.channels);
                     await setDoc(doc(db, "leagues", guild_id), league, { merge: true });
                     return respond("all users notified!");
