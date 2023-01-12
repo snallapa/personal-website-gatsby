@@ -72,7 +72,7 @@ async function react(channelId, messageId) {
     try {
         const reactionPromise = Object.keys(reactions).reduce((p, reaction) => {
             const currentReaction = reactions[reaction];
-            return p.then(_ => DiscordRequest(`/channels/${channelId}/messages/${messageId}/reactions/${currentReaction}/@me`, {method: 'PUT'}));
+            return p.then(_ => DiscordRequest(`channels/${channelId}/messages/${messageId}/reactions/${currentReaction}/@me`, {method: 'PUT'}));
         }, Promise.resolve());
         await reactionPromise;
     } catch (e) {
@@ -83,7 +83,7 @@ async function react(channelId, messageId) {
 
 async function getReactedUsers(channelId, messageId, reaction) {
     try {
-        return DiscordRequest(`/channels/${channelId}/messages/${messageId}/reactions/${reactions[reaction]}`, { method: 'GET' })
+        return DiscordRequest(`channels/${channelId}/messages/${messageId}/reactions/${reactions[reaction]}`, { method: 'GET' })
             .then(r => r.json());
     } catch (e) {
         console.error(`get reaction failed for ${channelId}, ${messageId}, and ${reaction}`);
@@ -116,17 +116,17 @@ function findTeam(teams, search_phrase) {
 }
 
 async function forceWin(fwChannel, gameChannel, result) {
-    const res = await DiscordRequest(`/channel/${gameChannel}`, { method: 'GET' });
+    const res = await DiscordRequest(`channel/${gameChannel}`, { method: 'GET' });
     const channel = await res.json()
     const channelName = channel.name;
     const message = `${channelName}: ${result}`;
-    await DiscordRequest(`/channels/${fwChannel}/messages`, { method: 'POST', body: { content: message } });
-    await DiscordRequest(`/channels/${cId}`, { method: 'DELETE' });
+    await DiscordRequest(`channels/${fwChannel}/messages`, { method: 'POST', body: { content: message } });
+    await DiscordRequest(`channels/${cId}`, { method: 'DELETE' });
     return true;
 }
 
 async function ping(gameChannel, teams) {
-    const res = await DiscordRequest(`/channel/${gameChannel}`, { method: 'GET' });
+    const res = await DiscordRequest(`channel/${gameChannel}`, { method: 'GET' });
     const channel = await res.json()
     const channelName = channel.name;
     const channelTeams = channelName.split("-vs-").map(t => t.replace("-", " "));
@@ -138,7 +138,7 @@ async function ping(gameChannel, teams) {
             return "";
         }
     }).join(" ").trim();
-    await DiscordRequest(`/channels/${gameChannel}/messages`, { method: 'POST', body: { content: `${content} is your game scheduled? Schedule it! or react to my first message to set it as scheduled!` } });
+    await DiscordRequest(`channels/${gameChannel}/messages`, { method: 'POST', body: { content: `${content} is your game scheduled? Schedule it! or react to my first message to set it as scheduled!` } });
     return true;
 }
 
@@ -169,7 +169,7 @@ async function updateChannel(cId, league) {
         const fwUsers = await getReactedUsers(cId, currentState.message, "fw");
         if (ggUsers.length > 1) {
             currentState.events.push("DONE");
-            await DiscordRequest(`/channels/${cId}`, { method: 'DELETE' });
+            await DiscordRequest(`channels/${cId}`, { method: 'DELETE' });
             return currentState;
         }
         if (fwUsers.length > 1) {
@@ -187,7 +187,7 @@ async function updateChannel(cId, league) {
                     }
                 } else if(currentState.events.includes("FW_REQUESTED")) {
                     const message = `FW requested <@&${league.commands.game_channels.adminRole}>`;
-                    await DiscordRequest(`/channels/${cId}/messages`, { method: 'POST', body: { content: message } });
+                    await DiscordRequest(`channels/${cId}/messages`, { method: 'POST', body: { content: message } });
                     currentState.events.push("FW_REQUESTED");
                     return currentState;
                 }
