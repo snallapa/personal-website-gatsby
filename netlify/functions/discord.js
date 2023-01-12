@@ -171,6 +171,10 @@ function notifyWaitlist(waitlist, top) {
     return "__**Open Team Availiable**__\n" + "You turn is here:\n" + waitlist.filter((_, idx) => idx < top).map((user, idx) => `${idx + 1}: <@${user}>`).join("\n");
 }
 
+function notifierMessage(users) {
+    return `${users}\nTime to schedule your game! Once your game is scheduled, hit the ⏰. Otherwise, You will be notified again.\nWhen you're done playing, let me know with 🏆.\nNeed to sim this game? React with ⏭ AND the home/away to force win. Choose both home and away to fair sim!`
+}
+
 
 exports.handler = async function(event, context) {
     if (!verifier(event)) {
@@ -340,10 +344,11 @@ exports.handler = async function(event, context) {
                         }).join(" ").trim();
                         // console.log(content);
                         if (content) {
+                            const message = league.commands.game_channels.autoUpdate ? notifierMessage(content) : content;
                             return [DiscordRequest(`channels/${channelId}/messages`, {
                                 method: 'POST',
                                 body: {
-                                    content: content,
+                                    content: message,
                                 }
                             })];
                         } else {
@@ -352,10 +357,52 @@ exports.handler = async function(event, context) {
                     });
                 const responses = await Promise.all(messagePromises);
                 if (responses.every(r => r.ok)) {
+                    const messages = await Promise.all(responses.map(r => r.json()))
+                    const currentTime = new Date().getTime();
+                    league.commands.game_channels.channels = messages.reduce((acc, m) => { 
+                        if (acc[m.channelId]) {
+                            acc[m.channelId].lastNotified = currentTime
+                        } else {
+                            acc[m.channelId] = { message: m.id, lastNotified : currentTime };
+                        }
+                    }, league.commands.game_channels.channels|| {});
+                    await setDoc(doc(db, "leagues", guild_id), league, { merge: true });
                     return respond("all users notified!");
                 } else {
                     return respond("hmm something went wrong :(, not all of them were notified");
                 }
+            } else if (subcommand === "configure_notifier") {
+                const fwChannel = command.options[0].value
+                const waitPing = command.options[1].value
+                const adminRole = command.options[2] ? command.options[2].value : "";
+                await setDoc(doc(db, "leagues", guild_id), {
+                    commands: {
+                        game_channels: {
+                            fwChannel,
+                            waitPing,
+                            adminRole,
+                            autoUpdate: true
+                        }
+                    }
+                }, { merge: true });
+                const update = {}
+                update["gameChannels"] = {};
+                update["gameChannels"][guild_id] = true;
+                await setDoc(doc(db, "leagues", "guild_updates"), update, { merge: true });
+                return respond("configured! notifier is ready for use");
+            } else if (subcommand === "off_notifier") {
+                await setDoc(doc(db, "leagues", guild_id), {
+                    commands: {
+                        game_channels: {
+                            autoUpdate: false
+                        }
+                    }
+                }, { merge: true });
+                const update = {}
+                update["gameChannels"] = {};
+                update["gameChannels"][guild_id] = false;
+                await setDoc(doc(db, "leagues", "guild_updates"), update, { merge: true });
+                return respond("notifier is turned off");
             }
         } else if (name === "teams") {
             const command = options[0];

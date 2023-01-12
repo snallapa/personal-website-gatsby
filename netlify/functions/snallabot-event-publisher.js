@@ -73,18 +73,56 @@ async function publishGuildTeamEvent(guild_id) {
     }
 }
 
+async function publishChannelEvent(guild_id) {
+    try {
+        const res = await DiscordRequest(`guilds/${guild_id}/members?limit=1000`, {
+            method: "GET"
+        });
+        const users = await res.json();
+        const userWithRoles = users.map(u => ({ id: u.user.id, roles: u.roles }));
+        const channels = await res.json();
+        const channelIds = channels.filter(c => {
+            // text channel, in right category, with `vs` in it
+            return c.type === 0 && c.parent_id && c.parent_id === category && c.name.includes("vs");
+        }).map(c => c.id);
+        const backgroundRes = await fetch("https://nallapareddy.com/.netlify/functions/notifier-plane-background", {
+            method: 'POST',
+            body: JSON.stringify({
+                guild_id: guild_id,
+                currentChannels: channelIds,
+                users: userWithRoles
+            })
+        });
+        return backgroundRes;
+    } catch (e) {
+        console.error(`guild ${guild_id} team publish unsuccessful error: ${e}`);
+        return { ok: false };
+    }
+}
+
+
 exports.handler = async function(event, context) {
     const docRef = doc(db, "leagues", "guild_updates");
     const docSnap = await getDoc(docRef);
     const updateData = docSnap.data();
-    const guilds = Object.keys(updateData.teams);
-    const updates = guilds.filter(g => updateData.teams[g]).map(g => publishGuildTeamEvent(g));
-    const updateRes = await Promise.all(updates);
-    if (updateRes.every(r => r.ok)) {
-        console.log("updates sent successfully");
+    const teamGuilds = Object.keys(updateData.teams);
+    const teamUpdates = teamGuilds.filter(g => updateData.teams[g]).map(g => publishGuildTeamEvent(g));
+    const teamUpdatesRes = await Promise.all(teamUpdates);
+    if (teamUpdatesRes.every(r => r.ok)) {
+        console.log("team updates sent successfully");
     } else {
-        console.log("updates were not sent succesfully");
+        console.log("not all team updates were sent succesfully");
     }
+
+    const gameChannelGuilds = Object.keys(updateData.gameChannels);
+    const gameChannelUpdates = gameChannelGuilds.filter(g => updateData.gameChannels[g]).map(g => publishChannelEvent(g));
+    const gameChannelUpdatesRes = await Promise.all(gameChannelUpdates);
+    if (gameChannelUpdatesRes.every(r => r.ok)) {
+        console.log("game channel updates sent successfully");
+    } else {
+        console.log("not all game channel updates were sent succesfully");
+    }
+
     return {
         statusCode: 200,
     };
