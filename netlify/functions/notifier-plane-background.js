@@ -150,7 +150,7 @@ exports.handler = async function (event, context) {
         console.log(`no league found for ${guild_id}`)
         return;
     }
-    const league = docSnap.data();
+    let league = docSnap.data();
 
     // delete channels not there
     const channelStates = league.commands.game_channels.channels;
@@ -158,12 +158,18 @@ exports.handler = async function (event, context) {
         .forEach(cId => league.commands.game_channels.channels[cId] = deleteField());
     await updateDoc(docRef, league);
 
+    const updatedSnap = await getDoc(docRef);
+    league = updatedSnap.data();
+
     const promises = currentChannels.map(cId => {
         const currentState = league.commands.game_channels.channels[cId];
         if (!currentState) {
             return Promise.resolve({});
         }
         currentState.events = currentState.events || [];
+        if (currentState.event.includes("DONE")) {
+            return Promise.resolve(currentState);
+        }
         // first if we havent reacted, we must react
         if (currentState.events.includes("REACTED")) {
             try {
@@ -172,7 +178,7 @@ exports.handler = async function (event, context) {
                 
             } catch (e) {
                 console.error(`guild ${guild_id} failed to react error: ${e}`);
-                return Promise.resolve();
+                return Promise.resolve(currentState);
             }
         } else {
             const ggUsers = getReactedUsers(cId, currentState.message, "gg");
