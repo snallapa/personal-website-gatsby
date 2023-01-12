@@ -155,9 +155,12 @@ exports.handler = async function (event, context) {
 
     // delete channels not there
     const channelStates = league.commands.game_channels.channels;
-    Object.keys(channelStates).filter(cId => !currentChannels.includes(cId))
-        .forEach(cId => league.commands.game_channels.channels[cId] = deleteField());
-    await updateDoc(docRef, league);
+    const deletions = Object.keys(channelStates).filter(cId => !currentChannels.includes(cId))
+    .reduce((acc, cId) => {
+        acc[`league.commands.game_channels.channels.${cId}`] = deleteField();
+        return acc;
+    }, {});
+    await updateDoc(docRef, deletions);
 
     const updatedSnap = await getDoc(docRef);
     league = updatedSnap.data();
