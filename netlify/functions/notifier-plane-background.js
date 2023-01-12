@@ -98,7 +98,7 @@ function decideResult(homeUsers, awayUsers) {
     if (homeUsers.length > 1) {
         return "FW Home"
     }
-    if (awayUsers.league > 1) {
+    if (awayUsers.length > 1) {
         return "FW Away";
     }
     throw Error("we should not have gotten here!");
