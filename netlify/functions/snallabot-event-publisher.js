@@ -83,6 +83,10 @@ async function publishChannelEvent(guild_id) {
         const channelRes = await DiscordRequest(`guilds/${guild_id}/channels`, {
             method: 'GET',
         });
+        const docRef = doc(db, "leagues", guild_id);
+        const docSnap = await getDoc(docRef);
+        const league = docSnap.data();
+        const category = league.commands.game_channels.category;
         const channels = await channelRes.json();
         const channelIds = channels.filter(c => {
             // text channel, in right category, with `vs` in it
