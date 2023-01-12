@@ -198,7 +198,7 @@ async function updateChannel(cId, league, guild_id) {
                     currentState.events.push("DONE");
                     return currentState;
                 } catch (e) {
-                    console.warn(`FW requested but no home or away option chosen. Doing nothing ${guild_id}, ${cId}`);
+                    console.warn(`FW requested but no home or away option chosen. Doing nothing ${guild_id}, ${cId}: ${e}`);
                     return currentState;
                 }
 
