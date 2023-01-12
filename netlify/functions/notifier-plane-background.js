@@ -142,7 +142,7 @@ async function ping(gameChannel, teams) {
     return true;
 }
 
-async function updateChannel(cId, league, guild_id) {
+async function updateChannel(cId, league, users, guild_id) {
     const currentState = league.commands.game_channels.channels[cId];
     if (!currentState) {
         return {};
@@ -242,7 +242,7 @@ exports.handler = async function (event, context) {
     const updatedSnap = await getDoc(docRef);
     league = updatedSnap.data();
 
-    const promises = currentChannels.map(cId => updateChannel(cId, league, guild_id));
+    const promises = currentChannels.map(cId => updateChannel(cId, league, users, guild_id));
     const res = await Promise.all(promises);
     await setDoc(doc(db, "leagues", guild_id), league, { merge: true });
 }
