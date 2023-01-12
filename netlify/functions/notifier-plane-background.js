@@ -1,4 +1,5 @@
 import fetch from 'node-fetch';
+import { initializeApp } from "firebase/app";
 import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteField } from "firebase/firestore";
 
 
