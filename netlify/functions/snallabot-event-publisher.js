@@ -105,7 +105,7 @@ exports.handler = async function(event, context) {
     const docRef = doc(db, "leagues", "guild_updates");
     const docSnap = await getDoc(docRef);
     const updateData = docSnap.data();
-    const teamGuilds = Object.keys(updateData.teams);
+    const teamGuilds = Object.keys(updateData.teams || {});
     const teamUpdates = teamGuilds.filter(g => updateData.teams[g]).map(g => publishGuildTeamEvent(g));
     const teamUpdatesRes = await Promise.all(teamUpdates);
     if (teamUpdatesRes.every(r => r.ok)) {
@@ -114,7 +114,7 @@ exports.handler = async function(event, context) {
         console.log("not all team updates were sent succesfully");
     }
 
-    const gameChannelGuilds = Object.keys(updateData.gameChannels);
+    const gameChannelGuilds = Object.keys(updateData.gameChannels || {});
     const gameChannelUpdates = gameChannelGuilds.filter(g => updateData.gameChannels[g]).map(g => publishChannelEvent(g));
     const gameChannelUpdatesRes = await Promise.all(gameChannelUpdates);
     if (gameChannelUpdatesRes.every(r => r.ok)) {
