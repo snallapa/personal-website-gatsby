@@ -49,7 +49,7 @@ async function DiscordRequest(endpoint, options) {
             const data = await res.json();
             if (data["retry_after"]) {
                 tries = tries + 1;
-                await new Promise(r => setTimeout(r, error["retry_after"] * 1000));
+                await new Promise(r => setTimeout(r, data["retry_after"] * 1000));
             } else {
                 console.log(res);
                 throw new Error(JSON.stringify(data));
@@ -61,11 +61,11 @@ async function DiscordRequest(endpoint, options) {
 }
 
 const reactions = {
-    "sch": "U%2B23F0",
-    "gg": "U%2B1F3C6",
-    "home": "U%2B1F3C6",
-    "away": "U%2B1F6EB",
-    "fw": "U%2B23ED"
+    "sch": "%3Aalarm_clock%3A",
+    "gg": "%3Atrophy%3A",
+    "home": "%3Ahouse%3A",
+    "away": "%3Aairplane_departure%3A",
+    "fw": "%3Atrack_next%3A"
 }
 
 async function react(channelId, messageId) {
