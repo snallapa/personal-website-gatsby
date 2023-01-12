@@ -190,11 +190,12 @@ exports.handler = async function (event, context) {
             const homeUsers = getReactedUsers(cId, currentState.message, "home");
             const awayUsers = getReactedUsers(cId, currentState.message, "away");
             const fwUsers = getReactedUsers(cId, currentState.message, "fw");
+            console.log(ggUsers);
             if (ggUsers.length > 1) {
                 currentState.events.push("DONE");
                 return DiscordRequest(`/channels/${cId}`, { method: 'DELETE' }).then(_ => currentState);
             }
-            if (fwUsers > 1) {
+            if (fwUsers.length > 1) {
                 if (league.commands.game_channels.adminRole) {
                     const admins = users.filter(u => u.roles.includes(league.commands.game_channels.adminRole)).map(u => u.id);
                     if (fwUsers.filter(u => admins.includes(u.id)).length >= 1) {
