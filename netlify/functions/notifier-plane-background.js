@@ -121,7 +121,7 @@ async function forceWin(fwChannel, gameChannel, result) {
     const channelName = channel.name;
     const message = `${channelName}: ${result}`;
     await DiscordRequest(`channels/${fwChannel}/messages`, { method: 'POST', body: { content: message } });
-    await DiscordRequest(`channels/${cId}`, { method: 'DELETE' });
+    await DiscordRequest(`channels/${gameChannel}`, { method: 'DELETE' });
     return true;
 }
 
@@ -182,7 +182,7 @@ async function updateChannel(cId, league, guild_id) {
                         currentState.events.push("DONE");
                         return currentState;
                     } catch (e) {
-                        console.warn(`FW requested but no home or away option chosen. Doing nothing ${guild_id}, ${channelId}`);
+                        console.warn(`FW requested but no home or away option chosen. Doing nothing ${guild_id}, ${cId}`);
                         return currentState;
                     }
                 } else if(currentState.events.includes("FW_REQUESTED")) {
@@ -198,7 +198,7 @@ async function updateChannel(cId, league, guild_id) {
                     currentState.events.push("DONE");
                     return currentState;
                 } catch (e) {
-                    console.warn(`FW requested but no home or away option chosen. Doing nothing ${guild_id}, ${channelId}`);
+                    console.warn(`FW requested but no home or away option chosen. Doing nothing ${guild_id}, ${cId}`);
                     return currentState;
                 }
 
