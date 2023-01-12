@@ -116,7 +116,7 @@ function findTeam(teams, search_phrase) {
 }
 
 async function forceWin(fwChannel, gameChannel, result) {
-    const res = await DiscordRequest(`channel/${gameChannel}`, { method: 'GET' });
+    const res = await DiscordRequest(`channels/${gameChannel}`, { method: 'GET' });
     const channel = await res.json()
     const channelName = channel.name;
     const message = `${channelName}: ${result}`;
@@ -126,7 +126,7 @@ async function forceWin(fwChannel, gameChannel, result) {
 }
 
 async function ping(gameChannel, teams) {
-    const res = await DiscordRequest(`channel/${gameChannel}`, { method: 'GET' });
+    const res = await DiscordRequest(`channels/${gameChannel}`, { method: 'GET' });
     const channel = await res.json()
     const channelName = channel.name;
     const channelTeams = channelName.split("-vs-").map(t => t.replace("-", " "));
