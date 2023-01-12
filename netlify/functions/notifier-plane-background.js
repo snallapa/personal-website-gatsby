@@ -70,11 +70,11 @@ const reactions = {
 
 async function react(channelId, messageId) {
     try {
-        const reactionPromises = Object.keys(reactions).map(reaction => {
+        const reactionPromise = Object.keys(reactions).reduce((p, reaction) => {
             const currentReaction = reactions[reaction];
-            return DiscordRequest(`/channels/${channelId}/messages/${messageId}/reactions/${currentReaction}/@me`, {method: 'PUT'})
-        })
-        await Promise.all(reactionPromises)
+            return p.then(_ => DiscordRequest(`/channels/${channelId}/messages/${messageId}/reactions/${currentReaction}/@me`, {method: 'PUT'}));
+        }, Promise.resolve());
+        await reactionPromise;
     } catch (e) {
         console.error(`reaction failed for ${channelId} and ${messageId}`);
         throw e;
