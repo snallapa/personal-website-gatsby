@@ -228,7 +228,7 @@ async function updateChannel(cId, league, users, guild_id) {
             )
             return currentState
           }
-        } else if (currentState.events.includes("FW_REQUESTED")) {
+        } else if (!currentState.events.includes("FW_REQUESTED")) {
           const message = `FW requested <@&${league.commands.game_channels.adminRole}>`
           await DiscordRequest(`channels/${cId}/messages`, {
             method: "POST",
