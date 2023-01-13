@@ -5,6 +5,7 @@ import {
   collection,
   getDocs,
   deleteDoc,
+  doc
 } from "firebase/firestore"
 
 import fetch from "node-fetch"
@@ -80,10 +81,10 @@ exports.handler = async function(event, context) {
 
   console.log(`number of firebase leagues: ${querySnapshot.size}`)
 
-  const deletePromises = querySnapshot.docs.flatMap(doc => {
-    if (!guilds.includes(doc.id) && !reservedLeagues.includes(doc.id)) {
-      console.log(`deleting league ${doc.id}`)
-      return [deleteDoc(doc(db, "leagues", doc.id))]
+  const deletePromises = querySnapshot.docs.flatMap(fDoc => {
+    if (!guilds.includes(fDoc.id) && !reservedLeagues.includes(fDoc.id)) {
+      console.log(`deleting league ${fDoc.id}`)
+      return [deleteDoc(doc(db, "leagues", fDoc.id))]
     }
     return []
   })
