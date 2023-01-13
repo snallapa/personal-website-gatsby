@@ -176,7 +176,8 @@ async function ping(gameChannel, teams) {
 }
 
 async function updateChannel(cId, league, users, guild_id) {
-  const currentState = league.commands.game_channels.channels[cId]
+  const channelStates = league.commands.game_channels.channels || {}
+  const currentState = channelStates[cId]
   if (!currentState) {
     return {}
   }

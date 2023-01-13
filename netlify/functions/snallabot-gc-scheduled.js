@@ -39,7 +39,7 @@ async function DiscordRequest(endpoint, options) {
       const data = await res.json()
       if (data["retry_after"]) {
         tries = tries + 1
-        await new Promise(r => setTimeout(r, error["retry_after"] * 1000))
+        await new Promise(r => setTimeout(r, data["retry_after"] * 1000))
       } else {
         console.log(res)
         throw new Error(JSON.stringify(data))
