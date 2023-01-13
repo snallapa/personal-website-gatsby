@@ -1,6 +1,11 @@
 import { initializeApp } from "firebase/app"
 
-import { getFirestore, collection, getDocs } from "firebase/firestore"
+import {
+  getFirestore,
+  collection,
+  getDocs,
+  deleteDoc,
+} from "firebase/firestore"
 
 import fetch from "node-fetch"
 
@@ -61,16 +66,29 @@ exports.handler = async function(event, context) {
       method: "GET",
     })
     const pagedGuilds = await res.json()
-    console.log(pagedGuilds)
     if (pagedGuilds.length === 0) {
       paging = false
     } else {
       guilds = guilds.concat(pagedGuilds.map(g => g.id))
     }
   }
-  console.log(guilds.length)
+  console.log(`number of servers: ${guilds.length}`)
 
-  // const querySnapshot = await getDocs(collection(db, "leagues"))
+  const querySnapshot = await getDocs(collection(db, "leagues"))
+
+  console.log(`number of firebase leagues: ${querySnapshot.size}`)
+
+  const deletePromises = querySnapshot.docs.flatMap(doc => {
+    if (!guilds.includes(doc.id)) {
+      // return [deleteDoc(doc(db, "leagues", doc.id))]
+      console.log(`would delete league ${doc.id}`)
+      return []
+    }
+    return []
+  })
+
+  // await Promise.all(deletePromises)
+
   return {
     statusCode: 200,
   }
