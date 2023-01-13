@@ -51,11 +51,9 @@ async function DiscordRequest(endpoint, options) {
 }
 
 exports.handler = async function(event, context) {
-  const guilds = []
   const res = await DiscordRequest("users/@me/guilds", { method: "GET" })
   const pagedGuilds = await res.json()
-  guilds.concat(pagedGuilds.map(g => g.id))
-  console.log(guilds)
+  let guilds = pagedGuilds.map(g => g.id)
   let paging = true
   while (paging) {
     const lastGuild = guilds[guilds.length - 1]
@@ -67,10 +65,10 @@ exports.handler = async function(event, context) {
     if (pagedGuilds.length === 0) {
       paging = false
     } else {
-      guilds.concat(pagedGuilds.map(g => g.id))
+      guilds = guilds.concat(pagedGuilds.map(g => g.id))
     }
   }
-  console.log(guilds)
+  console.log(guilds.length)
 
   // const querySnapshot = await getDocs(collection(db, "leagues"))
   return {
