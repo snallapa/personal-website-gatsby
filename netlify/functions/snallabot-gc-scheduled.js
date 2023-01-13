@@ -55,6 +55,7 @@ exports.handler = async function(event, context) {
   const res = await DiscordRequest("users/@me/guilds", { method: "GET" })
   const pagedGuilds = await res.json()
   guilds.concat(pagedGuilds.map(g => g.id))
+  console.log(guilds)
   let paging = true
   while (paging) {
     const lastGuild = guilds[guilds.length - 1]
