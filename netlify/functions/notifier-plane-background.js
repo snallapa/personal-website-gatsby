@@ -278,7 +278,7 @@ exports.handler = async function(event, context) {
   let league = docSnap.data()
 
   // delete channels not there
-  const channelStates = league.commands.game_channels.channels
+  const channelStates = league.commands.game_channels.channels || {};
   const deletions = Object.keys(channelStates)
     .filter(cId => !currentChannels.includes(cId))
     .reduce((acc, cId) => {
