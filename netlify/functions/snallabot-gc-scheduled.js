@@ -82,14 +82,13 @@ exports.handler = async function(event, context) {
 
   const deletePromises = querySnapshot.docs.flatMap(doc => {
     if (!guilds.includes(doc.id) && !reservedLeagues.includes(doc.id)) {
-      // return [deleteDoc(doc(db, "leagues", doc.id))]
-      console.log(`would delete league ${doc.id}`)
-      return []
+      console.log(`deleting league ${doc.id}`)
+      return [deleteDoc(doc(db, "leagues", doc.id))]
     }
     return []
   })
 
-  // await Promise.all(deletePromises)
+  await Promise.all(deletePromises)
 
   return {
     statusCode: 200,
