@@ -55,6 +55,8 @@ async function DiscordRequest(endpoint, options) {
   }
 }
 
+const reservedLeagues = ["guild_updates", "mca"]
+
 exports.handler = async function(event, context) {
   const res = await DiscordRequest("users/@me/guilds", { method: "GET" })
   const pagedGuilds = await res.json()
@@ -79,7 +81,7 @@ exports.handler = async function(event, context) {
   console.log(`number of firebase leagues: ${querySnapshot.size}`)
 
   const deletePromises = querySnapshot.docs.flatMap(doc => {
-    if (!guilds.includes(doc.id)) {
+    if (!guilds.includes(doc.id) && !reservedLeagues.includes(doc.id)) {
       // return [deleteDoc(doc(db, "leagues", doc.id))]
       console.log(`would delete league ${doc.id}`)
       return []
