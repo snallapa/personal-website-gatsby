@@ -63,6 +63,7 @@ exports.handler = async function(event, context) {
       method: "GET",
     })
     const pagedGuilds = await res.json()
+    console.log(pagedGuilds)
     if (pagedGuilds.length === 0) {
       paging = false
     } else {
