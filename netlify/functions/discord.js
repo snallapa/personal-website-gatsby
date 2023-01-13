@@ -548,6 +548,9 @@ exports.handler = async function(event, context) {
           )
         }
         const league = docSnap.data()
+        if (!league.commands.teams || !league.commands.teams.channel) {
+          return respond("configure teams first: `/teams configure`")
+        }
         const teams = league.teams
         let teamKey
         try {
@@ -642,6 +645,9 @@ exports.handler = async function(event, context) {
           )
         }
         const league = docSnap.data()
+        if (!league.commands.teams || !league.commands.teams.channel) {
+          return respond("configure teams first: `/teams configure`")
+        }
         const teams = league.teams
         let teamKey
         try {
