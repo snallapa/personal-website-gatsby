@@ -5,5 +5,10 @@
 [functions."updater-scheduled"]
 schedule = "0/20 * * * *"
 
+# update every 10 minutes
 [functions."snallabot-event-publisher"]
+schedule = "0/10 * * * *"
+
+# update every 10 minutes
+[functions."snallabot-gc-scheduled"]
 schedule = "0/10 * * * *"
