@@ -107,7 +107,7 @@ exports.handler = async function(event, context) {
     })
     .catch(console.warn)
 
-
+  console.log(locationUrl)
   const code2 = new URLSearchParams(
     locationUrl.replace("http://127.0.0.1/success", "")
   ).get("code")
