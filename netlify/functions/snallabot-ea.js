@@ -90,7 +90,7 @@ exports.handler = async function(event, context) {
       ent["entitlementTag"] === "ONLINE_ACCESS"
   )[0]["groupName"]
 
-  const res5 = await fetch(
+  const locationUrl = await fetch(
     `https://accounts.ea.com/connect/auth?response_type=code&redirect_uri=http://127.0.0.1/success&machineProfileKey=1d6830c75f0f5a26&release_type=prod&access_token=${access_token}&persona_id=${personaId}&client_id=MaddenCompanionApp19`,
     {
       redirect: "manual",
@@ -102,9 +102,12 @@ exports.handler = async function(event, context) {
       },
     }
   )
+    .then(res5 => {
+      return res5.headers.get("Location")
+    })
+    .catch(console.warn)
   console.log(res5)
 
-  const locationUrl = res5.headers.get("Location")
   const code2 = new URLSearchParams(
     locationUrl.replace("http://127.0.0.1/success", "")
   ).get("code")
