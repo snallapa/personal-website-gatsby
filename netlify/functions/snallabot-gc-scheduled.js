@@ -5,7 +5,7 @@ import {
   collection,
   getDocs,
   deleteDoc,
-  doc
+  doc,
 } from "firebase/firestore"
 
 import fetch from "node-fetch"
