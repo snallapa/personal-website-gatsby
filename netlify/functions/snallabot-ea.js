@@ -59,6 +59,8 @@ exports.handler = async function(event, context) {
   )
   const res3Json = await res3.json()
 
+  console.log(res3Json)
+
   const personaId = res3Json["personas"]["persona"].filter(
     p => p.showPersona === "EVERYONE"
   )[0].personaId
