@@ -33,6 +33,8 @@ exports.handler = async function(event, context) {
   const res1Json = await res1.json()
   const access_token = res1Json["access_token"]
 
+  console.log(res1Json)
+
   const res2 = await fetch(
     `https://accounts.ea.com/connect/tokeninfo?access_token=${access_token}`,
     {
@@ -45,6 +47,8 @@ exports.handler = async function(event, context) {
   )
   const res2Json = await res2.json()
   const pid = res2Json["pid_id"]
+
+  console.log(res2Json)
 
   const res3 = await fetch(
     `https://gateway.ea.com/proxy/identity/pids/${pid}/personas?access_token=${access_token}&status=ACTIVE`,
