@@ -137,9 +137,10 @@ exports.handler = async function(event, context) {
   const res7Json = await res7.json()
   const pidType = res7Json["pid_type"] // related to system (PS3)
 
-  const res8 = await fetch(
+  const locationUrl2 = await fetch(
     `https://accounts.ea.com/connect/auth?response_type=code&redirect_uri=http://127.0.0.1/success&machineProfileKey=1d6830c75f0f5a26&release_type=prod&access_token=${access_token2}&persona_id=${personaId}&client_id=${SYSTEM_MAP[system]}`,
     {
+      redirect: "manual",
       headers: {
         "User-Agent": "ProtoHttp 1.3/DS 15.1.2.2.0 (Android)",
         "Content-Type": "application/json;charset=utf-8",
@@ -147,9 +148,11 @@ exports.handler = async function(event, context) {
         "Access-Control-Expose-Headers": "Location",
       },
     }
-  )
+  ).then(res8 => {
+    return res8.headers.get("Location")
+  })
+  .catch(console.warn)
 
-  const locationUrl2 = res8.headers.get("Location")
   const code3 = new URLSearchParams(
     locationUrl2.replace("http://127.0.0.1/success", "")
   ).get("code")
