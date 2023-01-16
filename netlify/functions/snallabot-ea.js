@@ -106,7 +106,7 @@ exports.handler = async function(event, context) {
       return res5.headers.get("Location")
     })
     .catch(console.warn)
-  console.log(res5)
+
 
   const code2 = new URLSearchParams(
     locationUrl.replace("http://127.0.0.1/success", "")
