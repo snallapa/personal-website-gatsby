@@ -158,7 +158,7 @@ async function forceWin(
       ? `${channelName}: ${result} ${joinUsers(
           requestedUsers
         )}, confirmed by ${joinUsers(confirmedUsers)}`
-      : `${channelName}: ${result} by ${joinUsers(requestedUsers)}`
+      : `${channelName}: ${result} ${joinUsers(requestedUsers)}`
   await DiscordRequest(`channels/${fwChannel}/messages`, {
     method: "POST",
     body: {
