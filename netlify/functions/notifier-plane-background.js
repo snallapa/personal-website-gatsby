@@ -18,6 +18,8 @@ const firebaseConfig = {
   appId: "1:163156624093:web:dfe860c8bb38a62b075134",
 }
 
+const SNALLABOT_USER = "970091866450198548"
+
 const app = initializeApp(firebaseConfig)
 
 // Initialize Cloud Firestore and get a reference to the service
@@ -137,14 +139,34 @@ function findTeam(teams, search_phrase) {
   throw `could not find team ${search_phrase}`
 }
 
-async function forceWin(fwChannel, gameChannel, result) {
+function joinUsers(users) {
+  return users.map(uId => `<@${uId}>`).join("")
+}
+
+async function forceWin(
+  fwChannel,
+  gameChannel,
+  result,
+  requestedUsers,
+  confirmedUsers
+) {
   const res = await DiscordRequest(`channels/${gameChannel}`, { method: "GET" })
   const channel = await res.json()
   const channelName = channel.name
-  const message = `${channelName}: ${result}`
+  const message =
+    confirmedUsers.length > 0
+      ? `${channelName}: ${result} ${joinUsers(
+          requestedUsers
+        )}, confirmed by ${joinUsers(confirmedUsers)}`
+      : `${channelName}: ${result} by ${joinUsers(requestedUsers)}`
   await DiscordRequest(`channels/${fwChannel}/messages`, {
     method: "POST",
-    body: { content: message },
+    body: {
+      content: message,
+      allowed_mentions: {
+        parse: [],
+      },
+    },
   })
   await DiscordRequest(`channels/${gameChannel}`, { method: "DELETE" })
   return true
@@ -211,16 +233,27 @@ async function updateChannel(cId, league, users, guild_id) {
       return currentState
     }
     if (fwUsers.length > 1) {
+      const requestedUsers = fwUsers
+        .map(u => u.id)
+        .filter(uId => SNALLABOT_USER !== uId)
       if (league.commands.game_channels.adminRole) {
         const admins = users
           .filter(u =>
             u.roles.includes(league.commands.game_channels.adminRole)
           )
           .map(u => u.id)
-        if (fwUsers.filter(u => admins.includes(u.id)).length >= 1) {
+        const confirmed = requestedUsers.filter(u => admins.includes(u.id))
+        if (confirmed.length >= 1) {
           try {
             const result = decideResult(homeUsers, awayUsers)
-            await forceWin(league.commands.game_channels.fwChannel, cId, result)
+            const req = requestedUsers.filter(uId => !admins.includes(uId))
+            await forceWin(
+              league.commands.game_channels.fwChannel,
+              cId,
+              result,
+              req,
+              confirmed
+            )
             currentState.events.push("DONE")
             return currentState
           } catch (e) {
@@ -230,10 +263,17 @@ async function updateChannel(cId, league, users, guild_id) {
             return currentState
           }
         } else if (!currentState.events.includes("FW_REQUESTED")) {
-          const message = `FW requested <@&${league.commands.game_channels.adminRole}>`
+          const message = `FW requested <@&${
+            league.commands.game_channels.adminRole
+          } by ${joinUsers(requestedUsers)}>`
           await DiscordRequest(`channels/${cId}/messages`, {
             method: "POST",
-            body: { content: message },
+            body: {
+              content: message,
+              allowed_mentions: {
+                parse: ["roles"],
+              },
+            },
           })
           currentState.events.push("FW_REQUESTED")
           return currentState
@@ -241,7 +281,13 @@ async function updateChannel(cId, league, users, guild_id) {
       } else {
         try {
           const result = decideResult(homeUsers, awayUsers)
-          await forceWin(league.commands.game_channels.fwChannel, cId, result)
+          await forceWin(
+            league.commands.game_channels.fwChannel,
+            cId,
+            result,
+            requestedUsers,
+            []
+          )
           currentState.events.push("DONE")
           return currentState
         } catch (e) {
