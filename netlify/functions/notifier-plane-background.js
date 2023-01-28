@@ -242,7 +242,7 @@ async function updateChannel(cId, league, users, guild_id) {
             u.roles.includes(league.commands.game_channels.adminRole)
           )
           .map(u => u.id)
-        const confirmed = requestedUsers.filter(u => admins.includes(u.id))
+        const confirmed = requestedUsers.filter(uId => admins.includes(uId))
         if (confirmed.length >= 1) {
           try {
             const result = decideResult(homeUsers, awayUsers)
@@ -265,7 +265,7 @@ async function updateChannel(cId, league, users, guild_id) {
         } else if (!currentState.events.includes("FW_REQUESTED")) {
           const message = `FW requested <@&${
             league.commands.game_channels.adminRole
-          } by ${joinUsers(requestedUsers)}>`
+          }> by ${joinUsers(requestedUsers)}`
           await DiscordRequest(`channels/${cId}/messages`, {
             method: "POST",
             body: {
