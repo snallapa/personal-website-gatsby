@@ -76,6 +76,7 @@ exports.handler = async function(event, context) {
   const emojiRef = doc(db, "polls", "972269092440530994")
   const emojiSnap = await getDoc(emojiRef)
   const emojiDoc = emojiSnap.data()
+  console.log(polls)
 
   const res = await fetch(
     "http://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard"
