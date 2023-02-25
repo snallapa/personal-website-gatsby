@@ -66,13 +66,19 @@ function formatGame(g) {
 exports.handler = async function(event, context) {
   // console.log(event)
   const { guild_id } = JSON.parse(event.body)
-  const docRef = doc(db, "polls", "972269092440530994")
+  const docRef = doc(db, "polls", guild_id)
   const docSnap = await getDoc(docRef)
   if (!docSnap.exists()) {
     console.log(`no community found for ${guild_id}, do /setup_nfl_polls first`)
   }
   const polls = docSnap.data()
   console.log(polls)
+  const emojiRef = doc(db, "polls", "972269092440530994")
+  const emojiSnap = await getDoc(emojiRef)
+  if (!emojiSnap.exists()) {
+    console.log(`no community found for ${guild_id}, do /setup_nfl_polls first`)
+  }
+  const emojiDoc = docSnap.data()
   const res = await fetch(
     "http://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard"
   )
@@ -153,7 +159,7 @@ exports.handler = async function(event, context) {
     while (reactionCount < reactions.length && tries < 100) {
       const currentReaction = reactions[reactionCount]
       const emoji = `${currentReaction.emoji}%3A${
-        polls.nfl.emojis[currentReaction.emoji]
+        emojiDoc.nfl.emojis[currentReaction.emoji]
       }`
       try {
         await DiscordRequest(
