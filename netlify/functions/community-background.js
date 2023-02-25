@@ -66,7 +66,7 @@ function formatGame(g) {
 exports.handler = async function(event, context) {
   // console.log(event)
   const { guild_id } = JSON.parse(event.body)
-  const docRef = doc(db, "polls", guild_id)
+  const docRef = doc(db, "polls", "972269092440530994")
   const docSnap = await getDoc(docRef)
   if (!docSnap.exists()) {
     console.log(`no community found for ${guild_id}, do /setup_nfl_polls first`)
