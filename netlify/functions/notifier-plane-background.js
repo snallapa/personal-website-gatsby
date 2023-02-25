@@ -153,12 +153,11 @@ async function forceWin(
   const res = await DiscordRequest(`channels/${gameChannel}`, { method: "GET" })
   const channel = await res.json()
   const channelName = channel.name
-  const message =
-    confirmedUsers.length > 0
-      ? `${channelName}: ${result} ${joinUsers(
-          requestedUsers
-        )}, confirmed by ${joinUsers(confirmedUsers)}`
-      : `${channelName}: ${result} ${joinUsers(requestedUsers)}`
+  const requestMessage =
+    requestedUsers.length > 0 ? "requested: " + joinUsers(requestedUsers) : ""
+  const confirmedUsers =
+    confirmedUsers.length > 0 ? "confirmed: " + joinUsers(confirmedUsers) : ""
+  const message = `${channelName}: ${result}, ${requestMessage} ${confirmedUsers}`
   await DiscordRequest(`channels/${fwChannel}/messages`, {
     method: "POST",
     body: {
