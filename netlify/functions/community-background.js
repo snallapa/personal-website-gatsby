@@ -75,10 +75,8 @@ exports.handler = async function(event, context) {
   console.log(polls)
   const emojiRef = doc(db, "polls", "972269092440530994")
   const emojiSnap = await getDoc(emojiRef)
-  if (!emojiSnap.exists()) {
-    console.log(`no community found for ${guild_id}, do /setup_nfl_polls first`)
-  }
-  const emojiDoc = docSnap.data()
+  const emojiDoc = emojiSnap.data()
+
   const res = await fetch(
     "http://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard"
   )
