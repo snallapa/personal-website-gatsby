@@ -155,9 +155,9 @@ async function forceWin(
   const channelName = channel.name
   const requestMessage =
     requestedUsers.length > 0 ? "requested: " + joinUsers(requestedUsers) : ""
-  const confirmedUsers =
+  const confirmedUsersMessage =
     confirmedUsers.length > 0 ? "confirmed: " + joinUsers(confirmedUsers) : ""
-  const message = `${channelName}: ${result}, ${requestMessage} ${confirmedUsers}`
+  const message = `${channelName}: ${result}, ${requestMessage} ${confirmedUsersMessage}`
   await DiscordRequest(`channels/${fwChannel}/messages`, {
     method: "POST",
     body: {
