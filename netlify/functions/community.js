@@ -124,7 +124,31 @@ exports.handler = async function(event, context) {
         { merge: true }
       )
       return respond("configured channel!")
-    } else if (name === "manual_update") {
+    } else if (name === "setup_nba_polls") {
+      const channel = options[0].value
+      const auto = options[1] ? options[1].value : false
+      await setDoc(
+        doc(db, "polls", guild_id),
+        {
+          nba: {
+            channel: channel,
+          },
+        },
+        { merge: true }
+      )
+      const guilds = {}
+      guilds[guild_id] = auto
+      await setDoc(
+        doc(db, "polls", "guild_updates"),
+        {
+          nba: {
+            guilds,
+          },
+        },
+        { merge: true }
+      )
+      return respond("configured channel!")
+    } else if (name === "manual_update_nfl") {
       const docRef = doc(db, "polls", guild_id)
       const docSnap = await getDoc(docRef)
       if (!docSnap.exists()) {
@@ -142,6 +166,39 @@ exports.handler = async function(event, context) {
 
       const res = await fetch(
         "https://nallapareddy.com/.netlify/functions/community-background",
+        {
+          method: "POST",
+          body: JSON.stringify({
+            guild_id: guild_id,
+          }),
+        }
+      )
+      if (res.ok) {
+        return respond("creating polls shortly!")
+      } else {
+        console.log(res)
+        return respond(
+          "something went wrong :( I am not sure if polls will be created maybe ask owner"
+        )
+      }
+    } else if (name === "manual_update_nba") {
+      const docRef = doc(db, "polls", guild_id)
+      const docSnap = await getDoc(docRef)
+      if (!docSnap.exists()) {
+        return respond(
+          `no community found for ${guild_id}, do /setup_nba_polls first`
+        )
+      }
+      const polls = docSnap.data()
+      // fail this early
+      try {
+        const channel = polls.nba.channel
+      } catch (error) {
+        return respond("missing configuration, run `/setup_nba_polls` first")
+      }
+
+      const res = await fetch(
+        "https://nallapareddy.com/.netlify/functions/community-nba-background",
         {
           method: "POST",
           body: JSON.stringify({

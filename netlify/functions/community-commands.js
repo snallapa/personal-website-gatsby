@@ -6,7 +6,7 @@ const TEST_COMMAND = {
   type: 1,
 }
 
-const SETUP_COMMAND = {
+const SETUP_NFL_COMMAND = {
   name: "setup_nfl_polls",
   description: "setup the community for nfl game polls",
   type: 1,
@@ -27,13 +27,46 @@ const SETUP_COMMAND = {
   ],
 }
 
-const UPDATE_COMMAND = {
-  name: "manual_update",
+const SETUP_NBA_COMMAND = {
+  name: "setup_nba_polls",
+  description: "setup the community for nba game polls",
+  type: 1,
+  options: [
+    {
+      type: 7, // channel
+      name: "channel",
+      description: "channel to create polls in",
+      required: true,
+      channel_types: [0],
+    },
+    {
+      type: 5, // boolean
+      name: "auto_update",
+      description: "set to true to auto update polls every 10 minutes",
+      required: false,
+    },
+  ],
+}
+
+const UPDATE_COMMAND_NFL = {
+  name: "manual_update_nfl",
   description: "manual update poll scores",
   type: 1,
 }
 
-const COMMANDS = [TEST_COMMAND, SETUP_COMMAND, UPDATE_COMMAND]
+const UPDATE_COMMAND_NBA = {
+  name: "manual_update_nfl",
+  description: "manual update poll scores",
+  type: 1,
+}
+
+const COMMANDS = [
+  TEST_COMMAND,
+  SETUP_NFL_COMMAND,
+  SETUP_NBA_COMMAND,
+  UPDATE_COMMAND_NBA,
+  UPDATE_COMMAND_NFL,
+]
 
 const DELETED_COMMANDS = []
 
