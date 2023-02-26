@@ -121,6 +121,7 @@ async function gamePoll(polls, emojiDoc, guild_id, currentGame) {
     polls.nba.games[currentGame.id] = messageId
   }
   await setDoc(doc(db, "polls", guild_id), polls, { merge: true })
+  return true
 }
 
 exports.handler = async function(event, context) {
@@ -170,5 +171,4 @@ exports.handler = async function(event, context) {
     })
   const promises = gameMessages.map(g => gamePoll(polls, emojiDoc, guild_id, g))
   const reses = await Promise.all(promises)
-  console.log(reses.map(r => `${r.ok}`))
 }
