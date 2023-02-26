@@ -26,7 +26,7 @@ async function DiscordRequest(endpoint, options) {
   if (options.body) options.body = JSON.stringify(options.body)
   // Use node-fetch to make requests
   let tries = 0
-  const maxTries = 5
+  const maxTries = 10
   while (tries < maxTries) {
     const res = await fetch(url, {
       headers: {
