@@ -23,8 +23,9 @@ exports.handler = async function(event, context) {
   const docRef = doc(db, "polls", "guild_updates")
   const docSnap = await getDoc(docRef)
   const updateData = docSnap.data()
-  const guilds = Object.keys(updateData.nfl.guilds)
-  const updates = guilds
+  const nflGuilds = Object.keys(updateData.nfl.guilds)
+  const nbaGuilds = Object.keys(updateData.nba.guilds)
+  const nflUpdates = nflGuilds
     .filter(g => updateData.nfl.guilds[g])
     .map(g => {
       return fetch(
@@ -37,8 +38,22 @@ exports.handler = async function(event, context) {
         }
       )
     })
-  const updateRes = await Promise.all(updates)
-  if (updateRes.every(r => r.ok)) {
+  const nflUpdatesRes = await Promise.all(nflUpdates)
+  const nbaUpdates = nbaGuilds
+    .filter(g => updateData.nba.guilds[g])
+    .map(g => {
+      return fetch(
+        "https://nallapareddy.com/.netlify/functions/community-nba-background",
+        {
+          method: "POST",
+          body: JSON.stringify({
+            guild_id: g,
+          }),
+        }
+      )
+    })
+  const nbaUpdatesRes = await Promise.all(nbaUpdates)
+  if (nflUpdatesRes.every(r => r.ok) && nbaUpdatesRes.every(r => r.ok)) {
     console.log("updates sent successfully")
   } else {
     console.log("updates were not sent succesfully")
