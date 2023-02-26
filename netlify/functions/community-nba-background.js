@@ -70,7 +70,7 @@ function formatGame(g) {
   return `${awayTeam.team.displayName} ${awayTeam.score} - ${homeTeam.score} ${homeTeam.team.displayName}`
 }
 
-async function gamePoll(polls, emojiDoc, currentGame) {
+async function gamePoll(polls, emojiDoc, guild_id, currentGame) {
   const channel = polls.nba.channel
   if (!polls.nba.games[currentGame.id]) {
     const m = await DiscordRequest(`channels/${channel}/messages`, {
@@ -168,7 +168,7 @@ exports.handler = async function(event, context) {
         homeEmoji,
       }
     })
-  const promises = gameMessages.map(g => gamePoll(polls, emojiDoc, g))
+  const promises = gameMessages.map(g => gamePoll(polls, emojiDoc, guild_id, g))
   const reses = await Promise.all(promises)
   console.log(reses.map(r => `${r.ok}`))
 }
