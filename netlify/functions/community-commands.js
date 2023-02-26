@@ -55,7 +55,7 @@ const UPDATE_COMMAND_NFL = {
 }
 
 const UPDATE_COMMAND_NBA = {
-  name: "manual_update_nfl",
+  name: "manual_update_nba",
   description: "manual update poll scores",
   type: 1,
 }
