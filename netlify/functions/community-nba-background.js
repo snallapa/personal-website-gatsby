@@ -169,6 +169,8 @@ exports.handler = async function(event, context) {
         homeEmoji,
       }
     })
-  const promises = gameMessages.map(g => gamePoll(polls, emojiDoc, guild_id, g))
-  const reses = await Promise.all(promises)
+  for (let i = 0; i < gameMessages.length; i++) {
+    const g = gameMessages[i]
+    await gamePoll(polls, emojiDoc, guild_id, g)
+  }
 }
