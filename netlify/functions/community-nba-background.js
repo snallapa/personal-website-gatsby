@@ -72,7 +72,7 @@ function formatGame(g) {
 
 async function gamePoll(polls, emojiDoc, currentGame) {
   const channel = polls.nba.channel
-  if (!polls.nba.games[g.id]) {
+  if (!polls.nba.games[currentGame.id]) {
     const m = await DiscordRequest(`channels/${channel}/messages`, {
       method: "POST",
       body: {
