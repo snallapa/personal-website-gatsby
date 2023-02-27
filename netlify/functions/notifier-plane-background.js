@@ -199,59 +199,94 @@ async function ping(gameChannel, teams) {
 async function updateChannel(cId, league, users, guild_id) {
   const channelStates = league.commands.game_channels.channels || {}
   const currentState = channelStates[cId]
-  if (!currentState) {
-    return {}
-  }
-  currentState.events = currentState.events || []
-  if (currentState.events.includes("DONE")) {
-    return currentState
-  }
-  // first if we havent reacted, we must react
-  if (!currentState.events.includes("REACTED")) {
-    try {
-      currentState.events.push("REACTED")
-      await react(cId, currentState.message)
-      return currentState
-    } catch (e) {
-      console.error(`guild ${guild_id} failed to react error: ${e}`)
+  try {
+    if (!currentState) {
+      return {}
+    }
+    currentState.events = currentState.events || []
+    if (currentState.events.includes("DONE")) {
       return currentState
     }
-  } else {
-    const ggUsers = await getReactedUsers(cId, currentState.message, "gg")
-    const scheduledUsers = await getReactedUsers(
-      cId,
-      currentState.message,
-      "sch"
-    )
-    const homeUsers = await getReactedUsers(cId, currentState.message, "home")
-    const awayUsers = await getReactedUsers(cId, currentState.message, "away")
-    const fwUsers = await getReactedUsers(cId, currentState.message, "fw")
-    if (ggUsers.length > 1) {
-      currentState.events.push("DONE")
-      await DiscordRequest(`channels/${cId}`, { method: "DELETE" })
-      return currentState
-    }
-    if (fwUsers.length > 1) {
-      const requestedUsers = fwUsers
-        .map(u => u.id)
-        .filter(uId => SNALLABOT_USER !== uId)
-      if (league.commands.game_channels.adminRole) {
-        const admins = users
-          .filter(u =>
-            u.roles.includes(league.commands.game_channels.adminRole)
-          )
+    // first if we havent reacted, we must react
+    if (!currentState.events.includes("REACTED")) {
+      try {
+        currentState.events.push("REACTED")
+        await react(cId, currentState.message)
+        return currentState
+      } catch (e) {
+        console.error(`guild ${guild_id} failed to react error: ${e}`)
+        return currentState
+      }
+    } else {
+      const ggUsers = await getReactedUsers(cId, currentState.message, "gg")
+      const scheduledUsers = await getReactedUsers(
+        cId,
+        currentState.message,
+        "sch"
+      )
+      const homeUsers = await getReactedUsers(cId, currentState.message, "home")
+      const awayUsers = await getReactedUsers(cId, currentState.message, "away")
+      const fwUsers = await getReactedUsers(cId, currentState.message, "fw")
+      if (ggUsers.length > 1) {
+        currentState.events.push("DONE")
+        await DiscordRequest(`channels/${cId}`, { method: "DELETE" })
+        return currentState
+      }
+      if (fwUsers.length > 1) {
+        const requestedUsers = fwUsers
           .map(u => u.id)
-        const confirmed = requestedUsers.filter(uId => admins.includes(uId))
-        if (confirmed.length >= 1) {
+          .filter(uId => SNALLABOT_USER !== uId)
+        if (league.commands.game_channels.adminRole) {
+          const admins = users
+            .filter(u =>
+              u.roles.includes(league.commands.game_channels.adminRole)
+            )
+            .map(u => u.id)
+          const confirmed = requestedUsers.filter(uId => admins.includes(uId))
+          if (confirmed.length >= 1) {
+            try {
+              const result = decideResult(homeUsers, awayUsers)
+              const req = requestedUsers.filter(uId => !admins.includes(uId))
+              await forceWin(
+                league.commands.game_channels.fwChannel,
+                cId,
+                result,
+                req,
+                confirmed
+              )
+              currentState.events.push("DONE")
+              return currentState
+            } catch (e) {
+              console.warn(
+                `FW requested but no home or away option chosen. Doing nothing ${guild_id}, ${cId}: ${e}`
+              )
+              return currentState
+            }
+          } else if (!currentState.events.includes("FW_REQUESTED")) {
+            const message = `FW requested <@&${
+              league.commands.game_channels.adminRole
+            }> by ${joinUsers(requestedUsers)}`
+            await DiscordRequest(`channels/${cId}/messages`, {
+              method: "POST",
+              body: {
+                content: message,
+                allowed_mentions: {
+                  parse: ["roles"],
+                },
+              },
+            })
+            currentState.events.push("FW_REQUESTED")
+            return currentState
+          }
+        } else {
           try {
             const result = decideResult(homeUsers, awayUsers)
-            const req = requestedUsers.filter(uId => !admins.includes(uId))
             await forceWin(
               league.commands.game_channels.fwChannel,
               cId,
               result,
-              req,
-              confirmed
+              requestedUsers,
+              []
             )
             currentState.events.push("DONE")
             return currentState
@@ -261,54 +296,25 @@ async function updateChannel(cId, league, users, guild_id) {
             )
             return currentState
           }
-        } else if (!currentState.events.includes("FW_REQUESTED")) {
-          const message = `FW requested <@&${
-            league.commands.game_channels.adminRole
-          }> by ${joinUsers(requestedUsers)}`
-          await DiscordRequest(`channels/${cId}/messages`, {
-            method: "POST",
-            body: {
-              content: message,
-              allowed_mentions: {
-                parse: ["roles"],
-              },
-            },
-          })
-          currentState.events.push("FW_REQUESTED")
-          return currentState
-        }
-      } else {
-        try {
-          const result = decideResult(homeUsers, awayUsers)
-          await forceWin(
-            league.commands.game_channels.fwChannel,
-            cId,
-            result,
-            requestedUsers,
-            []
-          )
-          currentState.events.push("DONE")
-          return currentState
-        } catch (e) {
-          console.warn(
-            `FW requested but no home or away option chosen. Doing nothing ${guild_id}, ${cId}: ${e}`
-          )
-          return currentState
         }
       }
-    }
 
-    if (scheduledUsers.length === 1) {
-      const waitPing = league.commands.game_channels.waitPing || 12
-      const now = new Date()
-      const last = new Date(currentState.lastNotified)
-      const hoursSince = (now - last) / 36e5
-      if (hoursSince > waitPing) {
-        currentState.lastNotified = new Date().getTime()
-        await ping(cId, league.teams)
-        return currentState
+      if (scheduledUsers.length === 1) {
+        const waitPing = league.commands.game_channels.waitPing || 12
+        const now = new Date()
+        const last = new Date(currentState.lastNotified)
+        const hoursSince = (now - last) / 36e5
+        if (hoursSince > waitPing) {
+          currentState.lastNotified = new Date().getTime()
+          await ping(cId, league.teams)
+          return currentState
+        }
       }
     }
+  } catch (e) {
+    console.log(`${guild_id} ${cId} failed to update`)
+    console.error(e)
+    return currentState
   }
 }
 
