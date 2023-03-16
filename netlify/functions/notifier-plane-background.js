@@ -190,7 +190,7 @@ async function ping(gameChannel, teams) {
   await DiscordRequest(`channels/${gameChannel}/messages`, {
     method: "POST",
     body: {
-      content: `${content} is your game scheduled? Schedule it! or react to my first message to set it as scheduled!`,
+      content: `${content} is your game scheduled? Schedule it! or react to my first message to set it as scheduled! Hit the trophy if its done already`,
     },
   })
   return true
