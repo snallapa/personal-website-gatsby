@@ -149,7 +149,8 @@ async function forceWin(
   result,
   requestedUsers,
   confirmedUsers,
-  logger
+  logger,
+  guild_id
 ) {
   const res = await DiscordRequest(`channels/${gameChannel}`, { method: "GET" })
   const channel = await res.json()
@@ -300,7 +301,8 @@ async function updateChannel(cId, league, users, guild_id) {
                 result,
                 req,
                 confirmed,
-                logger
+                logger,
+                guild_id
               )
               currentState.events.push("DONE")
               return currentState
@@ -335,7 +337,8 @@ async function updateChannel(cId, league, users, guild_id) {
               result,
               requestedUsers,
               [],
-              logger
+              logger,
+              guild_id
             )
             currentState.events.push("DONE")
             return currentState
