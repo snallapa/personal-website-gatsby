@@ -536,21 +536,9 @@ exports.handler = async function(event, context) {
       )
     }
     if (responses.every(x => x)) {
-      return {
-        statusCode: 200,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          message: "success updating global command",
-        }),
-      }
+      console.log("success updating global command")
     } else {
-      return {
-        statusCode: 400,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          message: "failed to update global command",
-        }),
-      }
+      console.log("failed to update global command")
     }
   }
   let responses
@@ -571,20 +559,8 @@ exports.handler = async function(event, context) {
     )
   }
   if (responses.every(x => x)) {
-    return {
-      statusCode: 200,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        message: "success updating guild command",
-      }),
-    }
+    console.log("success updating guild command")
   } else {
-    return {
-      statusCode: 400,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        message: "failed to update guild command",
-      }),
-    }
+    console.log("failed to update guild command")
   }
 }
