@@ -45,21 +45,30 @@ async function DiscordRequest(endpoint, options) {
   // Stringify payloads
   if (options.body) options.body = JSON.stringify(options.body)
   // Use node-fetch to make requests
-  const res = await fetch(url, {
-    headers: {
-      Authorization: `Bot ${process.env.DISCORD_TOKEN}`,
-      "Content-Type": "application/json; charset=UTF-8",
-    },
-    ...options,
-  })
-  // throw API errors
-  if (!res.ok) {
-    const data = await res.json()
-    console.log(res)
-    throw new Error(JSON.stringify(data))
+  let tries = 0
+  const maxTries = 5
+  while (tries < maxTries) {
+    const res = await fetch(url, {
+      headers: {
+        Authorization: `Bot ${process.env.DISCORD_TOKEN}`,
+        "Content-Type": "application/json; charset=UTF-8",
+      },
+      ...options,
+    })
+    if (!res.ok) {
+      const data = await res.json()
+      if (data["retry_after"]) {
+        tries = tries + 1
+        await new Promise(r => setTimeout(r, data["retry_after"] * 1000))
+      } else {
+        console.log(data)
+        throw new Error(JSON.stringify(data))
+      }
+    } else {
+      return res
+    }
   }
-  // return original response
-  return res
+  throw new Error("reached max rate limit tries")
 }
 
 function respond(
