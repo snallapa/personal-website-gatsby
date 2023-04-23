@@ -143,27 +143,6 @@ function joinUsers(users) {
   return users.map(uId => `<@${uId}>`).join("")
 }
 
-async function getMessages(channelId) {
-  let messages = await DiscordRequest(
-    `/channels/${channelId}/messages?limit=100`,
-    {
-      method: "GET",
-    }
-  ).then(r => r.json())
-  let newMessages = messages
-  while (newMessages.length > 0) {
-    const lastMessage = messages[messages.length - 1]
-    const newMessages = await DiscordRequest(
-      `/channels/${channelId}/messages?limit=100&after${lastMessage.id}`,
-      {
-        method: "GET",
-      }
-    ).then(r => r.json())
-    messages = messages.concat(newMessages)
-  }
-  return messages
-}
-
 async function forceWin(
   fwChannel,
   gameChannel,
@@ -190,12 +169,6 @@ async function forceWin(
     },
   })
   if (logger.on) {
-    const logMessages = await getMessages(gameChannel).then(messages => {
-      return messages.map(m => ({
-        content: m.content,
-        user: m.author.id,
-      }))
-    })
     const _ = await fetch(
       "https://nallapareddy.com/.netlify/functions/snallabot-logger-background",
       {
@@ -203,14 +176,21 @@ async function forceWin(
         body: JSON.stringify({
           guild_id: guild_id,
           logType: "CHANNEL",
-          channelName: channelName,
-          messages: logMessages,
+          channelId: cId,
+          additionalMessages: [
+            {
+              content: `cleared by ${joinUsers(
+                requestedUsers.concat(confirmedUsers)
+              )}`,
+              user: SNALLABOT_USER,
+            },
+          ],
         }),
       }
     )
+  } else {
+    await DiscordRequest(`channels/${gameChannel}`, { method: "DELETE" })
   }
-
-  await DiscordRequest(`channels/${gameChannel}`, { method: "DELETE" })
   return true
 }
 
@@ -274,22 +254,9 @@ async function updateChannel(cId, league, users, guild_id) {
       if (ggUsers.length > 1) {
         currentState.events.push("DONE")
         if (logger.on) {
-          const logMessages = await getMessages(cId).then(messages => {
-            return messages.map(m => ({
-              content: m.content,
-              user: m.author.id,
-            }))
-          })
           const filteredGGUsers = ggUsers
             .map(u => u.id)
-            .filter((uId = SNALLABOT_USER !== uId))
-          logMessages.push({
-            content: `channel closed by ${joinUsers(filteredGGUsers)}`,
-            user: SNALLABOT_USER,
-          })
-          const res = await DiscordRequest(`channels/${cId}`, { method: "GET" })
-          const channel = await res.json()
-          const channelName = channel.name
+            .filter(uId => uId !== SNALLABOT_USER)
           const _ = await fetch(
             "https://nallapareddy.com/.netlify/functions/snallabot-logger-background",
             {
@@ -297,13 +264,19 @@ async function updateChannel(cId, league, users, guild_id) {
               body: JSON.stringify({
                 guild_id: guild_id,
                 logType: "CHANNEL",
-                channelName: channelName,
-                messages: logMessages,
+                channelId: cId,
+                additionalMessages: [
+                  {
+                    content: `cleared by ${joinUsers(filteredGGUsers)}`,
+                    user: SNALLABOT_USER,
+                  },
+                ],
               }),
             }
           )
+        } else {
+          await DiscordRequest(`channels/${cId}`, { method: "DELETE" })
         }
-        await DiscordRequest(`channels/${cId}`, { method: "DELETE" })
         return currentState
       }
       if (fwUsers.length > 1) {

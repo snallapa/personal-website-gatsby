@@ -214,27 +214,6 @@ function notifierMessage(users) {
   return `${users}\nTime to schedule your game! Once your game is scheduled, hit the ⏰. Otherwise, You will be notified again.\nWhen you're done playing, let me know with 🏆.\nNeed to sim this game? React with ⏭ AND the home/away to force win. Choose both home and away to fair sim!`
 }
 
-async function getMessages(channelId) {
-  let messages = await DiscordRequest(
-    `/channels/${channelId}/messages?limit=100`,
-    {
-      method: "GET",
-    }
-  ).then(r => r.json())
-  let newMessages = messages
-  while (newMessages.length > 0) {
-    const lastMessage = messages[messages.length - 1]
-    const newMessages = await DiscordRequest(
-      `/channels/${channelId}/messages?limit=100&after${lastMessage.id}`,
-      {
-        method: "GET",
-      }
-    ).then(r => r.json())
-    messages = messages.concat(newMessages)
-  }
-  return messages
-}
-
 exports.handler = async function(event, context) {
   if (!verifier(event)) {
     return {
@@ -400,45 +379,34 @@ exports.handler = async function(event, context) {
         })
         const gameChannelIds = gameChannels.map(c => c.id)
         const logger = league.commands.logger || {}
+        let responses
         if (logger.on) {
-          const logPromises = gameChannels.map(c => {
-            getMessages(c.id).then(messages => {
-              const logMessages = messages.map(m => ({
-                content: m.content,
-                user: m.author.id,
-              }))
-              return fetch(
-                "https://nallapareddy.com/.netlify/functions/snallabot-logger-background",
-                {
-                  method: "POST",
-                  body: JSON.stringify({
-                    guild_id: guild_id,
-                    logType: "CHANNEL",
-                    channelName: c.name,
-                    messages: logMessages,
-                  }),
-                }
-              )
-            })
-          })
-          const _ = await Promise.all(logPromises)
-          await fetch(
-            "https://nallapareddy.com/.netlify/functions/snallabot-logger-background",
-            {
-              method: "POST",
-              body: JSON.stringify({
-                guild_id: guild_id,
-                logType: "COMMAND",
-                user: member.user.id,
-                command: `${name} ${subcommand}`,
-              }),
-            }
+          const logPromises = gameChannels.map(c =>
+            fetch(
+              "https://nallapareddy.com/.netlify/functions/snallabot-logger-background",
+              {
+                method: "POST",
+                body: JSON.stringify({
+                  guild_id: guild_id,
+                  logType: "CHANNEL",
+                  channelId: c.id,
+                  additionalMessages: [
+                    {
+                      content: `${name} ${subcommand}`,
+                      user: member.user.id,
+                    },
+                  ],
+                }),
+              }
+            )
           )
+          responses = await Promise.all(logPromises)
+        } else {
+          const deletePromises = gameChannelIds.map(id =>
+            DiscordRequest(`/channels/${id}`, { method: "DELETE" })
+          )
+          responses = await Promise.all(deletePromises)
         }
-        const deletePromises = gameChannelIds.map(id =>
-          DiscordRequest(`/channels/${id}`, { method: "DELETE" })
-        )
-        const responses = await Promise.all(deletePromises)
         if (responses.every(r => r.ok)) {
           return respond("done, all game channels were deleted!")
         } else {
