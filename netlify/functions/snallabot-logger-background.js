@@ -114,6 +114,7 @@ exports.handler = async function(event, context) {
     })
     const channel = await res1.json()
     const channelName = channel.name
+    await DiscordRequest(`/channels/${channelId}`, { method: "DELETE" }) // delete channel once we have all the info
     const res = await DiscordRequest(`channels/${logChannel}/threads`, {
       method: "POST",
       body: {
@@ -138,6 +139,5 @@ exports.handler = async function(event, context) {
       )
     }, Promise.resolve())
     await messagePromise
-    await DiscordRequest(`/channels/${channelId}`, { method: "DELETE" })
   }
 }
