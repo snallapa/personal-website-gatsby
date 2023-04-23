@@ -144,22 +144,18 @@ function joinUsers(users) {
 }
 
 async function getMessages(channelId) {
-  let messages = await DiscordRequest(`/channels/${channelId}/messages`, {
-    method: "GET",
-    body: {
-      limit: 100,
-    },
-  }).then(r => r.json())
+  let messages = await DiscordRequest(
+    `/channels/${channelId}/messages?limit=100`,
+    {
+      method: "GET",
+    }
+  ).then(r => r.json())
   while (true) {
     const lastMessage = messages[messages.length - 1]
     const newMessages = await DiscordRequest(
-      `/channels/${channelId}/messages`,
+      `/channels/${channelId}/messages?limit=100&after${lastMessage.id}`,
       {
         method: "GET",
-        body: {
-          limit: 100,
-          after: lastMessage.id,
-        },
       }
     ).then(r => r.json())
     if (newMessages.length === 0) {
