@@ -400,12 +400,9 @@ exports.handler = async function(event, context) {
             )
           })
           .map(c => c.id)
-        const deletePromises = gameChannelIds.map(id =>
-          DiscordRequest(`/channels/${id}`, { method: "DELETE" })
-        )
         const logger = league.commands.logger || {}
         if (logger.on) {
-          const logPromises = channels.map(c => {
+          const logPromises = gameChannelIds.map(c => {
             getMessages(c.id).then(messages => {
               const logMessages = messages.map(m => ({
                 content: m.content,
@@ -427,6 +424,9 @@ exports.handler = async function(event, context) {
           })
           const _ = await Promise.all(logPromises)
         }
+        const deletePromises = gameChannelIds.map(id =>
+          DiscordRequest(`/channels/${id}`, { method: "DELETE" })
+        )
         const responses = await Promise.all(deletePromises)
         if (responses.every(r => r.ok)) {
           return respond("done, all game channels were deleted!")

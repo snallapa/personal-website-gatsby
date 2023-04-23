@@ -150,7 +150,8 @@ async function getMessages(channelId) {
       method: "GET",
     }
   ).then(r => r.json())
-  while (true) {
+  let newMessages = messages
+  while (newMessages.length > 0) {
     const lastMessage = messages[messages.length - 1]
     const newMessages = await DiscordRequest(
       `/channels/${channelId}/messages?limit=100&after${lastMessage.id}`,
@@ -158,9 +159,6 @@ async function getMessages(channelId) {
         method: "GET",
       }
     ).then(r => r.json())
-    if (newMessages.length === 0) {
-      break
-    }
     messages = messages.concat(newMessages)
   }
   return messages
