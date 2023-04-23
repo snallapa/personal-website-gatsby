@@ -68,14 +68,14 @@ async function getMessages(channelId) {
   while (newMessages.length === 100) {
     const lastMessage = messages[messages.length - 1]
     newMessages = await DiscordRequest(
-      `/channels/${channelId}/messages?limit=100&after${lastMessage.id}`,
+      `/channels/${channelId}/messages?limit=100&before=${lastMessage.id}`,
       {
         method: "GET",
       }
     ).then(r => r.json())
     messages = messages.concat(newMessages)
   }
-  return messages
+  return messages.reverse()
 }
 
 exports.handler = async function(event, context) {
@@ -130,7 +130,7 @@ exports.handler = async function(event, context) {
         DiscordRequest(`channels/${threadId}/messages`, {
           method: "POST",
           body: {
-            content: `${message.content} by <@${message.user}>`,
+            content: `<@${message.user}: ${message.content}>`,
             allowed_mentions: {
               parse: [],
             },
