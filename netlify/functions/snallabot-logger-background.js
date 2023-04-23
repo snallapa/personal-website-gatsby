@@ -108,7 +108,9 @@ exports.handler = async function(event, context) {
       }))
     })
     const logMessages = channelMessages.concat(log.additionalMessages || [])
-    const res1 = await DiscordRequest(`channels/${cId}`, { method: "GET" })
+    const res1 = await DiscordRequest(`channels/${channelId}`, {
+      method: "GET",
+    })
     const channel = await res1.json()
     const channelName = channel.name
     const res = await DiscordRequest(`channels/${logChannel}/threads`, {
