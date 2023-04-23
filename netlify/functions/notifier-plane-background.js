@@ -143,12 +143,40 @@ function joinUsers(users) {
   return users.map(uId => `<@${uId}>`).join("")
 }
 
+async function getMessages(channelId) {
+  let messages = await DiscordRequest(`/channels/${channelId}/messages`, {
+    method: "GET",
+    body: {
+      limit: 100,
+    },
+  }).then(r => r.json())
+  while (true) {
+    const lastMessage = messages[messages.length - 1]
+    const newMessages = await DiscordRequest(
+      `/channels/${channelId}/messages`,
+      {
+        method: "GET",
+        body: {
+          limit: 100,
+          after: lastMessage.id,
+        },
+      }
+    ).then(r => r.json())
+    if (newMessages.length === 0) {
+      break
+    }
+    messages = messages.concat(newMessages)
+  }
+  return messages
+}
+
 async function forceWin(
   fwChannel,
   gameChannel,
   result,
   requestedUsers,
-  confirmedUsers
+  confirmedUsers,
+  logger
 ) {
   const res = await DiscordRequest(`channels/${gameChannel}`, { method: "GET" })
   const channel = await res.json()
@@ -167,6 +195,27 @@ async function forceWin(
       },
     },
   })
+  if (logger.on) {
+    const logMessages = await getMessages(gameChannel).then(messages => {
+      return messages.map(m => ({
+        content: m.content,
+        user: m.author.id,
+      }))
+    })
+    const _ = await fetch(
+      "https://nallapareddy.com/.netlify/functions/snallabot-logger-background",
+      {
+        method: "POST",
+        body: JSON.stringify({
+          guild_id: guild_id,
+          logType: "CHANNEL",
+          channelName: channelName,
+          messages: logMessages,
+        }),
+      }
+    )
+  }
+
   await DiscordRequest(`channels/${gameChannel}`, { method: "DELETE" })
   return true
 }
@@ -199,6 +248,7 @@ async function ping(gameChannel, teams) {
 async function updateChannel(cId, league, users, guild_id) {
   const channelStates = league.commands.game_channels.channels || {}
   const currentState = channelStates[cId]
+  const logger = league.commands.logger || {}
   try {
     if (!currentState) {
       return {}
@@ -229,6 +279,36 @@ async function updateChannel(cId, league, users, guild_id) {
       const fwUsers = await getReactedUsers(cId, currentState.message, "fw")
       if (ggUsers.length > 1) {
         currentState.events.push("DONE")
+        if (logger.on) {
+          const logMessages = await getMessages(cId).then(messages => {
+            return messages.map(m => ({
+              content: m.content,
+              user: m.author.id,
+            }))
+          })
+          const filteredGGUsers = ggUsers
+            .map(u => u.id)
+            .filter((uId = SNALLABOT_USER !== uId))
+          logMessages.push({
+            content: `channel closed by ${joinUsers(filteredGGUsers)}`,
+            user: SNALLABOT_USER,
+          })
+          const res = await DiscordRequest(`channels/${cId}`, { method: "GET" })
+          const channel = await res.json()
+          const channelName = channel.name
+          const _ = await fetch(
+            "https://nallapareddy.com/.netlify/functions/snallabot-logger-background",
+            {
+              method: "POST",
+              body: JSON.stringify({
+                guild_id: guild_id,
+                logType: "CHANNEL",
+                channelName: channelName,
+                messages: logMessages,
+              }),
+            }
+          )
+        }
         await DiscordRequest(`channels/${cId}`, { method: "DELETE" })
         return currentState
       }
@@ -252,7 +332,8 @@ async function updateChannel(cId, league, users, guild_id) {
                 cId,
                 result,
                 req,
-                confirmed
+                confirmed,
+                logger
               )
               currentState.events.push("DONE")
               return currentState
@@ -286,7 +367,8 @@ async function updateChannel(cId, league, users, guild_id) {
               cId,
               result,
               requestedUsers,
-              []
+              [],
+              logger
             )
             currentState.events.push("DONE")
             return currentState

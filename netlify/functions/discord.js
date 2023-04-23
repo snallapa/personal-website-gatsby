@@ -214,6 +214,33 @@ function notifierMessage(users) {
   return `${users}\nTime to schedule your game! Once your game is scheduled, hit the ⏰. Otherwise, You will be notified again.\nWhen you're done playing, let me know with 🏆.\nNeed to sim this game? React with ⏭ AND the home/away to force win. Choose both home and away to fair sim!`
 }
 
+async function getMessages(channelId) {
+  let messages = await DiscordRequest(`/channels/${channelId}/messages`, {
+    method: "GET",
+    body: {
+      limit: 100,
+    },
+  }).then(r => r.json())
+  while (true) {
+    const lastMessage = messages[messages.length - 1]
+    const newMessages = await DiscordRequest(
+      `/channels/${channelId}/messages`,
+      {
+        method: "GET",
+        body: {
+          limit: 100,
+          after: lastMessage.id,
+        },
+      }
+    ).then(r => r.json())
+    if (newMessages.length === 0) {
+      break
+    }
+    messages = messages.concat(newMessages)
+  }
+  return messages
+}
+
 exports.handler = async function(event, context) {
   if (!verifier(event)) {
     return {
@@ -221,7 +248,7 @@ exports.handler = async function(event, context) {
     }
   }
   // console.log(event)
-  const { type, guild_id, data, token } = JSON.parse(event.body)
+  const { type, guild_id, data, token, member, name } = JSON.parse(event.body)
   if (type === InteractionType.PING) {
     return {
       statusCode: 200,
@@ -325,6 +352,21 @@ exports.handler = async function(event, context) {
           })
         })
         const responses = await Promise.all(channelPromises)
+        const logger = league.commands.logger || {}
+        if (logger.on) {
+          const _ = await fetch(
+            "https://nallapareddy.com/.netlify/functions/snallabot-logger-background",
+            {
+              method: "POST",
+              body: JSON.stringify({
+                guild_id: guild_id,
+                logType: "COMMAND",
+                user: member.user.id,
+                command: name,
+              }),
+            }
+          )
+        }
         if (responses.every(r => r.ok)) {
           return respond("created!")
         } else {
@@ -367,6 +409,30 @@ exports.handler = async function(event, context) {
         const deletePromises = gameChannelIds.map(id =>
           DiscordRequest(`/channels/${id}`, { method: "DELETE" })
         )
+        const logger = league.commands.logger || {}
+        if (logger.on) {
+          const logPromises = channels.map(c => {
+            getMessages(c.id).then(messages => {
+              const logMessages = messages.map(m => ({
+                content: m.content,
+                user: m.author.id,
+              }))
+              return fetch(
+                "https://nallapareddy.com/.netlify/functions/snallabot-logger-background",
+                {
+                  method: "POST",
+                  body: JSON.stringify({
+                    guild_id: guild_id,
+                    logType: "CHANNEL",
+                    channelName: c.name,
+                    messages: logMessages,
+                  }),
+                }
+              )
+            })
+          })
+          const _ = await Promise.all(logPromises)
+        }
         const responses = await Promise.all(deletePromises)
         if (responses.every(r => r.ok)) {
           return respond("done, all game channels were deleted!")
