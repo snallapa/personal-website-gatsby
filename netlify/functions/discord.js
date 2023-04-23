@@ -389,21 +389,20 @@ exports.handler = async function(event, context) {
           method: "GET",
         })
         const channels = await res.json()
-        const gameChannelIds = channels
-          .filter(c => {
-            // text channel, in right category, with `vs` in it
-            return (
-              c.type === 0 &&
-              c.parent_id &&
-              c.parent_id === category &&
-              c.name.includes("vs")
-            )
-          })
-          .map(c => c.id)
+        const gameChannels = channels.filter(c => {
+          // text channel, in right category, with `vs` in it
+          return (
+            c.type === 0 &&
+            c.parent_id &&
+            c.parent_id === category &&
+            c.name.includes("vs")
+          )
+        })
+        const gameChannelIds = gameChannels.map(c => c.id)
         const logger = league.commands.logger || {}
         if (logger.on) {
-          const logPromises = gameChannelIds.map(c => {
-            getMessages(c).then(messages => {
+          const logPromises = gameChannels.map(c => {
+            getMessages(c.id).then(messages => {
               const logMessages = messages.map(m => ({
                 content: m.content,
                 user: m.author.id,
