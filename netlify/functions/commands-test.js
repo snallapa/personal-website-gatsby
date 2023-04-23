@@ -419,7 +419,7 @@ async function DiscordRequest(endpoint, options) {
 
 async function InstallGuildCommand(guildId, command) {
   // API endpoint to get and post guild commands
-  const endpoint = `applications/${process.env.APP_ID_TEST}_/guilds/${guildId}/commands`
+  const endpoint = `applications/${process.env.APP_ID_TEST}/guilds/${guildId}/commands`
   console.log(command)
   // install command
   try {
