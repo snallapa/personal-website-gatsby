@@ -356,7 +356,7 @@ exports.handler = async function(event, context) {
                 guild_id: guild_id,
                 logType: "COMMAND",
                 user: member.user.id,
-                command: name,
+                command: `${name} ${subcommand}`,
               }),
             }
           )
@@ -423,6 +423,18 @@ exports.handler = async function(event, context) {
             })
           })
           const _ = await Promise.all(logPromises)
+          await fetch(
+            "https://nallapareddy.com/.netlify/functions/snallabot-logger-background",
+            {
+              method: "POST",
+              body: JSON.stringify({
+                guild_id: guild_id,
+                logType: "COMMAND",
+                user: member.user.id,
+                command: `${name} ${subcommand}`,
+              }),
+            }
+          )
         }
         const deletePromises = gameChannelIds.map(id =>
           DiscordRequest(`/channels/${id}`, { method: "DELETE" })
