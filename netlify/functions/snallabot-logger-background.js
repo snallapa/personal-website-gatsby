@@ -130,7 +130,7 @@ exports.handler = async function(event, context) {
         DiscordRequest(`channels/${threadId}/messages`, {
           method: "POST",
           body: {
-            content: `<@${message.user}: ${message.content}>`,
+            content: `<@${message.user}>: ${message.content}`,
             allowed_mentions: {
               parse: [],
             },
