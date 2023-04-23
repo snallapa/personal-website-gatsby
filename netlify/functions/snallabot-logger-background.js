@@ -73,9 +73,9 @@ exports.handler = async function(event, context) {
       method: "POST",
       body: {
         content: `${log.command} by <@${log.user}>`,
-      },
-      allowed_mentions: {
-        parse: [],
+        allowed_mentions: {
+          parse: [],
+        },
       },
     })
   } else if (log.logType === "CHANNEL") {
@@ -98,9 +98,9 @@ exports.handler = async function(event, context) {
           method: "POST",
           body: {
             content: `${message.content} by <@${message.user}>`,
-          },
-          allowed_mentions: {
-            parse: [],
+            allowed_mentions: {
+              parse: [],
+            },
           },
         })
       )
