@@ -54,6 +54,7 @@ async function DiscordRequest(endpoint, options) {
       return res
     }
   }
+  throw new Error("reached max rate limit tries")
 }
 
 async function getMessages(channelId) {
