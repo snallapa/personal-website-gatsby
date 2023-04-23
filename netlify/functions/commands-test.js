@@ -397,7 +397,7 @@ async function DiscordRequest(endpoint, options) {
   while (tries < maxTries) {
     const res = await fetch(url, {
       headers: {
-        Authorization: `Bot ${process.env.DISCORD_TOKEN}`,
+        Authorization: `Bot ${process.env.DISCORD_TOKEN_TEST}`,
         "Content-Type": "application/json; charset=UTF-8",
       },
       ...options,
