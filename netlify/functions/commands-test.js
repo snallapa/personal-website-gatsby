@@ -420,7 +420,7 @@ async function DiscordRequest(endpoint, options) {
 async function InstallGuildCommand(guildId, command) {
   // API endpoint to get and post guild commands
   const endpoint = `applications/${process.env.APP_ID_TEST}/guilds/${guildId}/commands`
-  console.log(command)
+  // console.log(command)
   // install command
   try {
     const res = await DiscordRequest(endpoint, {
@@ -463,7 +463,7 @@ async function DeleteGlobalCommand(commandId) {
 async function InstallGlobalCommand(command) {
   // API endpoint to get and post guild commands
   const endpoint = `applications/${process.env.APP_ID_TEST}/commands`
-  console.log(command)
+  // console.log(command)
   // install command
   try {
     const res = await DiscordRequest(endpoint, {
@@ -483,7 +483,7 @@ async function HasGuildCommand(guildId, command) {
   try {
     const res = await DiscordRequest(endpoint, { method: "GET" })
     const data = await res.json()
-    console.log(data)
+    // console.log(data)
 
     if (data) {
       const installedNames = data.map(c => c["name"])
