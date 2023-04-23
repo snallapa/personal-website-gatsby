@@ -403,7 +403,7 @@ exports.handler = async function(event, context) {
         const logger = league.commands.logger || {}
         if (logger.on) {
           const logPromises = gameChannelIds.map(c => {
-            getMessages(c.id).then(messages => {
+            getMessages(c).then(messages => {
               const logMessages = messages.map(m => ({
                 content: m.content,
                 user: m.author.id,
