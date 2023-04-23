@@ -176,7 +176,7 @@ async function forceWin(
         body: JSON.stringify({
           guild_id: guild_id,
           logType: "CHANNEL",
-          channelId: cId,
+          channelId: gameChannel,
           additionalMessages: [
             {
               content: `cleared by ${joinUsers(
