@@ -1213,7 +1213,7 @@ exports.handler = async function(event, context) {
           },
           { merge: true }
         )
-        return respond("configured! logger is ready for use")
+        return respond("configured! logger on: " + on)
       }
     } else if (name === "create_game_channels") {
       return respond(
