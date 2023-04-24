@@ -1194,6 +1194,27 @@ exports.handler = async function(event, context) {
         .join("\n")
       const scheduleContent = `__**Week ${week}**__\n${gamesContent}`
       return respond(scheduleContent)
+    } else if (name === "logger") {
+      const command = options[0]
+      const subcommand = command.name
+      if (subcommand === "configure") {
+        const channel = command.options[0].value
+        const on = command.options[1] ? command.options[1].value : true
+
+        await setDoc(
+          doc(db, "leagues", guild_id),
+          {
+            commands: {
+              logger: {
+                channel: channel,
+                on: on,
+              },
+            },
+          },
+          { merge: true }
+        )
+        return respond("configured! logger is ready for use")
+      }
     } else if (name === "create_game_channels") {
       return respond(
         "this command has been changed. Use `/game_channels create` instead. See https://github.com/snallapa/snallabot for more information"
