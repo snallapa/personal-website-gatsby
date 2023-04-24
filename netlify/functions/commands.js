@@ -370,6 +370,34 @@ const MADDEN_STREAMS_COMMANDS = {
   type: 1,
 }
 
+const MADDEN_LOGGER_COMMANDS = {
+  name: "logger",
+  description: "logger: configure logger for snallabot",
+  options: [
+    {
+      type: 1, // sub command
+      name: "configure",
+      description: "sets channel",
+      options: [
+        {
+          type: 7, // channel
+          name: "channel",
+          description: "channel to send message in",
+          required: true,
+          channel_types: [0],
+        },
+        {
+          type: 5,
+          name: "on",
+          description: "auto assign teams based on a new role",
+          required: false,
+        },
+      ],
+    },
+  ],
+  type: 1,
+}
+
 const COMMANDS = [
   TEST_COMMAND,
   MADDEN_LEAGUE_COMMAND,
@@ -379,6 +407,7 @@ const COMMANDS = [
   MADDEN_WAITLIST_COMMANDS,
   MADDEN_STREAMS_COMMANDS,
   MADDEN_SCHEDULE_COMMAND,
+  MADDEN_LOGGER_COMMANDS,
 ]
 
 const DELETED_COMMANDS = [
