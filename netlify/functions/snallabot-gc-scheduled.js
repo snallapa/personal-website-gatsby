@@ -84,7 +84,16 @@ exports.handler = async function(event, context) {
   const deletePromises = querySnapshot.docs.flatMap(fDoc => {
     if (!guilds.includes(fDoc.id) && !reservedLeagues.includes(fDoc.id)) {
       console.log(`deleting league ${fDoc.id}`)
-      return [deleteDoc(doc(db, "leagues", fDoc.id))]
+      const update = {}
+      update["gameChannels"] = {}
+      update["gameChannels"][fDoc.id] = false
+      update["teams"][fDoc.id] = false
+      return [
+        deleteDoc(doc(db, "leagues", fDoc.id)),
+        setDoc(doc(db, "leagues", "guild_updates"), update, {
+          merge: true,
+        }),
+      ]
     }
     return []
   })
