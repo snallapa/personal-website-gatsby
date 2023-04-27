@@ -65,7 +65,10 @@ async function getMessages(channelId) {
     }
   ).then(r => r.json())
   let newMessages = messages
-  while (newMessages.length === 100) {
+  // feels like setting a max is a good idea. 1000 messages
+  let page = 0
+  const maxPage = 10
+  while (newMessages.length === 100 && page < 10) {
     const lastMessage = messages[messages.length - 1]
     newMessages = await DiscordRequest(
       `/channels/${channelId}/messages?limit=100&before=${lastMessage.id}`,
@@ -74,6 +77,7 @@ async function getMessages(channelId) {
       }
     ).then(r => r.json())
     messages = messages.concat(newMessages)
+    page = page + 1
   }
   return messages.reverse()
 }
