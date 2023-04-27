@@ -87,6 +87,7 @@ exports.handler = async function(event, context) {
       const update = {}
       update["gameChannels"] = {}
       update["gameChannels"][fDoc.id] = false
+      update["teams"] = {}
       update["teams"][fDoc.id] = false
       return [
         deleteDoc(doc(db, "leagues", fDoc.id)),
