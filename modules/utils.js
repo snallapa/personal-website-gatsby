@@ -1,4 +1,5 @@
 import fetch from "node-fetch"
+import { InteractionResponseType } from "discord-interactions"
 
 export async function DiscordRequest(
   endpoint,
@@ -51,4 +52,37 @@ export async function DiscordRequestCommunity(endpoint, options, maxTries = 5) {
     (token = process.env.DISCORD_TOKEN_COMMUNITY),
     (maxTries = maxTries)
   )
+}
+
+export function respond(
+  message,
+  statusCode = 200,
+  interactionType = InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE
+) {
+  return {
+    statusCode: statusCode,
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      type: interactionType,
+      data: {
+        content: message,
+      },
+    }),
+  }
+}
+
+export function respondNoMention(message) {
+  return {
+    statusCode: 200,
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+      data: {
+        content: message,
+        allowed_mentions: {
+          parse: [],
+        },
+      },
+    }),
+  }
 }

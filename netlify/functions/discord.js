@@ -5,7 +5,7 @@ import {
 } from "discord-interactions"
 import { initializeApp } from "firebase/app"
 import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore"
-
+import fetch from "node-fetch"
 import { DiscordRequestProd } from "../../modules/utils.js"
 
 const firebaseConfig = {
@@ -38,39 +38,6 @@ const app = initializeApp(firebaseConfig)
 
 // Initialize Cloud Firestore and get a reference to the service
 const db = getFirestore(app)
-
-function respond(
-  message,
-  statusCode = 200,
-  interactionType = InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE
-) {
-  return {
-    statusCode: statusCode,
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      type: interactionType,
-      data: {
-        content: message,
-      },
-    }),
-  }
-}
-
-function respondNoMention(message) {
-  return {
-    statusCode: 200,
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-      data: {
-        content: message,
-        allowed_mentions: {
-          parse: [],
-        },
-      },
-    }),
-  }
-}
 
 function findTeam(teams, search_phrase) {
   const term = search_phrase.toLowerCase()
@@ -200,7 +167,7 @@ exports.handler = async function (event, context) {
     }
   }
   // console.log(event)
-  const { type, guild_id, data, token, member, name } = JSON.parse(event.body)
+  const { type, guild_id, data, member, name } = JSON.parse(event.body)
   if (type === InteractionType.PING) {
     return {
       statusCode: 200,
@@ -208,126 +175,17 @@ exports.handler = async function (event, context) {
     }
   }
   if (type === InteractionType.APPLICATION_COMMAND) {
-    const { name, resolved, options } = data
+    const { name, options } = data
 
     if (name === "league_export") {
       return respond(
         `Type this URL carefully into your app (no spaces exactly as shown here): http://snallabot.herokuapp.com/${guild_id}`
       )
-    } else if (name === "import_league") {
-      // not recommended anymore
-      console.log(guild_id)
-
-      // let teamsData, schedulesData;
-      const attachmentValue = options[0].value
-      const attachmentValue2 = options[1].value
-      const schedulesUrl = resolved.attachments[attachmentValue].url
-      const teamsUrl = resolved.attachments[attachmentValue2].url
-      console.log("sending request to background function")
-      const res = await fetch(
-        "https://nallapareddy.com/.netlify/functions/upload-background",
-        {
-          method: "POST",
-          body: JSON.stringify({
-            guild_id: guild_id,
-            schedulesUrl: schedulesUrl,
-            teamsUrl: teamsUrl,
-            messageToken: token,
-          }),
-        }
-      )
-      return {
-        statusCode: 200,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          type: InteractionResponseType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE,
-          data: {
-            content: "got it! uploading...",
-          },
-        }),
-      }
     } else if (name === "game_channels") {
       const command = options[0]
       const subcommand = command.name
       if (subcommand === "configure") {
-        const category = command.options[0].value
-        await setDoc(
-          doc(db, "leagues", guild_id),
-          {
-            commands: {
-              game_channels: {
-                category: category,
-              },
-            },
-          },
-          { merge: true }
-        )
-        return respond("configured! game channels command is ready for use")
       } else if (subcommand === "create") {
-        const week = command.options[0].value
-        const docRef = doc(db, "leagues", guild_id)
-        const docSnap = await getDoc(docRef)
-        if (!docSnap.exists()) {
-          return respond(
-            `no league found for ${guild_id}, export in MCA using league_export first`
-          )
-        }
-        const league = docSnap.data()
-        let category
-        try {
-          category = league.commands.game_channels.category
-        } catch (error) {
-          return respond(
-            "missing configuration, run `/game_channels configure` first"
-          )
-        }
-        if (!league.schedules.reg || !league.schedules.reg[`week${week}`]) {
-          return respond(
-            `missing week ${week}. Please export the week in MCA (select ALL WEEKS in the app!)`
-          )
-        }
-
-        if (week > 18) {
-          return respond(`sorry I dont know about playoffs :(`)
-        }
-
-        const weeksGames = league.schedules.reg[`week${week}`]
-        const teams = league.teams
-        const channelPromises = weeksGames.map((game) => {
-          return DiscordRequestProd(`guilds/${guild_id}/channels`, {
-            method: "POST",
-            body: {
-              type: 0,
-              name: `${teams[game.awayTeamId].teamName}-vs-${
-                teams[game.homeTeamId].teamName
-              }`,
-              parent_id: category,
-            },
-          })
-        })
-        const responses = await Promise.all(channelPromises)
-        const logger = league.commands.logger || {}
-        if (logger.on) {
-          const _ = await fetch(
-            "https://nallapareddy.com/.netlify/functions/snallabot-logger-background",
-            {
-              method: "POST",
-              body: JSON.stringify({
-                guild_id: guild_id,
-                logType: "COMMAND",
-                user: member.user.id,
-                command: `${name} ${subcommand}`,
-              }),
-            }
-          )
-        }
-        if (responses.every((r) => r.ok)) {
-          return respond("created!")
-        } else {
-          return respond(
-            "something went wrong... maybe try again or contact owner"
-          )
-        }
       } else if (subcommand === "clear") {
         const docRef = doc(db, "leagues", guild_id)
         const docSnap = await getDoc(docRef)
