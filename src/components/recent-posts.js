@@ -1,5 +1,5 @@
 import React from "react"
-import styles from "./recent-posts.module.css"
+import * as styles from "./recent-posts.module.css"
 import { Link } from "gatsby"
 
 const Post = ({ title, subtitle, time, slug }) => (

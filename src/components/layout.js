@@ -1,6 +1,6 @@
 import React from "react"
 import Header from "./header"
-import styles from "./layout.module.css"
+import * as styles from "./layout.module.css"
 
 export default ({ children }) => (
   <div>
