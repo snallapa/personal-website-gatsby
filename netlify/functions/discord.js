@@ -4,6 +4,7 @@ import {
   verifyKey,
 } from "discord-interactions"
 import { initializeApp } from "firebase/app"
+import fetch from "node-fetch"
 import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore"
 import fetch from "node-fetch"
 import { DiscordRequestProd } from "../../modules/utils.js"

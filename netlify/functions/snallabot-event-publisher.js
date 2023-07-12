@@ -3,6 +3,7 @@ import { initializeApp } from "firebase/app"
 import { getFirestore, doc, getDoc } from "firebase/firestore"
 
 import { DiscordRequestProd } from "../../modules/utils.js"
+import fetch from "node-fetch"
 
 const firebaseConfig = {
   apiKey: "AIzaSyDf9ZiTBWf-sWY007WsKktMPewcrs07CWw",
