@@ -19,7 +19,7 @@ const firebaseConfig = {
 }
 
 function VerifyDiscordRequest(clientKey) {
-  return function(event) {
+  return function (event) {
     const signature = event.headers["x-signature-ed25519"]
     const timestamp = event.headers["x-signature-timestamp"]
     const isValidRequest = verifyKey(
@@ -40,30 +40,6 @@ const app = initializeApp(firebaseConfig)
 // Initialize Cloud Firestore and get a reference to the service
 const db = getFirestore(app)
 
-async function DiscordRequest(endpoint, options) {
-  // append endpoint to root API URL
-  const url = "https://discord.com/api/v9/" + endpoint
-  // Stringify payloads
-  if (options.body) options.body = JSON.stringify(options.body)
-  // Use node-fetch to make requests
-  const res = await fetch(url, {
-    headers: {
-      Authorization: `Bot ${process.env.DISCORD_TOKEN_COMMUNITY}`,
-      "Content-Type": "application/json; charset=UTF-8",
-    },
-    ...options,
-  })
-
-  // throw API errors
-  if (!res.ok) {
-    const data = await res.json()
-    console.log(res)
-    throw new Error(JSON.stringify(data))
-  }
-  // return original response
-  return res
-}
-
 function respond(
   message,
   statusCode = 200,
@@ -81,7 +57,7 @@ function respond(
   }
 }
 
-exports.handler = async function(event, context) {
+exports.handler = async function (event, context) {
   if (!verifier(event)) {
     return {
       statusCode: 401,

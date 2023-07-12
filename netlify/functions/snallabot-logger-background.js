@@ -1,4 +1,4 @@
-import fetch from "node-fetch"
+import { DiscordRequestProd } from "../../modules/utils.js"
 import { initializeApp } from "firebase/app"
 import {
   getFirestore,
@@ -25,64 +25,32 @@ const app = initializeApp(firebaseConfig)
 // Initialize Cloud Firestore and get a reference to the service
 const db = getFirestore(app)
 
-async function DiscordRequest(endpoint, options) {
-  // append endpoint to root API URL
-  const url = "https://discord.com/api/v9/" + endpoint
-  // Stringify payloads
-  if (options.body) options.body = JSON.stringify(options.body)
-  // Use node-fetch to make requests
-  let tries = 0
-  const maxTries = 10
-  while (tries < maxTries) {
-    const res = await fetch(url, {
-      headers: {
-        Authorization: `Bot ${process.env.DISCORD_TOKEN}`,
-        "Content-Type": "application/json; charset=UTF-8",
-      },
-      ...options,
-    })
-    if (!res.ok) {
-      const data = await res.json()
-      if (data["retry_after"]) {
-        tries = tries + 1
-        await new Promise(r => setTimeout(r, data["retry_after"] * 1000 * 4)) // set a longer timeout for logger messages
-      } else {
-        console.log(data)
-        throw new Error(JSON.stringify(data))
-      }
-    } else {
-      return res
-    }
-  }
-  throw new Error("reached max rate limit tries")
-}
-
 async function getMessages(channelId) {
-  let messages = await DiscordRequest(
+  let messages = await DiscordRequestProd(
     `/channels/${channelId}/messages?limit=100`,
     {
       method: "GET",
     }
-  ).then(r => r.json())
+  ).then((r) => r.json())
   let newMessages = messages
   // feels like setting a max is a good idea. 1000 messages
   let page = 0
   const maxPage = 10
   while (newMessages.length === 100 && page < 10) {
     const lastMessage = messages[messages.length - 1]
-    newMessages = await DiscordRequest(
+    newMessages = await DiscordRequestProd(
       `/channels/${channelId}/messages?limit=100&before=${lastMessage.id}`,
       {
         method: "GET",
       }
-    ).then(r => r.json())
+    ).then((r) => r.json())
     messages = messages.concat(newMessages)
     page = page + 1
   }
   return messages.reverse()
 }
 
-exports.handler = async function(event, context) {
+exports.handler = async function (event, context) {
   const log = JSON.parse(event.body)
   const guild_id = log.guild_id
   const docRef = doc(db, "leagues", guild_id)
@@ -95,7 +63,7 @@ exports.handler = async function(event, context) {
 
   const logChannel = league.commands.logger.channel || {}
   if (log.logType === "COMMAND") {
-    await DiscordRequest(`channels/${logChannel}/messages`, {
+    await DiscordRequestProd(`channels/${logChannel}/messages`, {
       method: "POST",
       body: {
         content: `${log.command} by <@${log.user}>`,
@@ -106,20 +74,20 @@ exports.handler = async function(event, context) {
     })
   } else if (log.logType === "CHANNEL") {
     const channelId = log.channelId
-    const channelMessages = await getMessages(channelId).then(messages => {
-      return messages.map(m => ({
+    const channelMessages = await getMessages(channelId).then((messages) => {
+      return messages.map((m) => ({
         content: m.content,
         user: m.author.id,
       }))
     })
     const logMessages = channelMessages.concat(log.additionalMessages || [])
-    const res1 = await DiscordRequest(`channels/${channelId}`, {
+    const res1 = await DiscordRequestProd(`channels/${channelId}`, {
       method: "GET",
     })
     const channel = await res1.json()
     const channelName = channel.name
-    await DiscordRequest(`/channels/${channelId}`, { method: "DELETE" }) // delete channel once we have all the info
-    const res = await DiscordRequest(`channels/${logChannel}/threads`, {
+    await DiscordRequestProd(`/channels/${channelId}`, { method: "DELETE" }) // delete channel once we have all the info
+    const res = await DiscordRequestProd(`channels/${logChannel}/threads`, {
       method: "POST",
       body: {
         name: `${channelName} channel log`,
@@ -130,8 +98,8 @@ exports.handler = async function(event, context) {
     const thread = await res.json()
     const threadId = thread.id
     const messagePromise = logMessages.reduce((p, message) => {
-      return p.then(_ =>
-        DiscordRequest(`channels/${threadId}/messages`, {
+      return p.then((_) =>
+        DiscordRequestProd(`channels/${threadId}/messages`, {
           method: "POST",
           body: {
             content: `<@${message.user}>: ${message.content}`,

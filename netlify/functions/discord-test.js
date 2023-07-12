@@ -6,7 +6,7 @@ import {
 import { initializeApp } from "firebase/app"
 import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore"
 
-import fetch from "node-fetch"
+import { DiscordRequestProd } from "../../modules/utils.js"
 
 const firebaseConfig = {
   apiKey: "AIzaSyDf9ZiTBWf-sWY007WsKktMPewcrs07CWw",
@@ -18,7 +18,7 @@ const firebaseConfig = {
 }
 
 function VerifyDiscordRequest(clientKey) {
-  return function(event) {
+  return function (event) {
     const signature = event.headers["x-signature-ed25519"]
     const timestamp = event.headers["x-signature-timestamp"]
     const isValidRequest = verifyKey(
@@ -38,38 +38,6 @@ const app = initializeApp(firebaseConfig)
 
 // Initialize Cloud Firestore and get a reference to the service
 const db = getFirestore(app)
-
-async function DiscordRequest(endpoint, options) {
-  // append endpoint to root API URL
-  const url = "https://discord.com/api/v9/" + endpoint
-  // Stringify payloads
-  if (options.body) options.body = JSON.stringify(options.body)
-  // Use node-fetch to make requests
-  let tries = 0
-  const maxTries = 5
-  while (tries < maxTries) {
-    const res = await fetch(url, {
-      headers: {
-        Authorization: `Bot ${process.env.DISCORD_TOKEN}`,
-        "Content-Type": "application/json; charset=UTF-8",
-      },
-      ...options,
-    })
-    if (!res.ok) {
-      const data = await res.json()
-      if (data["retry_after"]) {
-        tries = tries + 1
-        await new Promise(r => setTimeout(r, data["retry_after"] * 1000))
-      } else {
-        console.log(data)
-        throw new Error(JSON.stringify(data))
-      }
-    } else {
-      return res
-    }
-  }
-  throw new Error("reached max rate limit tries")
-}
 
 function respond(
   message,
@@ -149,7 +117,8 @@ function formatWithDivision(teams) {
       }, message)
     }, "")
   message = message + "\n"
-  message = message + `OPEN TEAMS: ${openTeams.map(t => t.teamName).join(", ")}`
+  message =
+    message + `OPEN TEAMS: ${openTeams.map((t) => t.teamName).join(", ")}`
   return message
 }
 
@@ -170,7 +139,8 @@ function formatNormal(teams) {
       return message + `${team}: ${dUser ? "<@" + dUser + ">" : "OPEN"}\n`
     }, "")
   message = message + "\n"
-  message = message + `OPEN TEAMS: ${openTeams.map(t => t.teamName).join(", ")}`
+  message =
+    message + `OPEN TEAMS: ${openTeams.map((t) => t.teamName).join(", ")}`
   return message
 }
 
@@ -184,7 +154,7 @@ function createTeamsMessage(teams) {
 }
 
 function createStreamsMessage(counts) {
-  const countsList = Object.keys(counts).map(user => ({
+  const countsList = Object.keys(counts).map((user) => ({
     user: user,
     count: counts[user],
   }))
@@ -195,7 +165,7 @@ function createStreamsMessage(counts) {
   return (
     "__**Streams**__\n" +
     sortedCountsList
-      .map(userCount => `<@${userCount.user}>: ${userCount.count}`)
+      .map((userCount) => `<@${userCount.user}>: ${userCount.count}`)
       .join("\n")
       .trim()
   )
@@ -223,7 +193,7 @@ function notifierMessage(users) {
   return `${users}\nTime to schedule your game! Once your game is scheduled, hit the ⏰. Otherwise, You will be notified again.\nWhen you're done playing, let me know with 🏆.\nNeed to sim this game? React with ⏭ AND the home/away to force win. Choose both home and away to fair sim!`
 }
 
-exports.handler = async function(event, context) {
+exports.handler = async function (event, context) {
   if (!verifier(event)) {
     return {
       statusCode: 401,
@@ -323,12 +293,14 @@ exports.handler = async function(event, context) {
 
         const weeksGames = league.schedules.reg[`week${week}`]
         const teams = league.teams
-        const channelPromises = weeksGames.map(game => {
-          return DiscordRequest(`guilds/${guild_id}/channels`, {
+        const channelPromises = weeksGames.map((game) => {
+          return DiscordRequestProd(`guilds/${guild_id}/channels`, {
             method: "POST",
             body: {
               type: 0,
-              name: `${teams[game.awayTeamId].teamName}-vs-${teams[game.homeTeamId].teamName}`,
+              name: `${teams[game.awayTeamId].teamName}-vs-${
+                teams[game.homeTeamId].teamName
+              }`,
               parent_id: category,
             },
           })
@@ -349,7 +321,7 @@ exports.handler = async function(event, context) {
             }
           )
         }
-        if (responses.every(r => r.ok)) {
+        if (responses.every((r) => r.ok)) {
           return respond("created!")
         } else {
           return respond(
@@ -373,11 +345,11 @@ exports.handler = async function(event, context) {
             "missing configuration, run `/game_channels configure` first"
           )
         }
-        const res = await DiscordRequest(`guilds/${guild_id}/channels`, {
+        const res = await DiscordRequestProd(`guilds/${guild_id}/channels`, {
           method: "GET",
         })
         const channels = await res.json()
-        const gameChannels = channels.filter(c => {
+        const gameChannels = channels.filter((c) => {
           // text channel, in right category, with `vs` in it
           return (
             c.type === 0 &&
@@ -386,11 +358,11 @@ exports.handler = async function(event, context) {
             c.name.includes("vs")
           )
         })
-        const gameChannelIds = gameChannels.map(c => c.id)
+        const gameChannelIds = gameChannels.map((c) => c.id)
         const logger = league.commands.logger || {}
         let responses
         if (logger.on) {
-          const logPromises = gameChannels.map(c =>
+          const logPromises = gameChannels.map((c) =>
             fetch(
               "https://nallapareddy.com/.netlify/functions/snallabot-logger-background",
               {
@@ -411,12 +383,12 @@ exports.handler = async function(event, context) {
           )
           responses = await Promise.all(logPromises)
         } else {
-          const deletePromises = gameChannelIds.map(id =>
-            DiscordRequest(`/channels/${id}`, { method: "DELETE" })
+          const deletePromises = gameChannelIds.map((id) =>
+            DiscordRequestProd(`/channels/${id}`, { method: "DELETE" })
           )
           responses = await Promise.all(deletePromises)
         }
-        if (responses.every(r => r.ok)) {
+        if (responses.every((r) => r.ok)) {
           return respond("done, all game channels were deleted!")
         } else {
           return respond(
@@ -440,12 +412,12 @@ exports.handler = async function(event, context) {
             "missing configuration, run `/game_channels configure` first"
           )
         }
-        const res = await DiscordRequest(`guilds/${guild_id}/channels`, {
+        const res = await DiscordRequestProd(`guilds/${guild_id}/channels`, {
           method: "GET",
         })
         const channels = await res.json()
         const messagePromises = channels
-          .filter(c => {
+          .filter((c) => {
             // filter on optional parameter
             if (command.options && command.options[0]) {
               const channelId = command.options[0].value
@@ -459,14 +431,14 @@ exports.handler = async function(event, context) {
               c.name.includes("vs")
             )
           })
-          .flatMap(c => {
+          .flatMap((c) => {
             console.log(c.name)
             const channelId = c.id
             const channelTeams = c.name
               .split("-vs-")
-              .map(t => t.replace("-", " "))
+              .map((t) => t.replace("-", " "))
             const content = channelTeams
-              .map(t => {
+              .map((t) => {
                 const user = league.teams[findTeam(league.teams, t)].discordUser
                 if (user) {
                   return `<@${user}>`
@@ -482,7 +454,7 @@ exports.handler = async function(event, context) {
                 ? notifierMessage(content)
                 : content
               return [
-                DiscordRequest(`channels/${channelId}/messages`, {
+                DiscordRequestProd(`channels/${channelId}/messages`, {
                   method: "POST",
                   body: {
                     content: message,
@@ -494,8 +466,8 @@ exports.handler = async function(event, context) {
             }
           })
         const responses = await Promise.all(messagePromises)
-        if (responses.every(r => r.ok)) {
-          const messages = await Promise.all(responses.map(r => r.json()))
+        if (responses.every((r) => r.ok)) {
+          const messages = await Promise.all(responses.map((r) => r.json()))
           const currentTime = new Date().getTime()
           league.commands.game_channels.channels =
             league.commands.game_channels.channels || {}
@@ -624,7 +596,7 @@ exports.handler = async function(event, context) {
             const messageId = league.commands.teams.message
             const channelId = league.commands.teams.channel
             try {
-              const res = await DiscordRequest(
+              const res = await DiscordRequestProd(
                 `channels/${channelId}/messages/${messageId}`,
                 {
                   method: "PATCH",
@@ -651,7 +623,7 @@ exports.handler = async function(event, context) {
           } else {
             const channelId = league.commands.teams.channel
             try {
-              const res = await DiscordRequest(
+              const res = await DiscordRequestProd(
                 `channels/${channelId}/messages`,
                 {
                   method: "POST",
@@ -712,7 +684,7 @@ exports.handler = async function(event, context) {
             const messageId = league.commands.teams.message
             const channelId = league.commands.teams.channel
             try {
-              const res = await DiscordRequest(
+              const res = await DiscordRequestProd(
                 `channels/${channelId}/messages/${messageId}`,
                 {
                   method: "PATCH",
@@ -739,7 +711,7 @@ exports.handler = async function(event, context) {
           } else {
             try {
               const channelId = league.commands.teams.channel
-              const res = await DiscordRequest(
+              const res = await DiscordRequestProd(
                 `channels/${channelId}/messages`,
                 {
                   method: "POST",
@@ -814,7 +786,7 @@ exports.handler = async function(event, context) {
             const messageId = league.commands.streams.message
             const channelId = league.commands.streams.channel
             try {
-              const res = await DiscordRequest(
+              const res = await DiscordRequestProd(
                 `channels/${channelId}/messages/${messageId}`,
                 {
                   method: "PATCH",
@@ -841,7 +813,7 @@ exports.handler = async function(event, context) {
           } else {
             const channelId = league.commands.streams.channel
             try {
-              const res = await DiscordRequest(
+              const res = await DiscordRequestProd(
                 `channels/${channelId}/messages`,
                 {
                   method: "POST",
@@ -896,7 +868,7 @@ exports.handler = async function(event, context) {
             const messageId = league.commands.streams.message
             const channelId = league.commands.streams.channel
             try {
-              const res = await DiscordRequest(
+              const res = await DiscordRequestProd(
                 `channels/${channelId}/messages/${messageId}`,
                 {
                   method: "PATCH",
@@ -921,7 +893,7 @@ exports.handler = async function(event, context) {
           } else {
             const channelId = league.commands.streams.channel
             try {
-              const res = await DiscordRequest(
+              const res = await DiscordRequestProd(
                 `channels/${channelId}/messages`,
                 {
                   method: "POST",
@@ -966,7 +938,7 @@ exports.handler = async function(event, context) {
         ) {
           return respond("streams is not configured yet. Configure it first")
         }
-        Object.keys(league.commands.streams.counts).forEach(user => {
+        Object.keys(league.commands.streams.counts).forEach((user) => {
           league.commands.streams.counts[user] = 0
         })
         const content = createStreamsMessage(league.commands.streams.counts)
@@ -975,7 +947,7 @@ exports.handler = async function(event, context) {
             const messageId = league.commands.streams.message
             const channelId = league.commands.streams.channel
             try {
-              const res = await DiscordRequest(
+              const res = await DiscordRequestProd(
                 `channels/${channelId}/messages/${messageId}`,
                 {
                   method: "PATCH",
@@ -1002,7 +974,7 @@ exports.handler = async function(event, context) {
           } else {
             const channelId = league.commands.streams.channel
             try {
-              const res = await DiscordRequest(
+              const res = await DiscordRequestProd(
                 `channels/${channelId}/messages`,
                 {
                   method: "POST",
@@ -1105,7 +1077,7 @@ exports.handler = async function(event, context) {
           league = docSnap.data()
         }
         const waitlist = league.commands.waitlist || []
-        league.commands.waitlist = waitlist.filter(w => w !== user)
+        league.commands.waitlist = waitlist.filter((w) => w !== user)
         await setDoc(doc(db, "leagues", guild_id), league, { merge: true })
         if (
           !league.commands ||
@@ -1188,8 +1160,10 @@ exports.handler = async function(event, context) {
       const teams = league.teams
       const gamesContent = weeksGames
         .map(
-          game =>
-            `${teams[game.awayTeamId].teamName} vs ${teams[game.homeTeamId].teamName}`
+          (game) =>
+            `${teams[game.awayTeamId].teamName} vs ${
+              teams[game.homeTeamId].teamName
+            }`
         )
         .join("\n")
       const scheduleContent = `__**Week ${week}**__\n${gamesContent}`

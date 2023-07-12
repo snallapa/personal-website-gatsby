@@ -2,7 +2,7 @@ import { initializeApp } from "firebase/app"
 
 import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore"
 
-import fetch from "node-fetch"
+import { DiscordRequestCommunity } from "../../modules/utils.js"
 
 const firebaseConfig = {
   apiKey: "AIzaSyDf9ZiTBWf-sWY007WsKktMPewcrs07CWw",
@@ -19,41 +19,10 @@ const app = initializeApp(firebaseConfig)
 // Initialize Cloud Firestore and get a reference to the service
 const db = getFirestore(app)
 
-async function DiscordRequest(endpoint, options) {
-  // append endpoint to root API URL
-  const url = "https://discord.com/api/v9/" + endpoint
-  // Stringify payloads
-  if (options.body) options.body = JSON.stringify(options.body)
-  // Use node-fetch to make requests
-  let tries = 0
-  const maxTries = 10
-  while (tries < maxTries) {
-    const res = await fetch(url, {
-      headers: {
-        Authorization: `Bot ${process.env.DISCORD_TOKEN_COMMUNITY}`,
-        "Content-Type": "application/json; charset=UTF-8",
-      },
-      ...options,
-    })
-    if (!res.ok) {
-      const data = await res.json()
-      if (data["retry_after"]) {
-        tries = tries + 1
-        await new Promise(r => setTimeout(r, data["retry_after"] * 1000))
-      } else {
-        console.log(res)
-        throw new Error(JSON.stringify(data))
-      }
-    } else {
-      return res
-    }
-  }
-}
-
 function formatGame(g) {
   const comp = g.competitions[0]
-  const homeTeam = comp.competitors.find(c => c.homeAway === "home")
-  const awayTeam = comp.competitors.find(c => c.homeAway === "away")
+  const homeTeam = comp.competitors.find((c) => c.homeAway === "home")
+  const awayTeam = comp.competitors.find((c) => c.homeAway === "away")
   const status = comp.status.type.name
   const schedule = comp.status.type.shortDetail
   if (status === "STATUS_FINAL") {
@@ -73,7 +42,7 @@ function formatGame(g) {
 async function gamePoll(polls, emojiDoc, guild_id, currentGame) {
   const channel = polls.nba.channel
   if (!polls.nba.games[currentGame.id]) {
-    const m = await DiscordRequest(`channels/${channel}/messages`, {
+    const m = await DiscordRequestCommunity(`channels/${channel}/messages`, {
       method: "POST",
       body: {
         content: currentGame.message,
@@ -91,20 +60,20 @@ async function gamePoll(polls, emojiDoc, guild_id, currentGame) {
     const awayEmoji = `${currentGame.awayEmoji}%3A${
       emojiDoc.emojis[currentGame.awayEmoji]
     }`
-    await DiscordRequest(
+    await DiscordRequestCommunity(
       `channels/${channel}/messages/${messageId}/reactions/${awayEmoji}/@me`,
       {
         method: "PUT",
       }
     )
-    await DiscordRequest(
+    await DiscordRequestCommunity(
       `channels/${channel}/messages/${messageId}/reactions/${homeEmoji}/@me`,
       {
         method: "PUT",
       }
     )
   } else {
-    const m = await DiscordRequest(
+    const m = await DiscordRequestCommunity(
       `channels/${channel}/messages/${polls.nba.games[currentGame.id]}`,
       {
         method: "PATCH",
@@ -124,7 +93,7 @@ async function gamePoll(polls, emojiDoc, guild_id, currentGame) {
   return true
 }
 
-exports.handler = async function(event, context) {
+exports.handler = async function (event, context) {
   // console.log(event)
   const { guild_id } = JSON.parse(event.body)
   const docRef = doc(db, "polls", guild_id)
@@ -155,11 +124,11 @@ exports.handler = async function(event, context) {
   polls.nba.games = polls.nba.games || {}
   const gameMessages = games
     .sort((a, b) => new Date(a.date) - new Date(b.date))
-    .map(g => {
+    .map((g) => {
       const id = g.id
       const comp = g.competitions[0]
-      const homeTeam = comp.competitors.find(c => c.homeAway === "home")
-      const awayTeam = comp.competitors.find(c => c.homeAway === "away")
+      const homeTeam = comp.competitors.find((c) => c.homeAway === "home")
+      const awayTeam = comp.competitors.find((c) => c.homeAway === "away")
       const awayEmoji = `snallabot_${awayTeam.team.abbreviation.toLowerCase()}`
       const homeEmoji = `snallabot_${homeTeam.team.abbreviation.toLowerCase()}`
       return {

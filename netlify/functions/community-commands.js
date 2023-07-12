@@ -1,4 +1,4 @@
-import fetch from "node-fetch"
+import { DiscordRequestCommunity } from "../../modules/utils.js"
 
 const TEST_COMMAND = {
   name: "test_community",
@@ -70,38 +70,13 @@ const COMMANDS = [
 
 const DELETED_COMMANDS = []
 
-async function DiscordRequest(endpoint, options) {
-  // append endpoint to root API URL
-  const url = "https://discord.com/api/v9/" + endpoint
-  // Stringify payloads
-  if (options.body) options.body = JSON.stringify(options.body)
-  console.log(options)
-  // Use node-fetch to make requests
-  const res = await fetch(url, {
-    headers: {
-      Authorization: `Bot ${process.env.DISCORD_TOKEN_COMMUNITY}`,
-      "Content-Type": "application/json; charset=UTF-8",
-    },
-    ...options,
-  })
-  // console.log(`response: ${res}, and okay ${res.oka}`);
-  // throw API errors
-  if (!res.ok) {
-    const data = await res.json()
-    console.log(res.status)
-    throw new Error(JSON.stringify(data))
-  }
-  // return original response
-  return res
-}
-
 async function InstallGuildCommand(guildId, command) {
   // API endpoint to get and post guild commands
   const endpoint = `applications/${process.env.APP_ID_COMMUNITY}/guilds/${guildId}/commands`
   console.log(command)
   // install command
   try {
-    const res = await DiscordRequest(endpoint, {
+    const res = await DiscordRequestCommunity(endpoint, {
       method: "POST",
       body: command,
     })
@@ -117,7 +92,7 @@ async function DeleteGuildCommand(guildId, commandId) {
   const endpoint = `applications/${process.env.APP_ID_COMMUNITY}/guilds/${guildId}/commands/${commandId}`
 
   try {
-    const res = await DiscordRequest(endpoint, { method: "DELETE" })
+    const res = await DiscordRequestCommunity(endpoint, { method: "DELETE" })
     return res.ok
   } catch (err) {
     console.error(err)
@@ -130,7 +105,7 @@ async function DeleteGlobalCommand(commandId) {
   const endpoint = `applications/${process.env.APP_ID_COMMUNITY}/commands/${commandId}`
   // install command
   try {
-    const res = await DiscordRequest(endpoint, { method: "DELETE" })
+    const res = await DiscordRequestCommunity(endpoint, { method: "DELETE" })
     return res.ok
   } catch (err) {
     console.error(err)
@@ -144,7 +119,7 @@ async function InstallGlobalCommand(command) {
   console.log(command)
   // install command
   try {
-    const res = await DiscordRequest(endpoint, {
+    const res = await DiscordRequestCommunity(endpoint, {
       method: "POST",
       body: command,
     })
@@ -159,12 +134,12 @@ async function HasGuildCommand(guildId, command) {
   // API endpoint to get and post guild commands
   const endpoint = `applications/${process.env.APP_ID_COMMUNITY}/guilds/${guildId}/commands`
   try {
-    const res = await DiscordRequest(endpoint, { method: "GET" })
+    const res = await DiscordRequestCommunity(endpoint, { method: "GET" })
     const data = await res.json()
     console.log(data)
 
     if (data) {
-      const installedNames = data.map(c => c["name"])
+      const installedNames = data.map((c) => c["name"])
       // This is just matching on the name, so it's not good for updates
       await InstallGuildCommand(guildId, command)
       return true
@@ -178,12 +153,12 @@ async function HasGuildCommand(guildId, command) {
 async function HasGuildCommands(guildId, commands) {
   if (guildId === "") return
   const commandsInstalled = await Promise.all(
-    commands.map(c => HasGuildCommand(guildId, c))
+    commands.map((c) => HasGuildCommand(guildId, c))
   )
-  return commandsInstalled.every(x => x)
+  return commandsInstalled.every((x) => x)
 }
 
-exports.handler = async function(event, context) {
+exports.handler = async function (event, context) {
   console.log(event)
   const guildId = event.queryStringParameters.guild
   const type = event.queryStringParameters.type || "install"
@@ -192,28 +167,28 @@ exports.handler = async function(event, context) {
   const filteredCommands =
     commandFilter === "current" ? COMMANDS : DELETED_COMMANDS
   const applicationCommands = nameFilter
-    ? filteredCommands.filter(c => c.name === nameFilter)
+    ? filteredCommands.filter((c) => c.name === nameFilter)
     : filteredCommands
 
   if (guildId === "global") {
     let responses
     if (type === "install") {
       responses = await Promise.all(
-        applicationCommands.map(command => InstallGlobalCommand(command))
+        applicationCommands.map((command) => InstallGlobalCommand(command))
       )
     } else {
       const endpoint = `applications/${process.env.APP_ID_COMMUNITY}/commands`
-      const res = await DiscordRequest(endpoint, { method: "GET" })
+      const res = await DiscordRequestCommunity(endpoint, { method: "GET" })
       const commands = await res.json()
-      const commandNames = applicationCommands.map(c => c.name)
+      const commandNames = applicationCommands.map((c) => c.name)
       const commandIds = commands
-        .filter(c => commandNames.includes(c.name))
-        .map(c => c.id)
+        .filter((c) => commandNames.includes(c.name))
+        .map((c) => c.id)
       responses = await Promise.all(
-        commandIds.map(id => DeleteGlobalCommand(id))
+        commandIds.map((id) => DeleteGlobalCommand(id))
       )
     }
-    if (responses.every(x => x)) {
+    if (responses.every((x) => x)) {
       return {
         statusCode: 200,
         headers: { "Content-Type": "application/json" },
@@ -234,21 +209,23 @@ exports.handler = async function(event, context) {
   let responses
   if (type === "install") {
     responses = await Promise.all(
-      applicationCommands.map(command => InstallGuildCommand(guildId, command))
+      applicationCommands.map((command) =>
+        InstallGuildCommand(guildId, command)
+      )
     )
   } else {
     const endpoint = `applications/${process.env.APP_ID_COMMUNITY}/guilds/${guildId}/commands`
-    const res = await DiscordRequest(endpoint, { method: "GET" })
+    const res = await DiscordRequestCommunity(endpoint, { method: "GET" })
     const commands = await res.json()
-    const commandNames = applicationCommands.map(c => c.name)
+    const commandNames = applicationCommands.map((c) => c.name)
     const commandIds = commands
-      .filter(c => commandNames.includes(c.name))
-      .map(c => c.id)
+      .filter((c) => commandNames.includes(c.name))
+      .map((c) => c.id)
     responses = await Promise.all(
-      commandIds.map(id => DeleteGuildCommand(guildId, id))
+      commandIds.map((id) => DeleteGuildCommand(guildId, id))
     )
   }
-  if (responses.every(x => x)) {
+  if (responses.every((x) => x)) {
     return {
       statusCode: 200,
       headers: { "Content-Type": "application/json" },
