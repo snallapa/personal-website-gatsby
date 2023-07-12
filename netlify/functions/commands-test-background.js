@@ -1,4 +1,3 @@
-import fetch from "node-fetch"
 import { DiscordRequest } from "../../modules/utils.js"
 
 const TEST_COMMAND = {

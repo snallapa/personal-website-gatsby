@@ -12,6 +12,7 @@ const firebaseConfig = {
   messagingSenderId: "163156624093",
   appId: "1:163156624093:web:dfe860c8bb38a62b075134",
 }
+import fetch from "node-fetch"
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig)
