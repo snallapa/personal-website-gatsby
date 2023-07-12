@@ -1,4 +1,5 @@
 import fetch from "node-fetch"
+import { DiscordRequest } from "../../modules/utils.js"
 
 const TEST_COMMAND = {
   name: "test",
@@ -414,47 +415,20 @@ const DELETED_COMMANDS = [
   MADDEN_CHANNELS_CLEAR_COMMAND,
 ]
 
-async function DiscordRequest(endpoint, options) {
-  // append endpoint to root API URL
-  const url = "https://discord.com/api/v9/" + endpoint
-  // Stringify payloads
-  if (options.body) options.body = JSON.stringify(options.body)
-  // Use node-fetch to make requests
-  let tries = 0
-  const maxTries = 5
-  while (tries < maxTries) {
-    const res = await fetch(url, {
-      headers: {
-        Authorization: `Bot ${process.env.DISCORD_TOKEN_TEST}`,
-        "Content-Type": "application/json; charset=UTF-8",
-      },
-      ...options,
-    })
-    if (!res.ok) {
-      const data = await res.json()
-      if (data["retry_after"]) {
-        tries = tries + 1
-        await new Promise(r => setTimeout(r, data["retry_after"] * 1000))
-      } else {
-        console.log(data)
-        throw new Error(JSON.stringify(data))
-      }
-    } else {
-      return res
-    }
-  }
-}
-
 async function InstallGuildCommand(guildId, command) {
   // API endpoint to get and post guild commands
   const endpoint = `applications/${process.env.APP_ID_TEST}/guilds/${guildId}/commands`
   // console.log(command)
   // install command
   try {
-    const res = await DiscordRequest(endpoint, {
-      method: "POST",
-      body: command,
-    })
+    const res = await DiscordRequest(
+      endpoint,
+      {
+        method: "POST",
+        body: command,
+      },
+      process.env.DISCORD_TOKEN_TEST
+    )
     return res.ok
   } catch (err) {
     console.error(err)
@@ -467,7 +441,11 @@ async function DeleteGuildCommand(guildId, commandId) {
   const endpoint = `applications/${process.env.APP_ID_TEST}/guilds/${guildId}/commands/${commandId}`
 
   try {
-    const res = await DiscordRequest(endpoint, { method: "DELETE" })
+    const res = await DiscordRequest(
+      endpoint,
+      { method: "DELETE" },
+      process.env.DISCORD_TOKEN_TEST
+    )
     return res.ok
   } catch (err) {
     console.error(err)
@@ -480,7 +458,11 @@ async function DeleteGlobalCommand(commandId) {
   const endpoint = `applications/${process.env.APP_ID_TEST}/commands/${commandId}`
   // install command
   try {
-    const res = await DiscordRequest(endpoint, { method: "DELETE" })
+    const res = await DiscordRequest(
+      endpoint,
+      { method: "DELETE" },
+      process.env.DISCORD_TOKEN_TEST
+    )
     return res.ok
   } catch (err) {
     console.error(err)
@@ -494,10 +476,14 @@ async function InstallGlobalCommand(command) {
   // console.log(command)
   // install command
   try {
-    const res = await DiscordRequest(endpoint, {
-      method: "POST",
-      body: command,
-    })
+    const res = await DiscordRequest(
+      endpoint,
+      {
+        method: "POST",
+        body: command,
+      },
+      process.env.DISCORD_TOKEN_TEST
+    )
     return res.ok
   } catch (err) {
     console.error(err)
@@ -509,12 +495,16 @@ async function HasGuildCommand(guildId, command) {
   // API endpoint to get and post guild commands
   const endpoint = `applications/${process.env.APP_ID_TEST}/guilds/${guildId}/commands`
   try {
-    const res = await DiscordRequest(endpoint, { method: "GET" })
+    const res = await DiscordRequest(
+      endpoint,
+      { method: "GET" },
+      process.env.DISCORD_TOKEN_TEST
+    )
     const data = await res.json()
     // console.log(data)
 
     if (data) {
-      const installedNames = data.map(c => c["name"])
+      const installedNames = data.map((c) => c["name"])
       // This is just matching on the name, so it's not good for updates
       await InstallGuildCommand(guildId, command)
       return true
@@ -528,12 +518,12 @@ async function HasGuildCommand(guildId, command) {
 async function HasGuildCommands(guildId, commands) {
   if (guildId === "") return
   const commandsInstalled = await Promise.all(
-    commands.map(c => HasGuildCommand(guildId, c))
+    commands.map((c) => HasGuildCommand(guildId, c))
   )
-  return commandsInstalled.every(x => x)
+  return commandsInstalled.every((x) => x)
 }
 
-exports.handler = async function(event, context) {
+exports.handler = async function (event, context) {
   console.log(event)
   const guildId = event.queryStringParameters.guild
   const type = event.queryStringParameters.type || "install"
@@ -542,28 +532,32 @@ exports.handler = async function(event, context) {
   const filteredCommands =
     commandFilter === "current" ? COMMANDS : DELETED_COMMANDS
   const applicationCommands = nameFilter
-    ? filteredCommands.filter(c => c.name === nameFilter)
+    ? filteredCommands.filter((c) => c.name === nameFilter)
     : filteredCommands
 
   if (guildId === "global") {
     let responses
     if (type === "install") {
       responses = await Promise.all(
-        applicationCommands.map(command => InstallGlobalCommand(command))
+        applicationCommands.map((command) => InstallGlobalCommand(command))
       )
     } else {
       const endpoint = `applications/${process.env.APP_ID_TEST}/commands`
-      const res = await DiscordRequest(endpoint, { method: "GET" })
+      const res = await DiscordRequest(
+        endpoint,
+        { method: "GET" },
+        process.env.DISCORD_TOKEN_TEST
+      )
       const commands = await res.json()
-      const commandNames = applicationCommands.map(c => c.name)
+      const commandNames = applicationCommands.map((c) => c.name)
       const commandIds = commands
-        .filter(c => commandNames.includes(c.name))
-        .map(c => c.id)
+        .filter((c) => commandNames.includes(c.name))
+        .map((c) => c.id)
       responses = await Promise.all(
-        commandIds.map(id => DeleteGlobalCommand(id))
+        commandIds.map((id) => DeleteGlobalCommand(id))
       )
     }
-    if (responses.every(x => x)) {
+    if (responses.every((x) => x)) {
       console.log("success updating global command")
     } else {
       console.log("failed to update global command")
@@ -572,21 +566,27 @@ exports.handler = async function(event, context) {
   let responses
   if (type === "install") {
     responses = await Promise.all(
-      applicationCommands.map(command => InstallGuildCommand(guildId, command))
+      applicationCommands.map((command) =>
+        InstallGuildCommand(guildId, command)
+      )
     )
   } else {
     const endpoint = `applications/${process.env.APP_ID_TEST}/guilds/${guildId}/commands`
-    const res = await DiscordRequest(endpoint, { method: "GET" })
+    const res = await DiscordRequest(
+      endpoint,
+      { method: "GET" },
+      process.env.DISCORD_TOKEN_TEST
+    )
     const commands = await res.json()
-    const commandNames = applicationCommands.map(c => c.name)
+    const commandNames = applicationCommands.map((c) => c.name)
     const commandIds = commands
-      .filter(c => commandNames.includes(c.name))
-      .map(c => c.id)
+      .filter((c) => commandNames.includes(c.name))
+      .map((c) => c.id)
     responses = await Promise.all(
-      commandIds.map(id => DeleteGuildCommand(guildId, id))
+      commandIds.map((id) => DeleteGuildCommand(guildId, id))
     )
   }
-  if (responses.every(x => x)) {
+  if (responses.every((x) => x)) {
     console.log("success updating guild command")
   } else {
     console.log("failed to update guild command")

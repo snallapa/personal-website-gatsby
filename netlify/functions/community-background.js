@@ -1,7 +1,7 @@
 import { initializeApp } from "firebase/app"
 
 import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore"
-
+import { DiscordRequestCommunity } from "../../modules/utils.js"
 import fetch from "node-fetch"
 
 const firebaseConfig = {
@@ -19,34 +19,10 @@ const app = initializeApp(firebaseConfig)
 // Initialize Cloud Firestore and get a reference to the service
 const db = getFirestore(app)
 
-async function DiscordRequest(endpoint, options) {
-  // append endpoint to root API URL
-  const url = "https://discord.com/api/v9/" + endpoint
-  // Stringify payloads
-  if (options.body) options.body = JSON.stringify(options.body)
-  // Use node-fetch to make requests
-  const res = await fetch(url, {
-    headers: {
-      Authorization: `Bot ${process.env.DISCORD_TOKEN_COMMUNITY}`,
-      "Content-Type": "application/json; charset=UTF-8",
-    },
-    ...options,
-  })
-
-  // throw API errors
-  if (!res.ok) {
-    const data = await res.json()
-    console.log(res)
-    throw new Error(JSON.stringify(data))
-  }
-  // return original response
-  return res
-}
-
 function formatGame(g) {
   const comp = g.competitions[0]
-  const homeTeam = comp.competitors.find(c => c.homeAway === "home")
-  const awayTeam = comp.competitors.find(c => c.homeAway === "away")
+  const homeTeam = comp.competitors.find((c) => c.homeAway === "home")
+  const awayTeam = comp.competitors.find((c) => c.homeAway === "away")
   const status = comp.status.type.name
   const schedule = comp.status.type.shortDetail
   if (status === "STATUS_FINAL") {
@@ -63,7 +39,7 @@ function formatGame(g) {
   return `${awayTeam.team.displayName} ${awayTeam.score} - ${homeTeam.score} ${homeTeam.team.displayName}`
 }
 
-exports.handler = async function(event, context) {
+exports.handler = async function (event, context) {
   // console.log(event)
   const { guild_id } = JSON.parse(event.body)
   const docRef = doc(db, "polls", guild_id)
@@ -94,11 +70,11 @@ exports.handler = async function(event, context) {
 
   const gameMessages = games
     .sort((a, b) => new Date(a.date) - new Date(b.date))
-    .map(g => {
+    .map((g) => {
       const id = g.id
       const comp = g.competitions[0]
-      const homeTeam = comp.competitors.find(c => c.homeAway === "home")
-      const awayTeam = comp.competitors.find(c => c.homeAway === "away")
+      const homeTeam = comp.competitors.find((c) => c.homeAway === "home")
+      const awayTeam = comp.competitors.find((c) => c.homeAway === "away")
       const awayEmoji = `snallabot_${awayTeam.team.abbreviation.toLowerCase()}`
       const homeEmoji = `snallabot_${homeTeam.team.abbreviation.toLowerCase()}`
       return {
@@ -112,7 +88,7 @@ exports.handler = async function(event, context) {
   if (!polls.nfl[`week${week}`]) {
     // create the poll messages
     // header for games
-    const _ = await DiscordRequest(`channels/${channel}/messages`, {
+    const _ = await DiscordRequestCommunity(`channels/${channel}/messages`, {
       method: "POST",
       body: {
         content: `**__Week ${week} Games__**`,
@@ -128,15 +104,18 @@ exports.handler = async function(event, context) {
     while (messageCount < gameMessages.length && tries < 40) {
       const currentGame = gameMessages[messageCount]
       try {
-        const m = await DiscordRequest(`channels/${channel}/messages`, {
-          method: "POST",
-          body: {
-            content: currentGame.message,
-            allowed_mentions: {
-              parse: [],
+        const m = await DiscordRequestCommunity(
+          `channels/${channel}/messages`,
+          {
+            method: "POST",
+            body: {
+              content: currentGame.message,
+              allowed_mentions: {
+                parse: [],
+              },
             },
-          },
-        })
+          }
+        )
         const jsonRes = await m.json()
         const messageId = jsonRes.id
         reactions.push({ messageId, emoji: currentGame.awayEmoji })
@@ -148,7 +127,7 @@ exports.handler = async function(event, context) {
         console.log(e)
         const error = JSON.parse(e.message)
         if (error["retry_after"]) {
-          await new Promise(r => setTimeout(r, error["retry_after"] * 1000))
+          await new Promise((r) => setTimeout(r, error["retry_after"] * 1000))
           console.log(`game messages retries: ${tries}`)
         }
       }
@@ -161,7 +140,7 @@ exports.handler = async function(event, context) {
         emojiDoc.nfl.emojis[currentReaction.emoji]
       }`
       try {
-        await DiscordRequest(
+        await DiscordRequestCommunity(
           `channels/${channel}/messages/${currentReaction.messageId}/reactions/${emoji}/@me`,
           {
             method: "PUT",
@@ -173,7 +152,7 @@ exports.handler = async function(event, context) {
         console.log(e)
         const error = JSON.parse(e.message)
         if (error["retry_after"]) {
-          await new Promise(r => setTimeout(r, error["retry_after"] * 1000))
+          await new Promise((r) => setTimeout(r, error["retry_after"] * 1000))
         }
         console.log(`reaction tries: ${tries}`)
       }
@@ -187,7 +166,7 @@ exports.handler = async function(event, context) {
     while (messageCount < gameMessages.length && tries < 100) {
       const currentGame = gameMessages[messageCount]
       try {
-        const m = await DiscordRequest(
+        const m = await DiscordRequestCommunity(
           `channels/${channel}/messages/${
             polls.nfl[`week${week}`][currentGame.id]
           }`,
@@ -209,7 +188,7 @@ exports.handler = async function(event, context) {
         console.log(e)
         const error = JSON.parse(e.message)
         if (error["retry_after"]) {
-          await new Promise(r => setTimeout(r, error["retry_after"] * 1000))
+          await new Promise((r) => setTimeout(r, error["retry_after"] * 1000))
         }
         tries = tries + 1
       }

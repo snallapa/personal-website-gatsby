@@ -1,4 +1,4 @@
-import fetch from "node-fetch"
+import { DiscordRequestProd } from "../../modules/utils.js"
 import { initializeApp } from "firebase/app"
 import {
   getFirestore,
@@ -40,37 +40,6 @@ function findTeam(teams, search_phrase) {
   throw `could not find team ${search_phrase}`
 }
 
-async function DiscordRequest(endpoint, options) {
-  // append endpoint to root API URL
-  const url = "https://discord.com/api/v9/" + endpoint
-  // Stringify payloads
-  if (options.body) options.body = JSON.stringify(options.body)
-  // Use node-fetch to make requests
-  let tries = 0
-  const maxTries = 5
-  while (tries < maxTries) {
-    const res = await fetch(url, {
-      headers: {
-        Authorization: `Bot ${process.env.DISCORD_TOKEN}`,
-        "Content-Type": "application/json; charset=UTF-8",
-      },
-      ...options,
-    })
-    if (!res.ok) {
-      const data = await res.json()
-      if (data["retry_after"]) {
-        tries = tries + 1
-        await new Promise(r => setTimeout(r, data["retry_after"] * 1000))
-      } else {
-        console.log(data)
-        throw new Error(JSON.stringify(data))
-      }
-    } else {
-      return res
-    }
-  }
-}
-
 const reactions = {
   sch: "%E2%8F%B0",
   gg: "%F0%9F%8F%86",
@@ -83,8 +52,8 @@ async function react(channelId, messageId) {
   try {
     const reactionPromise = Object.keys(reactions).reduce((p, reaction) => {
       const currentReaction = reactions[reaction]
-      return p.then(_ =>
-        DiscordRequest(
+      return p.then((_) =>
+        DiscordRequestProd(
           `channels/${channelId}/messages/${messageId}/reactions/${currentReaction}/@me`,
           { method: "PUT" }
         )
@@ -99,10 +68,10 @@ async function react(channelId, messageId) {
 
 async function getReactedUsers(channelId, messageId, reaction) {
   try {
-    return DiscordRequest(
+    return DiscordRequestProd(
       `channels/${channelId}/messages/${messageId}/reactions/${reactions[reaction]}`,
       { method: "GET" }
-    ).then(r => r.json())
+    ).then((r) => r.json())
   } catch (e) {
     console.error(
       `get reaction failed for ${channelId}, ${messageId}, and ${reaction}`
@@ -140,7 +109,7 @@ function findTeam(teams, search_phrase) {
 }
 
 function joinUsers(users) {
-  return users.map(uId => `<@${uId}>`).join("")
+  return users.map((uId) => `<@${uId}>`).join("")
 }
 
 async function forceWin(
@@ -152,7 +121,9 @@ async function forceWin(
   logger,
   guild_id
 ) {
-  const res = await DiscordRequest(`channels/${gameChannel}`, { method: "GET" })
+  const res = await DiscordRequestProd(`channels/${gameChannel}`, {
+    method: "GET",
+  })
   const channel = await res.json()
   const channelName = channel.name
   const requestMessage =
@@ -160,7 +131,7 @@ async function forceWin(
   const confirmedUsersMessage =
     confirmedUsers.length > 0 ? "confirmed: " + joinUsers(confirmedUsers) : ""
   const message = `${channelName}: ${result}, ${requestMessage} ${confirmedUsersMessage}`
-  await DiscordRequest(`channels/${fwChannel}/messages`, {
+  await DiscordRequestProd(`channels/${fwChannel}/messages`, {
     method: "POST",
     body: {
       content: message,
@@ -190,18 +161,20 @@ async function forceWin(
       }
     )
   } else {
-    await DiscordRequest(`channels/${gameChannel}`, { method: "DELETE" })
+    await DiscordRequestProd(`channels/${gameChannel}`, { method: "DELETE" })
   }
   return true
 }
 
 async function ping(gameChannel, teams) {
-  const res = await DiscordRequest(`channels/${gameChannel}`, { method: "GET" })
+  const res = await DiscordRequestProd(`channels/${gameChannel}`, {
+    method: "GET",
+  })
   const channel = await res.json()
   const channelName = channel.name
-  const channelTeams = channelName.split("-vs-").map(t => t.replace("-", " "))
+  const channelTeams = channelName.split("-vs-").map((t) => t.replace("-", " "))
   const content = channelTeams
-    .map(t => {
+    .map((t) => {
       const user = teams[findTeam(teams, t)].discordUser
       if (user) {
         return `<@${user}>`
@@ -211,7 +184,7 @@ async function ping(gameChannel, teams) {
     })
     .join(" ")
     .trim()
-  await DiscordRequest(`channels/${gameChannel}/messages`, {
+  await DiscordRequestProd(`channels/${gameChannel}/messages`, {
     method: "POST",
     body: {
       content: `${content} is your game scheduled? Schedule it! or react to my first message to set it as scheduled! Hit the trophy if its done already`,
@@ -256,8 +229,8 @@ async function updateChannel(cId, league, users, guild_id) {
         currentState.events.push("DONE")
         if (logger.on) {
           const filteredGGUsers = ggUsers
-            .map(u => u.id)
-            .filter(uId => uId !== SNALLABOT_USER)
+            .map((u) => u.id)
+            .filter((uId) => uId !== SNALLABOT_USER)
           const _ = await fetch(
             "https://nallapareddy.com/.netlify/functions/snallabot-logger-background",
             {
@@ -276,25 +249,25 @@ async function updateChannel(cId, league, users, guild_id) {
             }
           )
         } else {
-          await DiscordRequest(`channels/${cId}`, { method: "DELETE" })
+          await DiscordRequestProd(`channels/${cId}`, { method: "DELETE" })
         }
         return currentState
       }
       if (fwUsers.length > 1) {
         const requestedUsers = fwUsers
-          .map(u => u.id)
-          .filter(uId => SNALLABOT_USER !== uId)
+          .map((u) => u.id)
+          .filter((uId) => SNALLABOT_USER !== uId)
         if (league.commands.game_channels.adminRole) {
           const admins = users
-            .filter(u =>
+            .filter((u) =>
               u.roles.includes(league.commands.game_channels.adminRole)
             )
-            .map(u => u.id)
-          const confirmed = requestedUsers.filter(uId => admins.includes(uId))
+            .map((u) => u.id)
+          const confirmed = requestedUsers.filter((uId) => admins.includes(uId))
           if (confirmed.length >= 1) {
             try {
               const result = decideResult(homeUsers, awayUsers)
-              const req = requestedUsers.filter(uId => !admins.includes(uId))
+              const req = requestedUsers.filter((uId) => !admins.includes(uId))
               await forceWin(
                 league.commands.game_channels.fwChannel,
                 cId,
@@ -316,7 +289,7 @@ async function updateChannel(cId, league, users, guild_id) {
             const message = `FW requested <@&${
               league.commands.game_channels.adminRole
             }> by ${joinUsers(requestedUsers)}`
-            await DiscordRequest(`channels/${cId}/messages`, {
+            await DiscordRequestProd(`channels/${cId}/messages`, {
               method: "POST",
               body: {
                 content: message,
@@ -370,7 +343,7 @@ async function updateChannel(cId, league, users, guild_id) {
   }
 }
 
-exports.handler = async function(event, context) {
+exports.handler = async function (event, context) {
   const { guild_id, currentChannels, users } = JSON.parse(event.body)
 
   const docRef = doc(db, "leagues", guild_id)
@@ -384,7 +357,7 @@ exports.handler = async function(event, context) {
   // delete channels not there
   const channelStates = league.commands.game_channels.channels || {}
   const deletions = Object.keys(channelStates)
-    .filter(cId => !currentChannels.includes(cId))
+    .filter((cId) => !currentChannels.includes(cId))
     .reduce((acc, cId) => {
       acc[`commands.game_channels.channels.${cId}`] = deleteField()
       return acc
@@ -394,7 +367,7 @@ exports.handler = async function(event, context) {
   const updatedSnap = await getDoc(docRef)
   league = updatedSnap.data()
 
-  const promises = currentChannels.map(cId =>
+  const promises = currentChannels.map((cId) =>
     updateChannel(cId, league, users, guild_id)
   )
   const res = await Promise.all(promises)

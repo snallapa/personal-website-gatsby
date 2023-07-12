@@ -2,7 +2,7 @@ import { initializeApp } from "firebase/app"
 
 import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore"
 
-import fetch from "node-fetch"
+import { DiscordRequestProd } from "../../modules/utils.js"
 
 const firebaseConfig = {
   apiKey: "AIzaSyDf9ZiTBWf-sWY007WsKktMPewcrs07CWw",
@@ -18,37 +18,6 @@ const app = initializeApp(firebaseConfig)
 
 // Initialize Cloud Firestore and get a reference to the service
 const db = getFirestore(app)
-
-async function DiscordRequest(endpoint, options) {
-  // append endpoint to root API URL
-  const url = "https://discord.com/api/v9/" + endpoint
-  // Stringify payloads
-  if (options.body) options.body = JSON.stringify(options.body)
-  // Use node-fetch to make requests
-  let tries = 0
-  const maxTries = 5
-  while (tries < maxTries) {
-    const res = await fetch(url, {
-      headers: {
-        Authorization: `Bot ${process.env.DISCORD_TOKEN}`,
-        "Content-Type": "application/json; charset=UTF-8",
-      },
-      ...options,
-    })
-    if (!res.ok) {
-      const data = await res.json()
-      if (data["retry_after"]) {
-        tries = tries + 1
-        await new Promise(r => setTimeout(r, error["retry_after"] * 1000))
-      } else {
-        console.log(res)
-        throw new Error(JSON.stringify(data))
-      }
-    } else {
-      return res
-    }
-  }
-}
 
 function formatWithDivision(teams) {
   const divisions = {}
@@ -80,7 +49,8 @@ function formatWithDivision(teams) {
       }, message)
     }, "")
   message = message + "\n"
-  message = message + `OPEN TEAMS: ${openTeams.map(t => t.teamName).join(", ")}`
+  message =
+    message + `OPEN TEAMS: ${openTeams.map((t) => t.teamName).join(", ")}`
   return message
 }
 
@@ -101,7 +71,8 @@ function formatNormal(teams) {
       return message + `${team}: ${dUser ? "<@" + dUser + ">" : "OPEN"}\n`
     }, "")
   message = message + "\n"
-  message = message + `OPEN TEAMS: ${openTeams.map(t => t.teamName).join(", ")}`
+  message =
+    message + `OPEN TEAMS: ${openTeams.map((t) => t.teamName).join(", ")}`
   return message
 }
 
@@ -114,7 +85,7 @@ function createTeamsMessage(teams) {
   }
 }
 
-exports.handler = async function(event, context) {
+exports.handler = async function (event, context) {
   // console.log(event)
   const { guild_id, users } = JSON.parse(event.body)
   const docRef = doc(db, "leagues", guild_id)
@@ -125,10 +96,10 @@ exports.handler = async function(event, context) {
   }
   const league = docSnap.data()
   const teamIds = Object.keys(league.teams)
-  teamIds.forEach(tId => {
+  teamIds.forEach((tId) => {
     const team = league.teams[tId]
     if (team.trackingRole) {
-      const teamUser = users.filter(u => u.roles.includes(team.trackingRole))
+      const teamUser = users.filter((u) => u.roles.includes(team.trackingRole))
       if (teamUser.length === 0) {
         league.teams[tId].discordUser = ""
       } else if (teamUser.length === 1) {
@@ -143,7 +114,7 @@ exports.handler = async function(event, context) {
     const messageId = league.commands.teams.message
     const channelId = league.commands.teams.channel
     try {
-      const res = await DiscordRequest(
+      const res = await DiscordRequestProd(
         `channels/${channelId}/messages/${messageId}`,
         {
           method: "PATCH",

@@ -9,8 +9,7 @@ import {
   setDoc,
 } from "firebase/firestore"
 
-import fetch from "node-fetch"
-import {DiscordRequest} from "../../modules/utils.js"
+import { DiscordRequestProd } from "../../modules/utils.js"
 
 const firebaseConfig = {
   apiKey: "AIzaSyDf9ZiTBWf-sWY007WsKktMPewcrs07CWw",
@@ -27,24 +26,26 @@ const app = initializeApp(firebaseConfig)
 // Initialize Cloud Firestore and get a reference to the service
 const db = getFirestore(app)
 
-
 const reservedLeagues = ["guild_updates", "mca"]
 
-exports.handler = async function(event, context) {
-  const res = await DiscordRequest("users/@me/guilds", { method: "GET" })
+exports.handler = async function (event, context) {
+  const res = await DiscordRequestProd("users/@me/guilds", { method: "GET" })
   const pagedGuilds = await res.json()
-  let guilds = pagedGuilds.map(g => g.id)
+  let guilds = pagedGuilds.map((g) => g.id)
   let paging = true
   while (paging) {
     const lastGuild = guilds[guilds.length - 1]
-    const res = await DiscordRequest(`users/@me/guilds?after=${lastGuild}`, {
-      method: "GET",
-    })
+    const res = await DiscordRequestProd(
+      `users/@me/guilds?after=${lastGuild}`,
+      {
+        method: "GET",
+      }
+    )
     const pagedGuilds = await res.json()
     if (pagedGuilds.length === 0) {
       paging = false
     } else {
-      guilds = guilds.concat(pagedGuilds.map(g => g.id))
+      guilds = guilds.concat(pagedGuilds.map((g) => g.id))
     }
   }
   console.log(`number of servers: ${guilds.length}`)
@@ -53,7 +54,7 @@ exports.handler = async function(event, context) {
 
   console.log(`number of firebase leagues: ${querySnapshot.size}`)
 
-  const deletePromises = querySnapshot.docs.flatMap(fDoc => {
+  const deletePromises = querySnapshot.docs.flatMap((fDoc) => {
     if (!guilds.includes(fDoc.id) && !reservedLeagues.includes(fDoc.id)) {
       console.log(`deleting league ${fDoc.id}`)
       const update = {}

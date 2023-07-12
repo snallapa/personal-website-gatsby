@@ -1,15 +1,21 @@
-export async function DiscordRequest(endpoint, options) {
+import fetch from "node-fetch"
+
+export async function DiscordRequest(
+  endpoint,
+  options,
+  token = process.env.DISCORD_TOKEN,
+  maxTries = 5
+) {
   // append endpoint to root API URL
   const url = "https://discord.com/api/v9/" + endpoint
   // Stringify payloads
   if (options.body) options.body = JSON.stringify(options.body)
   // Use node-fetch to make requests
   let tries = 0
-  const maxTries = 5
   while (tries < maxTries) {
     const res = await fetch(url, {
       headers: {
-        Authorization: `Bot ${process.env.DISCORD_TOKEN}`,
+        Authorization: `Bot ${token}`,
         "Content-Type": "application/json; charset=UTF-8",
       },
       ...options,
@@ -18,7 +24,7 @@ export async function DiscordRequest(endpoint, options) {
       const data = await res.json()
       if (data["retry_after"]) {
         tries = tries + 1
-        await new Promise(r => setTimeout(r, data["retry_after"] * 1000))
+        await new Promise((r) => setTimeout(r, data["retry_after"] * 1000))
       } else {
         console.log(res)
         throw new Error(JSON.stringify(data))
@@ -27,4 +33,22 @@ export async function DiscordRequest(endpoint, options) {
       return res
     }
   }
+}
+
+export async function DiscordRequestProd(endpoint, options, maxTries = 5) {
+  return DiscordRequest(
+    endpoint,
+    options,
+    (token = process.env.DISCORD_TOKEN),
+    (maxTries = maxTries)
+  )
+}
+
+export async function DiscordRequestCommunity(endpoint, options, maxTries = 5) {
+  return DiscordRequest(
+    endpoint,
+    options,
+    (token = process.env.DISCORD_TOKEN_COMMUNITY),
+    (maxTries = maxTries)
+  )
 }
