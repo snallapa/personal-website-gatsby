@@ -3,20 +3,9 @@ import {
   InteractionResponseType,
   verifyKey,
 } from "discord-interactions"
-import { initializeApp } from "firebase/app"
-import fetch from "node-fetch"
-import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore"
-import fetch from "node-fetch"
+import { doc, getDoc, setDoc } from "firebase/firestore"
 import { DiscordRequestProd } from "../../modules/utils.js"
-
-const firebaseConfig = {
-  apiKey: "AIzaSyDf9ZiTBWf-sWY007WsKktMPewcrs07CWw",
-  authDomain: "championslounge-f0f36.firebaseapp.com",
-  projectId: "championslounge-f0f36",
-  storageBucket: "championslounge-f0f36.appspot.com",
-  messagingSenderId: "163156624093",
-  appId: "1:163156624093:web:dfe860c8bb38a62b075134",
-}
+import { gameChannelHandler } from "../../modules/game-channels.js"
 
 function VerifyDiscordRequest(clientKey) {
   return function (event) {
@@ -33,12 +22,6 @@ function VerifyDiscordRequest(clientKey) {
 }
 
 const verifier = VerifyDiscordRequest(process.env.PUBLIC_KEY)
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig)
-
-// Initialize Cloud Firestore and get a reference to the service
-const db = getFirestore(app)
 
 function findTeam(teams, search_phrase) {
   const term = search_phrase.toLowerCase()
@@ -157,10 +140,6 @@ function notifyWaitlist(waitlist, top) {
   )
 }
 
-function notifierMessage(users) {
-  return `${users}\nTime to schedule your game! Once your game is scheduled, hit the ⏰. Otherwise, You will be notified again.\nWhen you're done playing, let me know with 🏆.\nNeed to sim this game? React with ⏭ AND the home/away to force win. Choose both home and away to fair sim!`
-}
-
 exports.handler = async function (event, context) {
   if (!verifier(event)) {
     return {
@@ -185,211 +164,8 @@ exports.handler = async function (event, context) {
     } else if (name === "game_channels") {
       const command = options[0]
       const subcommand = command.name
-      if (subcommand === "configure") {
-      } else if (subcommand === "create") {
-      } else if (subcommand === "clear") {
-        const docRef = doc(db, "leagues", guild_id)
-        const docSnap = await getDoc(docRef)
-        if (!docSnap.exists()) {
-          return respond(
-            `no league found for ${guild_id}, export in MCA using league_export first`
-          )
-        }
-        const league = docSnap.data()
-        let category
-        try {
-          category = league.commands.game_channels.category
-        } catch (error) {
-          return respond(
-            "missing configuration, run `/game_channels configure` first"
-          )
-        }
-        const res = await DiscordRequestProd(`guilds/${guild_id}/channels`, {
-          method: "GET",
-        })
-        const channels = await res.json()
-        const gameChannels = channels.filter((c) => {
-          // text channel, in right category, with `vs` in it
-          return (
-            c.type === 0 &&
-            c.parent_id &&
-            c.parent_id === category &&
-            c.name.includes("vs")
-          )
-        })
-        const gameChannelIds = gameChannels.map((c) => c.id)
-        const logger = league.commands.logger || {}
-        let responses
-        if (logger.on) {
-          const logPromises = gameChannels.map((c) =>
-            fetch(
-              "https://nallapareddy.com/.netlify/functions/snallabot-logger-background",
-              {
-                method: "POST",
-                body: JSON.stringify({
-                  guild_id: guild_id,
-                  logType: "CHANNEL",
-                  channelId: c.id,
-                  additionalMessages: [
-                    {
-                      content: `${name} ${subcommand}`,
-                      user: member.user.id,
-                    },
-                  ],
-                }),
-              }
-            )
-          )
-          responses = await Promise.all(logPromises)
-        } else {
-          const deletePromises = gameChannelIds.map((id) =>
-            DiscordRequestProd(`/channels/${id}`, { method: "DELETE" })
-          )
-          responses = await Promise.all(deletePromises)
-        }
-        if (responses.every((r) => r.ok)) {
-          return respond("done, all game channels were deleted!")
-        } else {
-          return respond(
-            "hmm something went wrong :(, not all of them were deleted"
-          )
-        }
-      } else if (subcommand === "notify") {
-        const docRef = doc(db, "leagues", guild_id)
-        const docSnap = await getDoc(docRef)
-        if (!docSnap.exists()) {
-          return respond(
-            `no league found for ${guild_id}, export in MCA using league_export first`
-          )
-        }
-        const league = docSnap.data()
-        let category
-        try {
-          category = league.commands.game_channels.category
-        } catch (error) {
-          return respond(
-            "missing configuration, run `/game_channels configure` first"
-          )
-        }
-        const res = await DiscordRequestProd(`guilds/${guild_id}/channels`, {
-          method: "GET",
-        })
-        const channels = await res.json()
-        const messagePromises = channels
-          .filter((c) => {
-            // filter on optional parameter
-            if (command.options && command.options[0]) {
-              const channelId = command.options[0].value
-              return c.id === channelId
-            }
-            // text channel, in right category, with `vs` in it
-            return (
-              c.type === 0 &&
-              c.parent_id &&
-              c.parent_id === category &&
-              c.name.includes("vs")
-            )
-          })
-          .flatMap((c) => {
-            console.log(c.name)
-            const channelId = c.id
-            const channelTeams = c.name
-              .split("-vs-")
-              .map((t) => t.replace("-", " "))
-            const content = channelTeams
-              .map((t) => {
-                const user = league.teams[findTeam(league.teams, t)].discordUser
-                if (user) {
-                  return `<@${user}>`
-                } else {
-                  return ""
-                }
-              })
-              .join(" at ")
-              .trim()
-            // console.log(content);
-            if (content) {
-              const message = league.commands.game_channels.autoUpdate
-                ? notifierMessage(content)
-                : content
-              return [
-                DiscordRequestProd(`channels/${channelId}/messages`, {
-                  method: "POST",
-                  body: {
-                    content: message,
-                  },
-                }),
-              ]
-            } else {
-              return []
-            }
-          })
-        const responses = await Promise.all(messagePromises)
-        if (responses.every((r) => r.ok)) {
-          const messages = await Promise.all(responses.map((r) => r.json()))
-          const currentTime = new Date().getTime()
-          league.commands.game_channels.channels =
-            league.commands.game_channels.channels || {}
-          league.commands.game_channels.channels = messages.reduce((acc, m) => {
-            if (acc[m.channel_id]) {
-              acc[m.channel_id].lastNotified = currentTime
-            } else {
-              acc[m.channel_id] = { message: m.id, lastNotified: currentTime }
-            }
-            return acc
-          }, league.commands.game_channels.channels)
-          await setDoc(doc(db, "leagues", guild_id), league, { merge: true })
-          return respond("all users notified!")
-        } else {
-          return respond(
-            "hmm something went wrong :(, not all of them were notified"
-          )
-        }
-      } else if (subcommand === "configure_notifier") {
-        const fwChannel = command.options[0].value
-        const waitPing = command.options[1].value
-        const adminRole = command.options[2] ? command.options[2].value : ""
-        await setDoc(
-          doc(db, "leagues", guild_id),
-          {
-            commands: {
-              game_channels: {
-                fwChannel,
-                waitPing,
-                adminRole,
-                autoUpdate: true,
-              },
-            },
-          },
-          { merge: true }
-        )
-        const update = {}
-        update["gameChannels"] = {}
-        update["gameChannels"][guild_id] = true
-        await setDoc(doc(db, "leagues", "guild_updates"), update, {
-          merge: true,
-        })
-        return respond("configured! notifier is ready for use")
-      } else if (subcommand === "off_notifier") {
-        await setDoc(
-          doc(db, "leagues", guild_id),
-          {
-            commands: {
-              game_channels: {
-                autoUpdate: false,
-              },
-            },
-          },
-          { merge: true }
-        )
-        const update = {}
-        update["gameChannels"] = {}
-        update["gameChannels"][guild_id] = false
-        await setDoc(doc(db, "leagues", "guild_updates"), update, {
-          merge: true,
-        })
-        return respond("notifier is turned off")
-      }
+      const response = await gameChannelHandler[subcommand](guild_id, command)
+      return response
     } else if (name === "teams") {
       const command = options[0]
       const subcommand = command.name
