@@ -2,6 +2,7 @@ import { doc, setDoc } from "firebase/firestore"
 import { respond } from "./utils.js"
 import { DiscordRequestProd } from "./utils.js"
 import { getLeague, db } from "./firebase-db.js"
+import { findTeam } from "./teams.js"
 import fetch from "node-fetch"
 
 async function handleConfigure(guild_id, command, member) {
