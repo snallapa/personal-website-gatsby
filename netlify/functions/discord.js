@@ -4,7 +4,11 @@ import {
   verifyKey,
 } from "discord-interactions"
 import { doc, getDoc, setDoc } from "firebase/firestore"
-import { DiscordRequestProd } from "../../modules/utils.js"
+import {
+  DiscordRequestProd,
+  respond,
+  respondNoMention,
+} from "../../modules/utils.js"
 import { gameChannelHandler } from "../../modules/game-channels.js"
 import { findTeam, createTeamsMessage } from "../../modules/teams.js"
 
