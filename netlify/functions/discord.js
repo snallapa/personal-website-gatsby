@@ -11,6 +11,7 @@ import {
 } from "../../modules/utils.js"
 import { gameChannelHandler } from "../../modules/game-channels.js"
 import { findTeam, createTeamsMessage } from "../../modules/teams.js"
+import { db } from "../../modules/firebase-db.js"
 
 function VerifyDiscordRequest(clientKey) {
   return function (event) {
