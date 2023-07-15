@@ -4,7 +4,7 @@ import { DiscordRequestProd } from "./utils.js"
 import { getLeague, db } from "./firebase-db.js"
 import fetch from "node-fetch"
 
-async function handleConfigure(guild_id, command) {
+async function handleConfigure(guild_id, command, member) {
   const category = command.options[0].value
   await setDoc(
     doc(db, "leagues", guild_id),
@@ -20,7 +20,7 @@ async function handleConfigure(guild_id, command) {
   return respond("configured! game channels command is ready for use")
 }
 
-async function handleCreate(guild_id, command) {
+async function handleCreate(guild_id, command, member) {
   const week = command.options[0].value
   let league
   try {
@@ -84,7 +84,7 @@ async function handleCreate(guild_id, command) {
   }
 }
 
-async function handleClear(guild_id, command) {
+async function handleClear(guild_id, command, member) {
   let league
   try {
     league = await getLeague(guild_id)
@@ -154,7 +154,7 @@ function notifierMessage(users) {
   return `${users}\nTime to schedule your game! Once your game is scheduled, hit the ⏰. Otherwise, You will be notified again.\nWhen you're done playing, let me know with 🏆.\nNeed to sim this game? React with ⏭ AND the home/away to force win. Choose both home and away to fair sim!`
 }
 
-async function handleNotify(guild_id, command) {
+async function handleNotify(guild_id, command, member) {
   let league
   try {
     league = await getLeague(guild_id)
@@ -242,7 +242,7 @@ async function handleNotify(guild_id, command) {
   }
 }
 
-async function handleConfigureNotifier(guild_id, command) {
+async function handleConfigureNotifier(guild_id, command, member) {
   const fwChannel = command.options[0].value
   const waitPing = command.options[1].value
   const adminRole = command.options[2] ? command.options[2].value : ""
@@ -269,7 +269,7 @@ async function handleConfigureNotifier(guild_id, command) {
   return respond("configured! notifier is ready for use")
 }
 
-async function handleOffNotifier(guild_id, command) {
+async function handleOffNotifier(guild_id, command, member) {
   await setDoc(
     doc(db, "leagues", guild_id),
     {
