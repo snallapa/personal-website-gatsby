@@ -72,7 +72,7 @@ async function handleCreate(guild_id, command, member) {
           guild_id: guild_id,
           logType: "COMMAND",
           user: member.user.id,
-          command: `game channels ${subcommand}`,
+          command: `game channels ${command.name}`,
         }),
       }
     )
@@ -128,7 +128,7 @@ async function handleClear(guild_id, command, member) {
             channelId: c.id,
             additionalMessages: [
               {
-                content: `game channels ${subcommand}`,
+                content: `game channels ${command.name}`,
                 user: member.user.id,
               },
             ],
