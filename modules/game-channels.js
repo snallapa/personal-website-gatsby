@@ -296,4 +296,5 @@ export const gameChannelHandler = {
   notify: handleNotify,
   configure_notifier: handleConfigureNotifier,
   off_notifier: handleOffNotifier,
+  clear: handleClear,
 }
