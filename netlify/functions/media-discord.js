@@ -16,7 +16,8 @@ exports.handler = async function (event, context) {
     }
   }
   console.log(event)
-  const { type, guild_id, data, member, name } = JSON.parse(event.body)
+  const discordEvent = JSON.parse(event.body)
+  const { type, guild_id, data, member, name } = discordEvent
   if (type === InteractionType.PING) {
     return {
       statusCode: 200,
@@ -122,7 +123,7 @@ exports.handler = async function (event, context) {
       message: {
         interaction: { id: interactionId },
       },
-    } = data
+    } = discordEvent
     if (custom_id === "choose_game") {
       const scheduleId = values[0]
       await setDoc(
