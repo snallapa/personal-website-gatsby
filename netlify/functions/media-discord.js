@@ -44,6 +44,7 @@ exports.handler = async function (event, context) {
           `missing week ${week}. Please export the week in MCA (select ALL WEEKS in the app!)`
         )
       }
+      const week = options[0].value
       const weeksGames = league.schedules.reg[`week${week}`]
       const teams = league.teams
 
