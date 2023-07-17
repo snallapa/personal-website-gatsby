@@ -122,6 +122,7 @@ exports.handler = async function (event, context) {
     const { custom_id, values } = data
     const {
       message: {
+        id: messageId,
         interaction: { id: interactionId },
       },
     } = discordEvent
@@ -153,6 +154,7 @@ exports.handler = async function (event, context) {
           body: JSON.stringify({
             guild_id: guild_id,
             interaction_id: interactionId,
+            message_id: messageId,
           }),
         }
       )
