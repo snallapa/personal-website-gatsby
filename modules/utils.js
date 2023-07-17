@@ -80,6 +80,20 @@ export function respond(
   }
 }
 
+export function updateMessage(message) {
+  return {
+    statusCode: statusCode,
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      type: InteractionResponseType.UPDATE_MESSAGE,
+      data: {
+        content: message,
+        components: [],
+      },
+    }),
+  }
+}
+
 export function ackMessage(statusCode = 200) {
   return {
     statusCode: statusCode,

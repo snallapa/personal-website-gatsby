@@ -4,6 +4,7 @@ import {
   DiscordRequestProd,
   respond,
   ackMessage,
+  updateMessage,
   VerifyDiscordRequest,
 } from "../../modules/utils.js"
 import { db, getMedia } from "../../modules/firebase-db.js"
@@ -158,10 +159,7 @@ exports.handler = async function (event, context) {
           }),
         }
       )
-      return respond(
-        "generating media!",
-        (interactionType = InteractionResponseType.UPDATE_MESSAGE)
-      )
+      return updateMessage("generating media!")
     }
     return respond(
       "we should not have gotten here... this command is broken contact owner"
