@@ -117,10 +117,47 @@ exports.handler = async function (event, context) {
       }
     }
   } else if (type === InteractionType.MESSAGE_COMPONENT) {
-    console.log(event)
-    return {
-      statusCode: 200,
-      body: JSON.stringify({ type: InteractionResponseType.PONG }),
+    const { custom_id, values } = data
+    const {
+      message: {
+        interaction: { id: interactionId },
+      },
+    } = data
+    if (custom_id === "choose_game") {
+      const scheduleId = values[0]
+      await setDoc(
+        doc(db, "media_interactions", interactionId),
+        {
+          scheduleId,
+        },
+        { merge: true }
+      )
+      return respond("ok!")
+    } else if (custom_id === "choose_media") {
+      const mediaId = values[0]
+      await setDoc(
+        doc(db, "media_interactions", interactionId),
+        {
+          mediaId,
+        },
+        { merge: true }
+      )
+      return respond("ok!")
+    } else if (custom_id === "generate_media") {
+      const _ = await fetch(
+        "https://nallapareddy.com/.netlify/functions/media-poster-background",
+        {
+          method: "POST",
+          body: JSON.stringify({
+            guild_id: guild_id,
+            interaction_id: interactionId,
+          }),
+        }
+      )
+      return respond("generating media!")
     }
+    return respond(
+      "we should not have gotten here... this command is broken contact owner"
+    )
   }
 }

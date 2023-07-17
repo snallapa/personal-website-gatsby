@@ -38,3 +38,12 @@ export async function getMedia(guild_id) {
   }
   return docSnap.data()
 }
+
+export async function getMediaInteraction(interaction_id) {
+  const docRef = doc(db, "media_interactions", interaction_id)
+  const docSnap = await getDoc(docRef)
+  if (!docSnap.exists()) {
+    throw new Error(`no interaction found for this media, redo the command`)
+  }
+  return docSnap.data()
+}
