@@ -1,8 +1,4 @@
-import {
-  InteractionType,
-  InteractionResponseType,
-  verifyKey,
-} from "discord-interactions"
+import { InteractionType, InteractionResponseType } from "discord-interactions"
 import { doc, getDoc, setDoc } from "firebase/firestore"
 import {
   DiscordRequestProd,
@@ -11,13 +7,15 @@ import {
 } from "../../modules/utils.js"
 import { db } from "../../modules/firebase-db.js"
 
+const verifier = VerifyDiscordRequest(process.env.PUBLIC_KEY_MEDIA)
+
 exports.handler = async function (event, context) {
   if (!verifier(event)) {
     return {
       statusCode: 401,
     }
   }
-  // console.log(event)
+  console.log(event)
   const { type, guild_id, data, member, name } = JSON.parse(event.body)
   if (type === InteractionType.PING) {
     return {
