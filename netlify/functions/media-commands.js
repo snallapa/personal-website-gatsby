@@ -2,8 +2,8 @@ import { DiscordRequestMedia } from "../../modules/utils.js"
 import { handleEvent } from "../../modules/commands-creator.js"
 
 const TEST_COMMAND = {
-  name: "test_community",
-  description: "Basic guild command",
+  name: "test_media",
+  description: "test media command",
   type: 1,
 }
 

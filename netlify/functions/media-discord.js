@@ -32,6 +32,8 @@ exports.handler = async function (event, context) {
       return respond(
         `Type this URL carefully into your app (no spaces exactly as shown here): http://snallabot.herokuapp.com/${guild_id}`
       )
+    } else if (name === "test_media") {
+      return respond("bot is working! :)")
     }
   }
 }
