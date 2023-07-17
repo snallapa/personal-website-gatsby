@@ -80,6 +80,16 @@ export function respond(
   }
 }
 
+export function ackMessage(statusCode = 200) {
+  return {
+    statusCode: statusCode,
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      type: InteractionResponseType.DEFERRED_UPDATE_MESSAGE,
+    }),
+  }
+}
+
 export function respondNoMention(message) {
   return {
     statusCode: 200,

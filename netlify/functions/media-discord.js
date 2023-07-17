@@ -3,6 +3,7 @@ import { doc, getDoc, setDoc } from "firebase/firestore"
 import {
   DiscordRequestProd,
   respond,
+  ackMessage,
   VerifyDiscordRequest,
 } from "../../modules/utils.js"
 import { db, getMedia } from "../../modules/firebase-db.js"
@@ -133,7 +134,7 @@ exports.handler = async function (event, context) {
         },
         { merge: true }
       )
-      return respond("ok!")
+      return ackMessage
     } else if (custom_id === "choose_media") {
       const mediaId = values[0]
       await setDoc(
@@ -143,7 +144,7 @@ exports.handler = async function (event, context) {
         },
         { merge: true }
       )
-      return respond("ok!")
+      return ackMessage()
     } else if (custom_id === "generate_media") {
       const _ = await fetch(
         "https://nallapareddy.com/.netlify/functions/media-poster-background",
@@ -155,7 +156,10 @@ exports.handler = async function (event, context) {
           }),
         }
       )
-      return respond("generating media!")
+      return respond(
+        "generating media!",
+        (interactionType = InteractionResponseType.UPDATE_MESSAGE)
+      )
     }
     return respond(
       "we should not have gotten here... this command is broken contact owner"
