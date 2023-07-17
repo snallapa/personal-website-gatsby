@@ -5,7 +5,7 @@ import {
   respond,
   VerifyDiscordRequest,
 } from "../../modules/utils.js"
-import { db } from "../../modules/firebase-db.js"
+import { db, getMedia } from "../../modules/firebase-db.js"
 
 const verifier = VerifyDiscordRequest(process.env.PUBLIC_KEY_MEDIA)
 
@@ -32,6 +32,77 @@ exports.handler = async function (event, context) {
       )
     } else if (name === "test_media") {
       return respond("bot is working! :)")
+    } else if (name === "generate_media") {
+      let league
+      try {
+        league = await getMedia(guild_id)
+      } catch (e) {
+        return respond(e.message)
+      }
+      if (!league.schedules.reg || !league.schedules.reg[`week${week}`]) {
+        return respond(
+          `missing week ${week}. Please export the week in MCA (select ALL WEEKS in the app!)`
+        )
+      }
+      const weeksGames = league.schedules.reg[`week${week}`]
+      const teams = league.teams
+
+      return {
+        statusCode: 200,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+          data: {
+            content: "Customize your media generation!",
+            components: [
+              {
+                type: 1,
+                components: [
+                  {
+                    type: 3,
+                    custom_id: "choose_game",
+                    options: weeksGames.map((game) => {
+                      const gameName = `${teams[game.awayTeamId].teamName}-vs-${
+                        teams[game.homeTeamId].teamName
+                      }`
+                      return {
+                        label: gameName,
+                        value: game.scheduleId,
+                        description: "",
+                      }
+                    }),
+                    placeholder: "Choose the game you want to generate media",
+                  },
+                ],
+              },
+              {
+                type: 1,
+                components: [
+                  {
+                    type: 3,
+                    custom_id: "choose_media",
+                    options: [
+                      {
+                        label: "First Take with Stephen A Smith",
+                        value: "first_take",
+                        description:
+                          "Generates a sports article in Stephen A Smith voice",
+                      },
+                      {
+                        label: "FS1 with Skip and Shannon",
+                        value: "fs",
+                        description:
+                          "Generates a sports article between Skip and Shannon from FS1",
+                      },
+                    ],
+                    placeholder: "Choose the media you want to generate",
+                  },
+                ],
+              },
+            ],
+          },
+        }),
+      }
     }
   }
 }

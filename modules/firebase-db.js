@@ -27,3 +27,14 @@ export async function getLeague(guild_id) {
   }
   return docSnap.data()
 }
+
+export async function getMedia(guild_id) {
+  const docRef = doc(db, "media", guild_id)
+  const docSnap = await getDoc(docRef)
+  if (!docSnap.exists()) {
+    throw new Error(
+      `no league found for ${guild_id}, export in MCA using media_export first`
+    )
+  }
+  return docSnap.data()
+}

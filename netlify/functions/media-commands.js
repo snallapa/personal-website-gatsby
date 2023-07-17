@@ -26,7 +26,14 @@ const GENERATE_COMMAND = {
   name: "generate_media",
   description: "start the media generation process",
   type: 1,
-  options: [],
+  options: [
+    {
+      type: 4, // integer
+      name: "week",
+      description: "The week number to generate media for",
+      required: true,
+    },
+  ],
 }
 
 const EXPORT_COMMAND = {
