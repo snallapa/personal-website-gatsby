@@ -29,7 +29,19 @@ const GENERATE_COMMAND = {
   options: [],
 }
 
-const COMMANDS = [TEST_COMMAND, CONFIGURE_COMMAND, GENERATE_COMMAND]
+const EXPORT_COMMAND = {
+  name: "media_export",
+  description: "The URL to enter into MCA for media bot to use",
+  type: 1,
+  options: [],
+}
+
+const COMMANDS = [
+  TEST_COMMAND,
+  CONFIGURE_COMMAND,
+  GENERATE_COMMAND,
+  EXPORT_COMMAND,
+]
 
 exports.handler = async function (event, context) {
   const res = await handleEvent(
