@@ -54,7 +54,7 @@ exports.handler = async function (event, context) {
         body: JSON.stringify({
           type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
           data: {
-            content: "Customize your media generation!",
+            content: `Customize your media generation for week ${week}`,
             components: [
               {
                 type: 1,
