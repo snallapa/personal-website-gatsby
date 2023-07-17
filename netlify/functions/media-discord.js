@@ -135,7 +135,7 @@ exports.handler = async function (event, context) {
         },
         { merge: true }
       )
-      return ackMessage
+      return ackMessage()
     } else if (custom_id === "choose_media") {
       const mediaId = values[0]
       await setDoc(
