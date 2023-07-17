@@ -1,5 +1,5 @@
 import fetch from "node-fetch"
-import { InteractionResponseType } from "discord-interactions"
+import { InteractionResponseType, verifyKey } from "discord-interactions"
 
 export async function DiscordRequest(
   endpoint,
