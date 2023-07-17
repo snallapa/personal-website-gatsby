@@ -39,12 +39,12 @@ exports.handler = async function (event, context) {
       } catch (e) {
         return respond(e.message)
       }
+      const week = options[0].value
       if (!league.schedules.reg || !league.schedules.reg[`week${week}`]) {
         return respond(
           `missing week ${week}. Please export the week in MCA (select ALL WEEKS in the app!)`
         )
       }
-      const week = options[0].value
       const weeksGames = league.schedules.reg[`week${week}`]
       const teams = league.teams
 
