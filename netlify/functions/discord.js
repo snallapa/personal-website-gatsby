@@ -8,24 +8,11 @@ import {
   DiscordRequestProd,
   respond,
   respondNoMention,
+  VerifyDiscordRequest,
 } from "../../modules/utils.js"
 import { gameChannelHandler } from "../../modules/game-channels.js"
 import { findTeam, createTeamsMessage } from "../../modules/teams.js"
 import { db } from "../../modules/firebase-db.js"
-
-function VerifyDiscordRequest(clientKey) {
-  return function (event) {
-    const signature = event.headers["x-signature-ed25519"]
-    const timestamp = event.headers["x-signature-timestamp"]
-    const isValidRequest = verifyKey(
-      event.body,
-      signature,
-      timestamp,
-      clientKey
-    )
-    return isValidRequest
-  }
-}
 
 const verifier = VerifyDiscordRequest(process.env.PUBLIC_KEY)
 

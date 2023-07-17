@@ -54,6 +54,15 @@ export async function DiscordRequestCommunity(endpoint, options, maxTries = 5) {
   )
 }
 
+export async function DiscordRequestMedia(endpoint, options, maxTries = 5) {
+  return DiscordRequest(
+    endpoint,
+    options,
+    (token = process.env.DISCORD_TOKEN_MEDIA),
+    (maxTries = maxTries)
+  )
+}
+
 export function respond(
   message,
   statusCode = 200,
@@ -84,5 +93,19 @@ export function respondNoMention(message) {
         },
       },
     }),
+  }
+}
+
+export function VerifyDiscordRequest(clientKey) {
+  return function (event) {
+    const signature = event.headers["x-signature-ed25519"]
+    const timestamp = event.headers["x-signature-timestamp"]
+    const isValidRequest = verifyKey(
+      event.body,
+      signature,
+      timestamp,
+      clientKey
+    )
+    return isValidRequest
   }
 }
