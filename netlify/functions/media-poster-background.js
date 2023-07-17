@@ -8,7 +8,7 @@ exports.handler = async function (event, context) {
   const { guild_id, interaction_id } = JSON.parse(event.body)
   let request
   try {
-    request = getMediaInteraction(interaction_id)
+    request = await getMediaInteraction(interaction_id)
   } catch (e) {
     console.error(e)
   }
