@@ -1,4 +1,5 @@
 import { DiscordRequestMedia } from "../../modules/utils.js"
+import { handleEvent } from "../../modules/commands-creator.js"
 
 const TEST_COMMAND = {
   name: "test_community",
