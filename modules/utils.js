@@ -82,7 +82,7 @@ export function respond(
 
 export function updateMessage(message) {
   return {
-    statusCode: statusCode,
+    statusCode: 200,
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       type: InteractionResponseType.UPDATE_MESSAGE,
