@@ -100,10 +100,27 @@ exports.handler = async function (event, context) {
                   },
                 ],
               },
+              {
+                type: 1,
+                components: [
+                  {
+                    type: 2,
+                    label: "Generate",
+                    style: 1,
+                    custom_id: "generate_media",
+                  },
+                ],
+              },
             ],
           },
         }),
       }
+    }
+  } else if (type === InteractionType.MESSAGE_COMPONENT) {
+    console.log(event)
+    return {
+      statusCode: 200,
+      body: JSON.stringify({ type: InteractionResponseType.PONG }),
     }
   }
 }
