@@ -144,7 +144,7 @@ exports.handler = async function (event, context) {
   await DiscordRequestMedia(`channels/${channel}/messages`, {
     method: "POST",
     body: {
-      content: generatedMessage,
+      content: generatedMessage.content,
       allowed_mentions: {
         parse: [],
       },
