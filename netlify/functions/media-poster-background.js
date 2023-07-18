@@ -16,7 +16,7 @@ function findWeekAndGame(weeks, scheduleId) {
   for (const weekNum of weekNums) {
     const week = weeks[weekNum]
     const game = week.filter((g) => {
-      return g.scheduleId == scheduleId
+      return g.scheduleId === scheduleId
     })
     console.log(game)
     if (game.length === 1) {
@@ -103,7 +103,7 @@ exports.handler = async function (event, context) {
   const { scheduleId, mediaId } = request
   const weeks = league.schedules.reg
 
-  const { weekNum, game } = findWeekAndGame(weeks, scheduleId)
+  const { weekNum, game } = findWeekAndGame(weeks, Number(scheduleId))
   const { awayScore, homeScore, awayTeamId, homeTeamId } = game
   const homeTeamStats = league.stats.reg[weekNum]["team-stats"][homeTeamId]
   const awayTeamStats = league.stats.reg[weekNum]["team-stats"][awayTeamId]
