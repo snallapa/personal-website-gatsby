@@ -127,7 +127,7 @@ exports.handler = async function (event, context) {
       ? "Stephen A Smith"
       : "Skip Bayless and Shannon Sharpe"
   const completion = await openai.createChatCompletion({
-    model: "gpt-3.5-turbo",
+    model: "gpt-3.5-turbo-16k",
     messages: [
       {
         role: "system",
