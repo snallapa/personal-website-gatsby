@@ -15,10 +15,9 @@ function findWeekAndGame(weeks, scheduleId) {
   const weekNums = Object.keys(weeks)
   for (const weekNum of weekNums) {
     const week = weeks[weekNum]
-    const game = week.find((g) => g.scheduleId === scheduleId)
-    console.log(game)
-    if (game) {
-      return { weekNum, game }
+    const game = week.filter((g) => g.scheduleId === scheduleId)
+    if (game.length === 1) {
+      return { weekNum, game: game[0] }
     }
   }
   throw new Error(`could not find ${scheduleId} in ${weeks}`)
