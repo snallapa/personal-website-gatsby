@@ -87,7 +87,7 @@ function formatStats(teamStats, playerStats, roster, teamName) {
       ;`${statKeyMapping[tStatName]}: ${tStats[tStatName]}`
     })
     .join("\n")
-  return `${teamName} Stats\n${teamStatsMessage}\n${teamName} Player Stats\n${plaerMessage}`
+  return `${teamName} Stats\n${teamStatsMessage}\n${teamName} Player Stats\n${playerMessage}`
 }
 
 exports.handler = async function (event, context) {
