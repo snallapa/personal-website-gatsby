@@ -15,7 +15,7 @@ function findWeekAndGame(weeks, scheduleId) {
   const weekNums = Object.keys(weeks)
   for (const weekNum of weekNums) {
     const week = weeks[weekNum]
-    const game = week.fnd((g) => g.scheduleId === scheduleId)
+    const game = week.find((g) => g.scheduleId === scheduleId)
     if (game) {
       return { weekNum, game: game[0] }
     }
