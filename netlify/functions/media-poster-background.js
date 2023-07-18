@@ -72,19 +72,17 @@ function formatStats(teamStats, playerStats, roster, teamName) {
       const { name } = roster[p.rosterId]
       let statString = Object.keys(pStats)
         .filter((statName) => pStats[statName] != 0 && statKeyMapping[statName])
-        .map((statName) => `${statKeyMapping[statName]}: ${pStats[statName]}`)
+        .map((statName) => `${pStats[statName]} ${statKeyMapping[statName]}`)
         .join(",")
       if (pStats.passComp) {
-        statString = `${pStats.passComp}/${pStats.passAtt},${statString}`
+        statString = `${pStats.passComp}/${pStats.passAtt} CP/ATT ,${statString}`
       }
       return `${name}: ${statString}`
     })
     .join("\n")
   const teamStatsMessage = Object.keys(tStats)
     .filter((tStatName) => statKeyMapping[tStatName])
-    .map((tStatName) => {
-      ;`${statKeyMapping[tStatName]}: ${tStats[tStatName]}`
-    })
+    .map((tStatName) => `${statKeyMapping[tStatName]}: ${tStats[tStatName]}`)
     .join("\n")
   return `${teamName} Stats\n${teamStatsMessage}\n${teamName} Player Stats\n${playerMessage}`
 }
