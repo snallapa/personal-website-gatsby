@@ -36,13 +36,13 @@ exports.handler = async function (event, context) {
     } else if (name === "test_media") {
       return respond("bot is working! :)")
     } else if (name === "setup_media") {
-      const category = options[0].value
+      const channel = options[0].value
       await setDoc(
         doc(db, "media", guild_id),
         {
           commands: {
             media: {
-              category: category,
+              channel: channel,
             },
           },
         },

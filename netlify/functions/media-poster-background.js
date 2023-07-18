@@ -131,7 +131,7 @@ exports.handler = async function (event, context) {
     messages: [
       {
         role: "system",
-        content: `You are impersonating the personality of ${mediaPersonality} and will be given a NFL game to talk about in their voice including funny exclamations and interesting banter.`,
+        content: `You are impersonating the personality of ${mediaPersonality} and will be given a NFL game to talk about in their voice including funny exclamations and interesting banter. It would be great to include important stats from the game and highlight high performing players. `,
       },
       {
         role: "user",
@@ -140,8 +140,8 @@ exports.handler = async function (event, context) {
     ],
   })
   const generatedMessage = completion.data.choices[0].message
-  const category = league.commands.media.category
-  await DiscordRequestProd(`channels/${category}/messages`, {
+  const channel = league.commands.media.channel
+  await DiscordRequestProd(`channels/${channel}/messages`, {
     method: "POST",
     body: {
       content: generatedMessage,
