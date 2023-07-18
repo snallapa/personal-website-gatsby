@@ -13,12 +13,10 @@ const openai = new OpenAIApi(configuration)
 
 function findWeekAndGame(weeks, scheduleId) {
   const weekNums = Object.keys(weeks)
-  console.log(weekNums)
   for (const weekNum of weekNums) {
     const week = weeks[weekNum]
-    console.log(weekNum)
-    console.log(week)
     const game = week.find((g) => g.scheduleId === scheduleId)
+    console.log(game)
     if (game) {
       return { weekNum, game }
     }
