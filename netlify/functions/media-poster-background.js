@@ -17,7 +17,7 @@ function findWeekAndGame(weeks, scheduleId) {
     const week = weeks[weekNum]
     const game = week.find((g) => g.scheduleId === scheduleId)
     if (game) {
-      return { weekNum, game: game[0] }
+      return { weekNum, game }
     }
   }
   throw new Error(`could not find ${scheduleId} in ${weeks}`)
