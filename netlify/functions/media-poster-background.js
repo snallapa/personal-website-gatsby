@@ -155,7 +155,7 @@ exports.handler = async function (event, context) {
   // })
   // const generatedMessage = completion.data.choices[0].message
   console.log(homeTeamMessage)
-  console.log(awayTeamMesage)
+  console.log(awayTeamMessage)
   const generatedMessage = ""
   const channel = league.commands.media.channel
   const title = [
