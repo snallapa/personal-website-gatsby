@@ -85,9 +85,9 @@ exports.handler = async function (event, context) {
                     type: 3,
                     custom_id: "choose_game",
                     options: weeksGames.map((game) => {
-                      const gameName = `${teams[game.awayTeamId].teamName}-vs-${
-                        teams[game.homeTeamId].teamName
-                      }`
+                      const gameName = `${teams[game.awayTeamId].teamName} ${
+                        game.awayScore
+                      } vs ${game.homeScore} ${teams[game.homeTeamId].teamName}`
                       return {
                         label: gameName,
                         value: game.scheduleId,
