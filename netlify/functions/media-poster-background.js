@@ -29,8 +29,8 @@ function getTeamPlayerStats(league, weekNum, teamId) {
   return Object.keys(playerStats)
     .map((rosterId) => {
       const stats = playerStats[rosterId].stats
-      const team = playerStats[rosterId].teamId
-      return { rosterId, stats, team }
+      const teamId = playerStats[rosterId].teamId
+      return { rosterId, stats, teamId }
     })
     .filter((r) => r.teamId === teamId)
 }
