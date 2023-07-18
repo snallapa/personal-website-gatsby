@@ -25,9 +25,12 @@ function findWeekAndGame(weeks, scheduleId) {
 
 function getTeamPlayerStats(league, weekNum, teamId) {
   const playerStats = league.stats.reg[weekNum]["player-stats"]
+  console.log(playerStats)
   return Object.keys(playerStats)
     .map((rosterId) => {
-      rosterId, playerStats[rosterId].stats, playerStats[rosterId].teamId
+      const stats = playerStats[rosterId].stats
+      const team = playerStats[rosterId].teamId
+      return { rosterId, stats, team }
     })
     .filter((r) => r.teamId === teamId)
 }
