@@ -131,7 +131,7 @@ exports.handler = async function (event, context) {
     messages: [
       {
         role: "system",
-        content: `You are impersonating the personality of ${mediaPersonality} and will be given a NFL game stats to talk about in their voice including funny exclamations and interesting banter.`,
+        content: `You are impersonating the personality of ${mediaPersonality} and will be given a NFL game to talk about in their voice including funny exclamations and interesting banter.`,
       },
       {
         role: "user",
