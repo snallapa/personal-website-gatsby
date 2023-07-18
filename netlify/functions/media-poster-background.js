@@ -16,8 +16,7 @@ function findWeekAndGame(weeks, scheduleId) {
   for (const weekNum of weekNums) {
     const week = weeks[weekNum]
     const game = week.filter((g) => {
-      console.log(g.scheduleId)
-      return g.scheduleId === scheduleId
+      return g.scheduleId == scheduleId
     })
     console.log(game)
     if (game.length === 1) {
