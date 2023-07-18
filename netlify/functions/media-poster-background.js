@@ -1,6 +1,6 @@
 import { initializeApp } from "firebase/app"
 
-import { DiscordRequestCommunity } from "../../modules/utils.js"
+import { DiscordRequestMedia } from "../../modules/utils.js"
 import { getMediaInteraction, getMedia } from "../../modules/firebase-db.js"
 import fetch from "node-fetch"
 import { Configuration, OpenAIApi } from "openai"
@@ -122,6 +122,32 @@ exports.handler = async function (event, context) {
     awayTeamRoster,
     awayTeamName
   )
-  console.log(homeTeamMessage)
-  console.log(awayTeamMessage)
+  const mediaPersonality =
+    mediaId === "first_take"
+      ? "Stephen A Smith"
+      : "Skip Bayless and Shannon Sharpe"
+  const completion = await openai.createChatCompletion({
+    model: "gpt-3.5-turbo",
+    messages: [
+      {
+        role: "system",
+        content: `You are impersonating the personality of ${mediaPersonality} and will be given a NFL game stats to talk about in their voice including funny exclamations and interesting banter.`,
+      },
+      {
+        role: "user",
+        content: `In less than 1500 characters, talk about this NFL game between the ${awayTeamName} and ${homeTeamName}. The score was ${awayTeamName} ${awayScore} - ${homeScore} ${homeTeamName}. Here are the stats for the game:\n${homeTeamMessage}\n${awayTeamMessage}`,
+      },
+    ],
+  })
+  const generatedMessage = completion.data.choices[0].message
+  const category = league.commands.media.category
+  await DiscordRequestProd(`channels/${category}/messages`, {
+    method: "POST",
+    body: {
+      content: generatedMessage,
+      allowed_mentions: {
+        parse: [],
+      },
+    },
+  })
 }

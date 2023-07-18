@@ -35,12 +35,31 @@ exports.handler = async function (event, context) {
       )
     } else if (name === "test_media") {
       return respond("bot is working! :)")
+    } else if (name === "setup_media") {
+      const category = options[0].value
+      await setDoc(
+        doc(db, "media", guild_id),
+        {
+          commands: {
+            media: {
+              category: category,
+            },
+          },
+        },
+        { merge: true }
+      )
+      return respond("configured! generate media command is ready for use")
     } else if (name === "generate_media") {
       let league
       try {
         league = await getMedia(guild_id)
       } catch (e) {
         return respond(e.message)
+      }
+      try {
+        const category = league.commands.media.category
+      } catch (e) {
+        return respond("run /setup_media first to set category")
       }
       const week = options[0].value
       if (!league.schedules.reg || !league.schedules.reg[`week${week}`]) {
