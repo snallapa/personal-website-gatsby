@@ -27,9 +27,7 @@ function getTeamPlayerStats(league, weekNum, teamId) {
   const playerStats = league.stats.reg[weekNum]["player-stats"]
   return Object.keys(playerStats)
     .map((rosterId) => {
-      const stats = playerStats[rosterId].stats
-      const teamId = playerStats[rosterId].teamId
-      return { rosterId, stats, teamId }
+      return { rosterId, ...playerStats[rosterId] }
     })
     .filter((r) => r.teamId === teamId)
 }
@@ -67,9 +65,16 @@ const statKeyMapping = {
 function formatStats(teamStats, playerStats, roster, teamName) {
   const tStats = JSON.parse(teamStats)
   const playerMessage = playerStats
+    .flatMap((p) => {
+      return Object.keys(p)
+        .filter((k) => k.startsWith("stats"))
+        .map((k) => {
+          return { ...p, stats: p[k] }
+        })
+    })
     .map((p) => {
       const pStats = JSON.parse(p.stats)
-      const { name } = roster[p.rosterId]
+      const { name, position } = roster[p.rosterId]
       let statString = Object.keys(pStats)
         .filter((statName) => pStats[statName] != 0 && statKeyMapping[statName])
         .map((statName) => `${pStats[statName]} ${statKeyMapping[statName]}`)
@@ -77,7 +82,7 @@ function formatStats(teamStats, playerStats, roster, teamName) {
       if (pStats.passComp) {
         statString = `${pStats.passComp}/${pStats.passAtt} CP/ATT ,${statString}`
       }
-      return `${name}: ${statString}`
+      return `${position} ${name}: ${statString}`
     })
     .join("\n")
   const teamStatsMessage = Object.keys(tStats)
@@ -154,9 +159,7 @@ exports.handler = async function (event, context) {
   //   ],
   // })
   // const generatedMessage = completion.data.choices[0].message
-  console.log(homeTeamMessage)
-  console.log(awayTeamMessage)
-  const generatedMessage = ""
+  const generatedMessage = [awayTeamMessage, homeTeamMesssage]
   const channel = league.commands.media.channel
   const title = [
     `**__What ${mediaPersonality} had to say about the ${awayTeamName} and ${homeTeamName} game__**`,
