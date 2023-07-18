@@ -141,7 +141,7 @@ exports.handler = async function (event, context) {
   })
   const generatedMessage = completion.data.choices[0].message
   const channel = league.commands.media.channel
-  await DiscordRequestProd(`channels/${channel}/messages`, {
+  await DiscordRequestMedia(`channels/${channel}/messages`, {
     method: "POST",
     body: {
       content: generatedMessage,
