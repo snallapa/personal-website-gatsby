@@ -87,6 +87,20 @@ function formatStats(teamStats, playerStats, roster, teamName) {
   return `${teamName} Stats\n${teamStatsMessage}\n${teamName} Player Stats\n${playerMessage}`
 }
 
+function splitter(str, l) {
+  var strs = []
+  while (str.length > l) {
+    var pos = str.substring(0, l).lastIndexOf(" ")
+    pos = pos <= 0 ? l : pos
+    strs.push(str.substring(0, pos))
+    var i = str.indexOf(" ", pos) + 1
+    if (i < pos || i > pos + l) i = pos
+    str = str.substring(i)
+  }
+  strs.push(str)
+  return strs
+}
+
 exports.handler = async function (event, context) {
   // console.log(event)
   const { guild_id, interaction_id, message_id } = JSON.parse(event.body)
@@ -141,13 +155,16 @@ exports.handler = async function (event, context) {
   })
   const generatedMessage = completion.data.choices[0].message
   const channel = league.commands.media.channel
-  await DiscordRequestMedia(`channels/${channel}/messages`, {
-    method: "POST",
-    body: {
-      content: generatedMessage.content,
-      allowed_mentions: {
-        parse: [],
+  const splitMessage = splitter(generatedMessage.content, 1000)
+  for (const partMessage of splitMessage) {
+    await DiscordRequestMedia(`channels/${channel}/messages`, {
+      method: "POST",
+      body: {
+        content: partMessage,
+        allowed_mentions: {
+          parse: [],
+        },
       },
-    },
-  })
+    })
+  }
 }
