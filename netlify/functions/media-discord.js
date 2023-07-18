@@ -178,7 +178,7 @@ exports.handler = async function (event, context) {
           }),
         }
       )
-      return updateMessage("generating media!")
+      return updateMessage("generating media... might take a moment")
     }
     return respond(
       "we should not have gotten here... this command is broken contact owner"

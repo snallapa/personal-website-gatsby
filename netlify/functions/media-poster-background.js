@@ -140,22 +140,28 @@ exports.handler = async function (event, context) {
     mediaId === "first_take"
       ? "Stephen A Smith"
       : "Skip Bayless and Shannon Sharpe"
-  const completion = await openai.createChatCompletion({
-    model: "gpt-3.5-turbo-16k",
-    messages: [
-      {
-        role: "system",
-        content: `You are impersonating the personality of ${mediaPersonality} and will be given a NFL game to talk about in their voice including funny exclamations and interesting banter. It would be great to include important stats from the game and highlight high performing players. `,
-      },
-      {
-        role: "user",
-        content: `In less than 1500 characters, talk about this NFL game between the ${awayTeamName} and ${homeTeamName}. The score was ${awayTeamName} ${awayScore} - ${homeScore} ${homeTeamName}. Here are the stats for the game:\n${homeTeamMessage}\n${awayTeamMessage}`,
-      },
-    ],
-  })
-  const generatedMessage = completion.data.choices[0].message
+  // const completion = await openai.createChatCompletion({
+  //   model: "gpt-3.5-turbo-16k",
+  //   messages: [
+  //     {
+  //       role: "system",
+  //       content: `You are impersonating the personality of ${mediaPersonality} and will be given a NFL game to talk about in their voice including funny exclamations and interesting banter. It would be great to include important stats from the game and highlight high performing players. `,
+  //     },
+  //     {
+  //       role: "user",
+  //       content: `In less than 1500 characters, talk about this NFL game between the ${awayTeamName} and ${homeTeamName}. The score was ${awayTeamName} ${awayScore} - ${homeScore} ${homeTeamName}. Here are the stats for the game:\n${homeTeamMessage}\n${awayTeamMessage}`,
+  //     },
+  //   ],
+  // })
+  // const generatedMessage = completion.data.choices[0].message
+  console.log(homeTeamMessage)
+  console.log(awayTeamMesage)
+  const generatedMessage = ""
   const channel = league.commands.media.channel
-  const splitMessage = splitter(generatedMessage.content, 1000)
+  const title = [
+    `**__What ${mediaPersonality} had to say about the ${awayTeamName} and ${homeTeamName} game__**`,
+  ]
+  const splitMessage = title.concat(splitter(generatedMessage.content, 1000))
   for (const partMessage of splitMessage) {
     await DiscordRequestMedia(`channels/${channel}/messages`, {
       method: "POST",
