@@ -15,18 +15,15 @@ function findWeekAndGame(weeks, scheduleId) {
   const weekNums = Object.keys(weeks)
   for (const weekNum of weekNums) {
     const week = weeks[weekNum]
-    const game = week.filter((g) => {
-      return g.scheduleId === scheduleId
-    })
-    console.log(game)
-    if (game.length === 1) {
+    const game = week.fnd((g) => g.scheduleId === scheduleId)
+    if (game) {
       return { weekNum, game: game[0] }
     }
   }
   throw new Error(`could not find ${scheduleId} in ${weeks}`)
 }
 
-function getTeamPlayerStats(league, teamId) {
+function getTeamPlayerStats(league, weekNum, teamId) {
   const playerStats = league.stats.reg[weekNum]["player-stats"]
   return Object.keys(playerStats)
     .map((rosterId) => {
@@ -107,8 +104,8 @@ exports.handler = async function (event, context) {
   const { awayScore, homeScore, awayTeamId, homeTeamId } = game
   const homeTeamStats = league.stats.reg[weekNum]["team-stats"][homeTeamId]
   const awayTeamStats = league.stats.reg[weekNum]["team-stats"][awayTeamId]
-  const homeTeamPlayerStats = getTeamPlayerStats(league, homeTeamId)
-  const awayTeamPlayerStats = getTeamPlayerStats(league, awayTeamId)
+  const homeTeamPlayerStats = getTeamPlayerStats(league, weekNum, homeTeamId)
+  const awayTeamPlayerStats = getTeamPlayerStats(league, weekNum, awayTeamId)
   const { teamName: homeTeamName, roster: homeTeamRoster } =
     league.teams[homeTeamId]
   const { teamName: awayTeamName, roster: awayTeamRoster } =
