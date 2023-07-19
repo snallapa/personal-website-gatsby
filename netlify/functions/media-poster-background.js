@@ -1,7 +1,9 @@
-import { initializeApp } from "firebase/app"
-
 import { DiscordRequestMedia } from "../../modules/utils.js"
-import { getMediaInteraction, getMedia } from "../../modules/firebase-db.js"
+import {
+  getMediaInteraction,
+  getMedia,
+  deleteMediaInteraction,
+} from "../../modules/firebase-db.js"
 import fetch from "node-fetch"
 import { Configuration, OpenAIApi } from "openai"
 
@@ -78,7 +80,7 @@ function formatStats(teamStats, playerStats, roster, teamName) {
       let statString = Object.keys(pStats)
         .filter((statName) => pStats[statName] != 0 && statKeyMapping[statName])
         .map((statName) => `${pStats[statName]} ${statKeyMapping[statName]}`)
-        .join(",")
+        .join(", ")
       if (pStats.passComp) {
         statString = `${pStats.passComp}/${pStats.passAtt} CP/ATT, ${statString}`
       }
@@ -149,27 +151,25 @@ exports.handler = async function (event, context) {
     mediaId === "first_take"
       ? "Stephen A Smith"
       : "Skip Bayless and Shannon Sharpe"
-  // const completion = await openai.createChatCompletion({
-  //   model: "gpt-3.5-turbo-16k",
-  //   messages: [
-  //     {
-  //       role: "system",
-  //       content: `You are impersonating the personality of ${mediaPersonality} and will be given a NFL game to talk about in their voice including funny exclamations and interesting banter. It would be great to include important stats from the game and highlight high performing players. `,
-  //     },
-  //     {
-  //       role: "user",
-  //       content: `In less than 1500 characters, talk about this NFL game between the ${awayTeamName} and ${homeTeamName}. The score was ${awayTeamName} ${awayScore} - ${homeScore} ${homeTeamName}. Here are the stats for the game:\n${homeTeamMessage}\n${awayTeamMessage}`,
-  //     },
-  //   ],
-  // })
-  // const generatedMessage = completion.data.choices[0].message
-  const generatedMessage = [awayTeamMessage, homeTeamMessage]
+  const completion = await openai.createChatCompletion({
+    model: "gpt-3.5-turbo-16k",
+    messages: [
+      {
+        role: "system",
+        content: `You are impersonating the personality of ${mediaPersonality} and will be given a NFL game to talk about in their voice including funny exclamations and interesting banter. It would be great to include important stats from the game and highlight high performing players. `,
+      },
+      {
+        role: "user",
+        content: `In less than 1500 characters, talk about this NFL game between the ${awayTeamName} and ${homeTeamName}. The score was ${awayTeamName} ${awayScore} - ${homeScore} ${homeTeamName}. Here are the stats for the game:\n${homeTeamMessage}\n${awayTeamMessage}`,
+      },
+    ],
+  })
+  const generatedMessage = completion.data.choices[0].message
   const channel = league.commands.media.channel
   const title = [
     `**__What ${mediaPersonality} had to say about the ${awayTeamName} and ${homeTeamName} game__**`,
   ]
-  // const splitMessage = title.concat(splitter(generatedMessage.content, 1000))
-  const splitMessage = title.concat(generatedMessage)
+  const splitMessage = title.concat(splitter(generatedMessage.content, 1000))
   for (const partMessage of splitMessage) {
     await DiscordRequestMedia(`channels/${channel}/messages`, {
       method: "POST",
@@ -181,4 +181,5 @@ exports.handler = async function (event, context) {
       },
     })
   }
+  await deleteMediaInteraction(interaction_id)
 }

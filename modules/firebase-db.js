@@ -1,6 +1,6 @@
 import { initializeApp } from "firebase/app"
 import { getFirestore } from "firebase/firestore"
-import { doc, getDoc } from "firebase/firestore"
+import { doc, getDoc, deleteDoc } from "firebase/firestore"
 
 const firebaseConfig = {
   apiKey: "AIzaSyDf9ZiTBWf-sWY007WsKktMPewcrs07CWw",
@@ -46,4 +46,9 @@ export async function getMediaInteraction(interaction_id) {
     throw new Error(`no interaction found for this media, redo the command`)
   }
   return docSnap.data()
+}
+
+export async function deleteMediaInteraction(interaction_id) {
+  const docRef = doc(db, "media_interactions", interaction_id)
+  const docSnap = await deleteDoc(docRef)
 }
