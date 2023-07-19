@@ -38,11 +38,11 @@ const statKeyMapping = {
   defSacks: "SACK",
   defTotalTackles: "TACKLES",
   recCatches: "REC",
-  recTDs: "TD",
-  recYds: "YDS",
+  recTDs: "Rec TD",
+  recYds: "Rec YDS",
   rushFum: "FUM LOST",
-  rushTDs: "TD",
-  rushYds: "YDS",
+  rushTDs: "Rush TD",
+  rushYds: "Rush YDS",
   fgMade: "FG MADE",
   fgAtt: "FG ATT",
   passYds: "YDS",
@@ -82,7 +82,11 @@ function formatStats(teamStats, playerStats, roster, teamName) {
       if (pStats.passComp) {
         statString = `${pStats.passComp}/${pStats.passAtt} CP/ATT ,${statString}`
       }
-      return `${position} ${name}: ${statString}`
+      if (statString) {
+        return `${position} ${name}: ${statString}`
+      } else {
+        return ""
+      }
     })
     .join("\n")
   const teamStatsMessage = Object.keys(tStats)
