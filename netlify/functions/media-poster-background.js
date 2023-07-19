@@ -168,7 +168,8 @@ exports.handler = async function (event, context) {
   const title = [
     `**__What ${mediaPersonality} had to say about the ${awayTeamName} and ${homeTeamName} game__**`,
   ]
-  const splitMessage = title.concat(splitter(generatedMessage.content, 1000))
+  // const splitMessage = title.concat(splitter(generatedMessage.content, 1000))
+  const splitMessage = title.concat(generatedMessage)
   for (const partMessage of splitMessage) {
     await DiscordRequestMedia(`channels/${channel}/messages`, {
       method: "POST",
