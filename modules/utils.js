@@ -133,3 +133,9 @@ export function VerifyDiscordRequest(clientKey) {
     return isValidRequest
   }
 }
+
+export function hoursSince(lastTime) {
+  const now = new Date()
+  const last = new Date(lastTime)
+  return (now - last) / 36e5
+}

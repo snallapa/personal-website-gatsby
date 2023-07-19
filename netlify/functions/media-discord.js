@@ -6,6 +6,7 @@ import {
   ackMessage,
   updateMessage,
   VerifyDiscordRequest,
+  hoursSince,
 } from "../../modules/utils.js"
 import { db, getMedia } from "../../modules/firebase-db.js"
 
@@ -17,7 +18,6 @@ exports.handler = async function (event, context) {
       statusCode: 401,
     }
   }
-  console.log(event)
   const discordEvent = JSON.parse(event.body)
   const { type, guild_id, data, member, name } = discordEvent
   if (type === InteractionType.PING) {
@@ -61,6 +61,17 @@ exports.handler = async function (event, context) {
       } catch (e) {
         return respond("run /setup_media first to set category")
       }
+      const lastGeneratedTime = league.commands?.media?.lastGeneratedTime
+
+      if (lastGeneratedTime) {
+        const hours = hoursSince(lastGeneratedTime)
+        const limit = Number(process.env.MEDIA_LIMIT) || 1
+        if (hours <= limit) {
+          return respond(
+            "due to ChatGPT limits, I can only run this command once every"
+          )
+        }
+      }
       const week = options[0].value
       if (!league.schedules.reg || !league.schedules.reg[`week${week}`]) {
         return respond(
@@ -69,7 +80,17 @@ exports.handler = async function (event, context) {
       }
       const weeksGames = league.schedules.reg[`week${week}`]
       const teams = league.teams
-
+      await setDoc(
+        doc(db, "media", guild_id),
+        {
+          commands: {
+            media: {
+              lastGeneratedTime: new Date().getTime(),
+            },
+          },
+        },
+        { merge: true }
+      )
       return {
         statusCode: 200,
         headers: { "Content-Type": "application/json" },
