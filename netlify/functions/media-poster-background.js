@@ -45,7 +45,7 @@ const statKeyMapping = {
   rushYds: "Rush YDS",
   fgMade: "FG MADE",
   fgAtt: "FG ATT",
-  passYds: "YDS",
+  passYds: "Passing YDS",
   passTDs: "TD",
   passInts: "INT",
   defFumRec: "Fumbles Recovered",
