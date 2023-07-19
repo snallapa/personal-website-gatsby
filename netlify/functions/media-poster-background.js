@@ -1,5 +1,6 @@
 import { DiscordRequestMedia } from "../../modules/utils.js"
 import {
+  db,
   getMediaInteraction,
   getMedia,
   deleteMediaInteraction,
