@@ -4,6 +4,7 @@ import {
   getMedia,
   deleteMediaInteraction,
 } from "../../modules/firebase-db.js"
+import { doc, setDoc } from "firebase/firestore"
 import fetch from "node-fetch"
 import { Configuration, OpenAIApi } from "openai"
 
@@ -182,4 +183,15 @@ exports.handler = async function (event, context) {
     })
   }
   await deleteMediaInteraction(interaction_id)
+  await setDoc(
+    doc(db, "media", guild_id),
+    {
+      commands: {
+        media: {
+          lastGeneratedTime: new Date().getTime(),
+        },
+      },
+    },
+    { merge: true }
+  )
 }

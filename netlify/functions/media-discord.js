@@ -84,17 +84,6 @@ exports.handler = async function (event, context) {
       }
       const weeksGames = league.schedules.reg[`week${week}`]
       const teams = league.teams
-      await setDoc(
-        doc(db, "media", guild_id),
-        {
-          commands: {
-            media: {
-              lastGeneratedTime: new Date().getTime(),
-            },
-          },
-        },
-        { merge: true }
-      )
       return {
         statusCode: 200,
         headers: { "Content-Type": "application/json" },
