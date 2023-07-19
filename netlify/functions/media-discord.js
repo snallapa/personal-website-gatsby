@@ -8,7 +8,11 @@ import {
   VerifyDiscordRequest,
   hoursSince,
 } from "../../modules/utils.js"
-import { db, getMedia } from "../../modules/firebase-db.js"
+import {
+  db,
+  getMedia,
+  deleteMediaInteraction,
+} from "../../modules/firebase-db.js"
 
 const verifier = VerifyDiscordRequest(process.env.PUBLIC_KEY_MEDIA)
 
@@ -152,6 +156,12 @@ exports.handler = async function (event, context) {
                     style: 1,
                     custom_id: "generate_media",
                   },
+                  {
+                    type: 2,
+                    label: "Generate",
+                    style: 2,
+                    custom_id: "cancel_media",
+                  },
                 ],
               },
             ],
@@ -200,6 +210,9 @@ exports.handler = async function (event, context) {
         }
       )
       return updateMessage("generating media... might take a moment")
+    } else if (custom_id === "cancel_media") {
+      await deleteMediaInteraction(interactionId)
+      return updateMessage("canceled :)")
     }
     return respond(
       "we should not have gotten here... this command is broken contact owner"
