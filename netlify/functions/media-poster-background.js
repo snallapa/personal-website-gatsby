@@ -163,7 +163,7 @@ exports.handler = async function (event, context) {
   //   ],
   // })
   // const generatedMessage = completion.data.choices[0].message
-  const generatedMessage = [awayTeamMessage, homeTeamMesssage]
+  const generatedMessage = [awayTeamMessage, homeTeamMessage]
   const channel = league.commands.media.channel
   const title = [
     `**__What ${mediaPersonality} had to say about the ${awayTeamName} and ${homeTeamName} game__**`,
