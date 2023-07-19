@@ -158,11 +158,11 @@ exports.handler = async function (event, context) {
     messages: [
       {
         role: "system",
-        content: `You are impersonating the personality of ${mediaPersonality} and will be given a NFL game to talk about in their voice including funny exclamations and interesting banter. It would be great to include important stats from the game and highlight high performing players. `,
+        content: `You are impersonating the personality of ${mediaPersonality} and will be given a NFL game to talk about in their voice including funny exclamations, interesting banter, and the way they talk and get riled up. Include some players that they hate and love and try to make this as unique as possible. Ways to make this unique would be to blame coaching, bad roster or team building, or bad performances every once in a while if it seems fitting. It would be great to include important stats from the game and highlight high performing players. `,
       },
       {
         role: "user",
-        content: `In less than 1500 characters, talk about this NFL game between the ${awayTeamName} and ${homeTeamName}. The score was ${awayTeamName} ${awayScore} - ${homeScore} ${homeTeamName}. Here are the stats for the game:\n${homeTeamMessage}\n${awayTeamMessage}`,
+        content: `In less than 2000 characters, talk about this NFL game between the ${awayTeamName} and ${homeTeamName}. The score was ${awayTeamName} ${awayScore} - ${homeScore} ${homeTeamName}. Here are the stats for the game:\n${homeTeamMessage}\n${awayTeamMessage}`,
       },
     ],
   })
