@@ -72,7 +72,7 @@ exports.handler = async function (event, context) {
         const limit = Number(process.env.MEDIA_LIMIT) || 1
         if (hours <= limit) {
           return respond(
-            `due to ChatGPT limits, I can only run this command once every ${hours} hour(s)`
+            `due to ChatGPT limits, I can only run this command once every ${limit} hour(s)`
           )
         }
       }
