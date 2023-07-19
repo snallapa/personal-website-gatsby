@@ -158,7 +158,7 @@ exports.handler = async function (event, context) {
                   },
                   {
                     type: 2,
-                    label: "Generate",
+                    label: "Cancel",
                     style: 2,
                     custom_id: "cancel_media",
                   },
