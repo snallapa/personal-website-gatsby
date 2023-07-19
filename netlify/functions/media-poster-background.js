@@ -72,7 +72,7 @@ function formatStats(teamStats, playerStats, roster, teamName) {
           return { ...p, stats: p[k] }
         })
     })
-    .map((p) => {
+    .flatMap((p) => {
       const pStats = JSON.parse(p.stats)
       const { name, position } = roster[p.rosterId]
       let statString = Object.keys(pStats)
@@ -80,12 +80,12 @@ function formatStats(teamStats, playerStats, roster, teamName) {
         .map((statName) => `${pStats[statName]} ${statKeyMapping[statName]}`)
         .join(",")
       if (pStats.passComp) {
-        statString = `${pStats.passComp}/${pStats.passAtt} CP/ATT ,${statString}`
+        statString = `${pStats.passComp}/${pStats.passAtt} CP/ATT, ${statString}`
       }
       if (statString) {
-        return `${position} ${name}: ${statString}`
+        return [`${position} ${name}: ${statString}`]
       } else {
-        return ""
+        return []
       }
     })
     .join("\n")
