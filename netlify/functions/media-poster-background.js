@@ -28,7 +28,7 @@ function findWeekAndGame(weeks, scheduleId) {
 }
 
 function getTeamPlayerStats(league, weekNum, teamId) {
-  const playerStats = league.stats.reg[weekNum]["player-stats"]
+  const playerStats = league.reg[weekNum]["player-stats"]
   return Object.keys(playerStats)
     .map((rosterId) => {
       return { rosterId, ...playerStats[rosterId] }
@@ -129,8 +129,8 @@ exports.handler = async function (event, context) {
 
   const { weekNum, game } = findWeekAndGame(weeks, Number(scheduleId))
   const { awayScore, homeScore, awayTeamId, homeTeamId } = game
-  const homeTeamStats = league.stats.reg[weekNum]["team-stats"][homeTeamId]
-  const awayTeamStats = league.stats.reg[weekNum]["team-stats"][awayTeamId]
+  const homeTeamStats = league.reg[weekNum]["team-stats"][homeTeamId]
+  const awayTeamStats = league.reg[weekNum]["team-stats"][awayTeamId]
   const homeTeamPlayerStats = getTeamPlayerStats(league, weekNum, homeTeamId)
   const awayTeamPlayerStats = getTeamPlayerStats(league, weekNum, awayTeamId)
   const { teamName: homeTeamName, roster: homeTeamRoster } =
