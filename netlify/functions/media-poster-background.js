@@ -18,7 +18,7 @@ const openai = new OpenAIApi(configuration)
 function findWeekAndGame(weeks, scheduleId) {
   const weekNums = Object.keys(weeks)
   for (const weekNum of weekNums) {
-    const week = weeks[weekNum]
+    const week = weeks[weekNum].schedules
     const game = week.find((g) => g.scheduleId === scheduleId)
     if (game) {
       return { weekNum, game }
@@ -125,7 +125,7 @@ exports.handler = async function (event, context) {
     console.error(e)
   }
   const { scheduleId, mediaId } = request
-  const weeks = league.schedules.reg
+  const weeks = league.reg
 
   const { weekNum, game } = findWeekAndGame(weeks, Number(scheduleId))
   const { awayScore, homeScore, awayTeamId, homeTeamId } = game
