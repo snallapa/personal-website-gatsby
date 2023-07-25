@@ -12,6 +12,7 @@ import {
   db,
   getMedia,
   deleteMediaInteraction,
+  getMediaWeek,
 } from "../../modules/firebase-db.js"
 
 const verifier = VerifyDiscordRequest(process.env.PUBLIC_KEY_MEDIA)
@@ -77,12 +78,13 @@ exports.handler = async function (event, context) {
         }
       }
       const week = options[0].value
-
-      if (!league.reg?.[`week${week}`]) {
-        return respond(
-          `missing week ${week}. Please export the week in MCA (select ALL WEEKS in the app!)`
-        )
+      let leagueWeek
+      try {
+        leagueWeek = await getMediaWeek(guild_id, week)
+      } catch (e) {
+        return respond(e.message)
       }
+
       const weeksGames = league.reg[`week${week}`].schedules
       const teams = league.teams
       return {
