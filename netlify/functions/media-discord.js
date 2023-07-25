@@ -85,7 +85,7 @@ exports.handler = async function (event, context) {
         return respond(e.message)
       }
 
-      const weeksGames = league.reg[`week${week}`].schedules
+      const weeksGames = league.schedules.reg[`week${week}`].schedules
       const teams = league.teams
       return {
         statusCode: 200,
