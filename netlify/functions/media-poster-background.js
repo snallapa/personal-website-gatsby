@@ -129,7 +129,7 @@ exports.handler = async function (event, context) {
   const weeks = league.schedules.reg
 
   const { weekNum, game } = findWeekAndGame(weeks, Number(scheduleId))
-  const leagueWeek = getMediaWeek(guild_id, weekNum)
+  const leagueWeek = await getMediaWeek(guild_id, weekNum)
   const { awayScore, homeScore, awayTeamId, homeTeamId } = game
   const homeTeamStats = leagueWeek["team-stats"][homeTeamId]
   const awayTeamStats = leagueWeek["team-stats"][awayTeamId]
