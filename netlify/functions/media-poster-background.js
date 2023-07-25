@@ -4,6 +4,7 @@ import {
   getMediaInteraction,
   getMedia,
   deleteMediaInteraction,
+  getMediaWeek,
 } from "../../modules/firebase-db.js"
 import { doc, setDoc } from "firebase/firestore"
 import fetch from "node-fetch"
@@ -18,7 +19,7 @@ const openai = new OpenAIApi(configuration)
 function findWeekAndGame(weeks, scheduleId) {
   const weekNums = Object.keys(weeks)
   for (const weekNum of weekNums) {
-    const week = weeks[weekNum].schedules
+    const week = weeks[weekNum]
     const game = week.find((g) => g.scheduleId === scheduleId)
     if (game) {
       return { weekNum, game }
@@ -27,8 +28,8 @@ function findWeekAndGame(weeks, scheduleId) {
   throw new Error(`could not find ${scheduleId} in ${weeks}`)
 }
 
-function getTeamPlayerStats(league, weekNum, teamId) {
-  const playerStats = league.reg[weekNum]["player-stats"]
+function getTeamPlayerStats(leagueWeek, teamId) {
+  const playerStats = leagueWeek["player-stats"]
   return Object.keys(playerStats)
     .map((rosterId) => {
       return { rosterId, ...playerStats[rosterId] }
@@ -125,14 +126,15 @@ exports.handler = async function (event, context) {
     console.error(e)
   }
   const { scheduleId, mediaId } = request
-  const weeks = league.reg
+  const weeks = league.schedules.reg
 
   const { weekNum, game } = findWeekAndGame(weeks, Number(scheduleId))
+  const leagueWeek = getMediaWeek(guild_id, weekNum)
   const { awayScore, homeScore, awayTeamId, homeTeamId } = game
-  const homeTeamStats = league.reg[weekNum]["team-stats"][homeTeamId]
-  const awayTeamStats = league.reg[weekNum]["team-stats"][awayTeamId]
-  const homeTeamPlayerStats = getTeamPlayerStats(league, weekNum, homeTeamId)
-  const awayTeamPlayerStats = getTeamPlayerStats(league, weekNum, awayTeamId)
+  const homeTeamStats = leagueWeek["team-stats"][homeTeamId]
+  const awayTeamStats = leagueWeek["team-stats"][awayTeamId]
+  const homeTeamPlayerStats = getTeamPlayerStats(leagueWeek, homeTeamId)
+  const awayTeamPlayerStats = getTeamPlayerStats(leagueWeek, awayTeamId)
   const { teamName: homeTeamName, roster: homeTeamRoster } =
     league.teams[homeTeamId]
   const { teamName: awayTeamName, roster: awayTeamRoster } =

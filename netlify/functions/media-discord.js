@@ -77,7 +77,7 @@ exports.handler = async function (event, context) {
         }
       }
       const week = options[0].value
-      console.log(league)
+
       if (!league.reg?.[`week${week}`]) {
         return respond(
           `missing week ${week}. Please export the week in MCA (select ALL WEEKS in the app!)`

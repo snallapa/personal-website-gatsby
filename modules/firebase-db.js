@@ -52,3 +52,14 @@ export async function deleteMediaInteraction(interaction_id) {
   const docRef = doc(db, "media_interactions", interaction_id)
   const docSnap = await deleteDoc(docRef)
 }
+
+export async function getMediaWeek(guild_id, weekNum) {
+  const docRef = doc(db, "media", guild_id, "reg", `week${weekNum}`)
+  const docSnap = await getDoc(docRef)
+  if (!docSnap.exists()) {
+    throw new Error(
+      `no week found for ${guild_id} and ${weekNum}, export in MCA using media_export first`
+    )
+  }
+  return docSnap.data()
+}
