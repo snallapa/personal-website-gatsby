@@ -28,6 +28,21 @@ function findWeekAndGame(weeks, scheduleId) {
   throw new Error(`could not find ${scheduleId} in ${weeks}`)
 }
 
+function stringifyWeek(weekNumber) {
+  if (weekNumber === 19) {
+    return "Wildcard"
+  } else if (weekNumber === 20) {
+    return "Divisional"
+  } else if (weekNumber === 21) {
+    return "Conference Championship"
+  } else if (weekNumber === 22) {
+    return "Pro Bowl"
+  } else if (weekNumber === 23) {
+    return "Super Bowl"
+  }
+  return `Week ${weekNumber}`
+}
+
 function getTeamPlayerStats(leagueWeek, teamId) {
   const playerStats = leagueWeek["player-stats"]
   return Object.keys(playerStats)
@@ -129,10 +144,8 @@ exports.handler = async function (event, context) {
   const weeks = league.schedules.reg
 
   const { weekNum, game } = findWeekAndGame(weeks, Number(scheduleId))
-  const leagueWeek = await getMediaWeek(
-    guild_id,
-    Number(weekNum.replace("week", ""))
-  )
+  const weekNumber = Number(weekNum.replace("week", ""))
+  const leagueWeek = await getMediaWeek(guild_id, weekNumber)
   const { awayScore, homeScore, awayTeamId, homeTeamId } = game
   const homeTeamStats = leagueWeek["team-stats"][homeTeamId]
   const awayTeamStats = leagueWeek["team-stats"][awayTeamId]
@@ -158,6 +171,7 @@ exports.handler = async function (event, context) {
     mediaId === "first_take"
       ? "Stephen A Smith"
       : "Skip Bayless and Shannon Sharpe"
+  const weekString = stringifyWeek(weekNumber)
   const completion = await openai.createChatCompletion({
     model: "gpt-3.5-turbo-16k",
     messages: [
@@ -167,14 +181,14 @@ exports.handler = async function (event, context) {
       },
       {
         role: "user",
-        content: `In less than 2000 characters, talk about this NFL game between the ${awayTeamName} and ${homeTeamName}. The score was ${awayTeamName} ${awayScore} - ${homeScore} ${homeTeamName}. Here are the stats for the game:\n${homeTeamMessage}\n${awayTeamMessage}`,
+        content: `In less than 2000 characters, talk about this ${weekString} NFL game between the ${awayTeamName} and ${homeTeamName}. The score was ${awayTeamName} ${awayScore} - ${homeScore} ${homeTeamName}. Here are the stats for the game:\n${homeTeamMessage}\n${awayTeamMessage}`,
       },
     ],
   })
   const generatedMessage = completion.data.choices[0].message
   const channel = league.commands.media.channel
   const title = [
-    `**__What ${mediaPersonality} had to say about the ${awayTeamName} and ${homeTeamName} game__**`,
+    `**__What ${mediaPersonality} had to say about the ${weekString} game between ${awayTeamName} and ${homeTeamName}__**`,
   ]
   const splitMessage = title.concat(splitter(generatedMessage.content, 1000))
   for (const partMessage of splitMessage) {
