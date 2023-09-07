@@ -125,7 +125,7 @@ async function handleNotify(guild_id, command, member) {
   return respond(notifyWaitlist(league.commands.waitlist, top))
 }
 
-export const waitlistChannelHandler = {
+export const waitlistHandler = {
   list: handleList,
   add: handleAdd,
   remove: handleRemove,
