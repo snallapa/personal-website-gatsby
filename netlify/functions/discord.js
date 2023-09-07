@@ -7,10 +7,10 @@ import { doc, getDoc, setDoc } from "firebase/firestore"
 import {
   DiscordRequestProd,
   respond,
-  respondNoMention,
   VerifyDiscordRequest,
 } from "../../modules/utils.js"
 import { gameChannelHandler } from "../../modules/game-channels.js"
+import { waitlistChannelHandler } from "../../modules/waitlist.js"
 import { findTeam, createTeamsMessage } from "../../modules/teams.js"
 import { db } from "../../modules/firebase-db.js"
 
@@ -31,24 +31,6 @@ function createStreamsMessage(counts) {
       .map((userCount) => `<@${userCount.user}>: ${userCount.count}`)
       .join("\n")
       .trim()
-  )
-}
-
-function createWaitlistMessage(waitlist) {
-  return (
-    "__**Waitlist**__\n" +
-    waitlist.map((user, idx) => `${idx + 1}: <@${user}>`).join("\n")
-  )
-}
-
-function notifyWaitlist(waitlist, top) {
-  return (
-    "__**Open Team Availiable**__\n" +
-    "You turn is here:\n" +
-    waitlist
-      .filter((_, idx) => idx < top)
-      .map((user, idx) => `${idx + 1}: <@${user}>`)
-      .join("\n")
   )
 }
 
@@ -560,134 +542,12 @@ exports.handler = async function (event, context) {
     } else if (name === "waitlist") {
       const command = options[0]
       const subcommand = command.name
-      if (subcommand === "list") {
-        const docRef = doc(db, "leagues", guild_id)
-        const docSnap = await getDoc(docRef)
-        let league
-        if (!docSnap.exists()) {
-          league = { commands: { waitlist: [] } }
-          await setDoc(doc(db, "leagues", guild_id), league, { merge: true })
-        } else {
-          league = docSnap.data()
-        }
-        if (
-          !league.commands ||
-          !league.commands.waitlist ||
-          league.commands.waitlist.length === 0
-        ) {
-          return respond("there is no one on the waitlist!")
-        } else {
-          return respondNoMention(
-            createWaitlistMessage(league.commands.waitlist)
-          )
-        }
-      } else if (subcommand === "add") {
-        const user = command.options[0].value
-        const docRef = doc(db, "leagues", guild_id)
-        const docSnap = await getDoc(docRef)
-        let league
-        if (!docSnap.exists()) {
-          league = { commands: { waitlist: [] } }
-          await setDoc(doc(db, "leagues", guild_id), league, { merge: true })
-        } else {
-          league = docSnap.data()
-        }
-        const waitlist = league.commands.waitlist || []
-        if (command.options[1]) {
-          const position = command.options[1].value
-          if (position > waitlist.length) {
-            return respond("invalid position, beyond the waitlist length")
-          }
-          waitlist.splice(position - 1, 0, user)
-          league.commands.waitlist = waitlist
-        } else {
-          waitlist.push(user)
-          league.commands.waitlist = waitlist
-        }
-        await setDoc(doc(db, "leagues", guild_id), league, { merge: true })
-        if (
-          !league.commands ||
-          !league.commands.waitlist ||
-          league.commands.waitlist.length === 0
-        ) {
-          return respond("there is no one on the waitlist!")
-        } else {
-          return respondNoMention(
-            createWaitlistMessage(league.commands.waitlist)
-          )
-        }
-      } else if (subcommand === "remove") {
-        const user = command.options[0].value
-        const docRef = doc(db, "leagues", guild_id)
-        const docSnap = await getDoc(docRef)
-        let league
-        if (!docSnap.exists()) {
-          league = { commands: { waitlist: [] } }
-          await setDoc(doc(db, "leagues", guild_id), league, { merge: true })
-        } else {
-          league = docSnap.data()
-        }
-        const waitlist = league.commands.waitlist || []
-        league.commands.waitlist = waitlist.filter((w) => w !== user)
-        await setDoc(doc(db, "leagues", guild_id), league, { merge: true })
-        if (
-          !league.commands ||
-          !league.commands.waitlist ||
-          league.commands.waitlist.length === 0
-        ) {
-          return respond("there is no one on the waitlist!")
-        } else {
-          return respondNoMention(
-            createWaitlistMessage(league.commands.waitlist)
-          )
-        }
-      } else if (subcommand === "pop") {
-        const position = command.options[0] ? command.options[0].value : 1
-        const docRef = doc(db, "leagues", guild_id)
-        const docSnap = await getDoc(docRef)
-        let league
-        if (!docSnap.exists()) {
-          league = { commands: { waitlist: [] } }
-          await setDoc(doc(db, "leagues", guild_id), league, { merge: true })
-        } else {
-          league = docSnap.data()
-        }
-        const waitlist = league.commands.waitlist || []
-        if (waitlist.length === 0) {
-          return respond("waitlist is empty")
-        }
-        league.commands.waitlist = waitlist.filter(
-          (_, idx) => idx !== position - 1
-        )
-        await setDoc(doc(db, "leagues", guild_id), league, { merge: true })
-        if (
-          !league.commands ||
-          !league.commands.waitlist ||
-          league.commands.waitlist.length === 0
-        ) {
-          return respond("there is no one on the waitlist!")
-        } else {
-          return respondNoMention(
-            createWaitlistMessage(league.commands.waitlist)
-          )
-        }
-      } else if (subcommand === "notify") {
-        const top = command.options[0] ? command.options[0].value : 1
-        const docRef = doc(db, "leagues", guild_id)
-        const docSnap = await getDoc(docRef)
-        let league
-        if (!docSnap.exists()) {
-          league = { commands: { waitlist: [] } }
-          await setDoc(doc(db, "leagues", guild_id), league, { merge: true })
-        } else {
-          league = docSnap.data()
-        }
-        const waitlist = league.commands.waitlist || []
-        if (waitlist.length === 0) {
-          return respond("waitlist is empty")
-        }
-        return respond(notifyWaitlist(league.commands.waitlist, top))
-      }
+      const response = await waitlistChannelHandler[subcommand](
+        guild_id,
+        command,
+        member
+      )
+      return response
     } else if (name === "schedule") {
       const week = options[0].value
       const docRef = doc(db, "leagues", guild_id)
