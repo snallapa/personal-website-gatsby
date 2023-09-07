@@ -30,8 +30,8 @@ async function handleList(guild_id, command, member) {
     console.error(e)
     return respond(e.message)
   }
-  const waitlist = league.commands?.waitlist
-  if (waitlist.length ?? 0 === 0) {
+  const waitlist = league.commands?.waitlist ?? []
+  if (waitlist.length === 0) {
     return respond("there is no one on the waitlist!")
   } else {
     return respondNoMention(createWaitlistMessage(waitlist))
@@ -60,7 +60,7 @@ async function handleAdd(guild_id, command, member) {
     league.commands.waitlist = waitlist
   }
   await setDoc(doc(db, "leagues", guild_id), league, { merge: true })
-  if (league.commands?.waitlist?.length ?? 0 === 0) {
+  if (waitlist.length === 0) {
     return respond("there is no one on the waitlist!")
   } else {
     return respondNoMention(createWaitlistMessage(league.commands.waitlist))
@@ -79,7 +79,7 @@ async function handleRemove(guild_id, command, member) {
   const waitlist = league.commands?.waitlist ?? []
   league.commands.waitlist = waitlist.filter((w) => w !== user)
   await setDoc(doc(db, "leagues", guild_id), league, { merge: true })
-  if (league.commands?.waitlist?.length ?? 0 === 0) {
+  if (waitlist.length === 0) {
     return respond("there is no one on the waitlist!")
   } else {
     return respondNoMention(createWaitlistMessage(league.commands.waitlist))
@@ -101,7 +101,7 @@ async function handlePop(guild_id, command, member) {
   }
   league.commands.waitlist = waitlist.filter((_, idx) => idx !== position - 1)
   await setDoc(doc(db, "leagues", guild_id), league, { merge: true })
-  if (league.commands?.waitlist?.length ?? 0 === 0) {
+  if (waitlist.length === 0) {
     return respond("there is no one on the waitlist!")
   } else {
     return respondNoMention(createWaitlistMessage(league.commands.waitlist))
