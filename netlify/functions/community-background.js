@@ -100,98 +100,69 @@ exports.handler = async function (event, context) {
     polls.nfl[`week${week}`] = {}
     let messageCount = 0
     const reactions = []
-    let tries = 0
-    while (messageCount < gameMessages.length && tries < 40) {
+    while (messageCount < gameMessages.length) {
       const currentGame = gameMessages[messageCount]
-      try {
-        const m = await DiscordRequestCommunity(
-          `channels/${channel}/messages`,
-          {
-            method: "POST",
-            body: {
-              content: currentGame.message,
-              allowed_mentions: {
-                parse: [],
-              },
+      const m = await DiscordRequestCommunity(
+        `channels/${channel}/messages`,
+        {
+          method: "POST",
+          body: {
+            content: currentGame.message,
+            allowed_mentions: {
+              parse: [],
             },
-          }
-        )
-        const jsonRes = await m.json()
-        const messageId = jsonRes.id
-        reactions.push({ messageId, emoji: currentGame.awayEmoji })
-        reactions.push({ messageId, emoji: currentGame.homeEmoji })
-        polls.nfl[`week${week}`][currentGame.id] = messageId
-        messageCount = messageCount + 1
-      } catch (e) {
-        tries = tries + 1
-        console.log(e)
-        const error = JSON.parse(e.message)
-        if (error["retry_after"]) {
-          await new Promise((r) => setTimeout(r, error["retry_after"] * 1000))
-          console.log(`game messages retries: ${tries}`)
-        }
-      }
+          },
+        },
+        (maxTries = 40)
+      )
+      const jsonRes = await m.json()
+      const messageId = jsonRes.id
+      reactions.push({ messageId, emoji: currentGame.awayEmoji })
+      reactions.push({ messageId, emoji: currentGame.homeEmoji })
+      polls.nfl[`week${week}`][currentGame.id] = messageId
+      messageCount = messageCount + 1
     }
     let reactionCount = 0
-    tries = 0
-    while (reactionCount < reactions.length && tries < 100) {
+    while (reactionCount < reactions.length) {
       const currentReaction = reactions[reactionCount]
       const emoji = `${currentReaction.emoji}%3A${
         emojiDoc.nfl.emojis[currentReaction.emoji]
       }`
-      try {
-        await DiscordRequestCommunity(
-          `channels/${channel}/messages/${currentReaction.messageId}/reactions/${emoji}/@me`,
-          {
-            method: "PUT",
-          }
-        )
-        reactionCount = reactionCount + 1
-      } catch (e) {
-        tries = tries + 1
-        console.log(e)
-        const error = JSON.parse(e.message)
-        if (error["retry_after"]) {
-          await new Promise((r) => setTimeout(r, error["retry_after"] * 1000))
-        }
-        console.log(`reaction tries: ${tries}`)
-      }
+      await DiscordRequestCommunity(
+        `channels/${channel}/messages/${currentReaction.messageId}/reactions/${emoji}/@me`,
+        {
+          method: "PUT",
+        },
+        (maxTries = 100)
+      )
+      reactionCount = reactionCount + 1
     }
     await setDoc(doc(db, "polls", guild_id), polls, { merge: true })
     console.log("set game messages for current week")
   } else {
     // update the poll messages
     let messageCount = 0
-    let tries = 0
-    while (messageCount < gameMessages.length && tries < 100) {
+    while (messageCount < gameMessages.length) {
       const currentGame = gameMessages[messageCount]
-      try {
-        const m = await DiscordRequestCommunity(
-          `channels/${channel}/messages/${
-            polls.nfl[`week${week}`][currentGame.id]
-          }`,
-          {
-            method: "PATCH",
-            body: {
-              content: currentGame.message,
-              allowed_mentions: {
-                parse: [],
-              },
+      const m = await DiscordRequestCommunity(
+        `channels/${channel}/messages/${
+          polls.nfl[`week${week}`][currentGame.id]
+        }`,
+        {
+          method: "PATCH",
+          body: {
+            content: currentGame.message,
+            allowed_mentions: {
+              parse: [],
             },
-          }
-        )
-        const jsonRes = await m.json()
-        const messageId = jsonRes.id
-        polls.nfl[`week${week}`][currentGame.id] = messageId
-        messageCount = messageCount + 1
-      } catch (e) {
-        console.log(e)
-        const error = JSON.parse(e.message)
-        if (error["retry_after"]) {
-          await new Promise((r) => setTimeout(r, error["retry_after"] * 1000))
-        }
-        tries = tries + 1
-      }
+          },
+        },
+        (maxTries = 100)
+      )
+      const jsonRes = await m.json()
+      const messageId = jsonRes.id
+      polls.nfl[`week${week}`][currentGame.id] = messageId
+      messageCount = messageCount + 1
     }
   }
 }
