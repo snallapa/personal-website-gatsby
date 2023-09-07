@@ -289,7 +289,7 @@ async function handleOpen(guild_id, command, member) {
   }
 }
 
-export const teamChannelHandler = {
+export const teamHandler = {
   configure: handleConfigure,
   assign: handleAssign,
   open: handleOpen,
