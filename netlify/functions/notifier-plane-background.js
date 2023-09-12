@@ -66,7 +66,7 @@ async function react(channelId, messageId) {
     throw e
   }
 }
-/*
+
 async function getReactedUsers(channelId, messageId, reaction) {
   try {
     return DiscordRequestProd(
@@ -193,7 +193,7 @@ async function ping(gameChannel, teams) {
   })
   return true
 }
-
+/*
 async function updateChannel(cId, league, users, guild_id) {
   const channelStates = league.commands.game_channels.channels || {}
   const currentState = channelStates[cId]
@@ -342,7 +342,7 @@ async function updateChannel(cId, league, users, guild_id) {
     console.error(e)
     return currentState
   }
-}*/
+} */
 
 exports.handler = async function (event, context) {
   /*  const { guild_id, currentChannels, users } = JSON.parse(event.body)
