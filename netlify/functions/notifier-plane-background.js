@@ -112,7 +112,7 @@ function findTeam(teams, search_phrase) {
 function joinUsers(users) {
   return users.map((uId) => `<@${uId}>`).join("")
 }
-
+/*
 async function forceWin(
   fwChannel,
   gameChannel,
@@ -166,7 +166,7 @@ async function forceWin(
   }
   return true
 }
-
+*/
 async function ping(gameChannel, teams) {
   const res = await DiscordRequestProd(`channels/${gameChannel}`, {
     method: "GET",
