@@ -48,7 +48,7 @@ const reactions = {
   away: "%F0%9F%9B%AB",
   fw: "%E2%8F%AD%EF%B8%8F",
 }
-/*
+
 async function react(channelId, messageId) {
   try {
     const reactionPromise = Object.keys(reactions).reduce((p, reaction) => {
@@ -66,7 +66,7 @@ async function react(channelId, messageId) {
     throw e
   }
 }
-
+/*
 async function getReactedUsers(channelId, messageId, reaction) {
   try {
     return DiscordRequestProd(
