@@ -7,7 +7,7 @@ schedule = "0/20 * * * *"
 
 # update every 10 minutes
 [functions."snallabot-event-publisher"]
-schedule = "0/01 * * * *"
+schedule = "0/02 * * * *"
 
 # update every day
 [functions."snallabot-gc-scheduled"]
