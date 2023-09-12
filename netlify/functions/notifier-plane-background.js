@@ -48,7 +48,7 @@ const reactions = {
   away: "%F0%9F%9B%AB",
   fw: "%E2%8F%AD%EF%B8%8F",
 }
-/*
+
 async function react(channelId, messageId) {
   try {
     const reactionPromise = Object.keys(reactions).reduce((p, reaction) => {
@@ -65,9 +65,8 @@ async function react(channelId, messageId) {
     console.error(`reaction failed for ${channelId} and ${messageId}`)
     throw e
   }
-  }
-  */
-/*
+}
+
 async function getReactedUsers(channelId, messageId, reaction) {
   try {
     return DiscordRequestProd(
@@ -80,8 +79,7 @@ async function getReactedUsers(channelId, messageId, reaction) {
     )
     throw e
   }
-  }
-*/
+}
 
 function decideResult(homeUsers, awayUsers) {
   if (homeUsers.length > 1 && awayUsers.length > 1) {
@@ -99,7 +97,7 @@ function decideResult(homeUsers, awayUsers) {
 function joinUsers(users) {
   return users.map((uId) => `<@${uId}>`).join("")
 }
-/*
+
 async function forceWin(
   fwChannel,
   gameChannel,
@@ -153,8 +151,7 @@ async function forceWin(
   }
   return true
 }
-*/
-/*
+
 async function ping(gameChannel, teams) {
   const res = await DiscordRequestProd(`channels/${gameChannel}`, {
     method: "GET",
@@ -180,8 +177,8 @@ async function ping(gameChannel, teams) {
     },
   })
   return true
-}*/
-/*
+}
+
 async function updateChannel(cId, league, users, guild_id) {
   const channelStates = league.commands.game_channels.channels || {}
   const currentState = channelStates[cId]
@@ -330,10 +327,10 @@ async function updateChannel(cId, league, users, guild_id) {
     console.error(e)
     return currentState
   }
-} */
+}
 
 exports.handler = async function (event, context) {
-  /*  const { guild_id, currentChannels, users } = JSON.parse(event.body)
+  const { guild_id, currentChannels, users } = JSON.parse(event.body)
   console.log(currentChannels)
 
   const docRef = doc(db, "leagues", guild_id)
@@ -361,5 +358,5 @@ exports.handler = async function (event, context) {
     updateChannel(cId, league, users, guild_id)
   )
   const res = await Promise.all(promises)
-  await setDoc(doc(db, "leagues", guild_id), league, { merge: true }) */
+  await setDoc(doc(db, "leagues", guild_id), league, { merge: true })
 }
