@@ -8,6 +8,7 @@ import {
   updateDoc,
   deleteField,
 } from "firebase/firestore"
+import fetch from "node-fetch"
 
 const firebaseConfig = {
   apiKey: "AIzaSyDf9ZiTBWf-sWY007WsKktMPewcrs07CWw",
@@ -17,8 +18,6 @@ const firebaseConfig = {
   messagingSenderId: "163156624093",
   appId: "1:163156624093:web:dfe860c8bb38a62b075134",
 }
-
-import fetch from "node-fetch"
 
 const SNALLABOT_USER = "970091866450198548"
 
