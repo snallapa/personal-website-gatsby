@@ -48,7 +48,7 @@ const reactions = {
   away: "%F0%9F%9B%AB",
   fw: "%E2%8F%AD%EF%B8%8F",
 }
-
+/*
 async function react(channelId, messageId) {
   try {
     const reactionPromise = Object.keys(reactions).reduce((p, reaction) => {
@@ -65,8 +65,9 @@ async function react(channelId, messageId) {
     console.error(`reaction failed for ${channelId} and ${messageId}`)
     throw e
   }
-}
-
+  }
+  */
+/*
 async function getReactedUsers(channelId, messageId, reaction) {
   try {
     return DiscordRequestProd(
@@ -79,7 +80,8 @@ async function getReactedUsers(channelId, messageId, reaction) {
     )
     throw e
   }
-}
+  }
+*/
 
 function decideResult(homeUsers, awayUsers) {
   if (homeUsers.length > 1 && awayUsers.length > 1) {
@@ -167,6 +169,7 @@ async function forceWin(
   return true
 }
 */
+/*
 async function ping(gameChannel, teams) {
   const res = await DiscordRequestProd(`channels/${gameChannel}`, {
     method: "GET",
@@ -192,7 +195,7 @@ async function ping(gameChannel, teams) {
     },
   })
   return true
-}
+}*/
 /*
 async function updateChannel(cId, league, users, guild_id) {
   const channelStates = league.commands.game_channels.channels || {}
