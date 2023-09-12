@@ -18,7 +18,7 @@ const firebaseConfig = {
   messagingSenderId: "163156624093",
   appId: "1:163156624093:web:dfe860c8bb38a62b075134",
 }
-/*
+
 const SNALLABOT_USER = "970091866450198548"
 
 const app = initializeApp(firebaseConfig)
@@ -48,7 +48,7 @@ const reactions = {
   away: "%F0%9F%9B%AB",
   fw: "%E2%8F%AD%EF%B8%8F",
 }
-
+/*
 async function react(channelId, messageId) {
   try {
     const reactionPromise = Object.keys(reactions).reduce((p, reaction) => {
