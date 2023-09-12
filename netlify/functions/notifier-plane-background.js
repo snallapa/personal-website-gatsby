@@ -8,7 +8,7 @@ import {
   updateDoc,
   deleteField,
 } from "firebase/firestore"
-//import fetch from "node-fetch"
+import fetch from "node-fetch"
 
 const firebaseConfig = {
   apiKey: "AIzaSyDf9ZiTBWf-sWY007WsKktMPewcrs07CWw",
