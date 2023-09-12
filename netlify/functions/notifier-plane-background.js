@@ -346,6 +346,7 @@ async function updateChannel(cId, league, users, guild_id) {
 
 exports.handler = async function (event, context) {
   const { guild_id, currentChannels, users } = JSON.parse(event.body)
+  console.log(currentChannels)
 
   const docRef = doc(db, "leagues", guild_id)
   const docSnap = await getDoc(docRef)
@@ -368,9 +369,9 @@ exports.handler = async function (event, context) {
   const updatedSnap = await getDoc(docRef)
   league = updatedSnap.data()
 
-  const promises = currentChannels.map((cId) =>
+  /*  const promises = currentChannels.map((cId) =>
     updateChannel(cId, league, users, guild_id)
   )
   const res = await Promise.all(promises)
-  await setDoc(doc(db, "leagues", guild_id), league, { merge: true })
+  await setDoc(doc(db, "leagues", guild_id), league, { merge: true }) */
 }
