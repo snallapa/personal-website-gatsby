@@ -3,6 +3,7 @@ import { respond } from "./utils.js"
 import { DiscordRequestProd } from "./utils.js"
 import { getLeague, db } from "./firebase-db.js"
 import fetch from "node-fetch"
+import { doc, updateDoc, deleteField } from "firebase/firestore"
 
 export function findTeam(teams, search_phrase) {
   const term = search_phrase.toLowerCase()
@@ -289,8 +290,38 @@ async function handleOpen(guild_id, command, member) {
   }
 }
 
+async function handleReset(guild_id, command, member) {
+  let league
+  try {
+    league = await getLeague(guild_id)
+  } catch (e) {
+    console.error(e)
+    return respond(e.message)
+  }
+  const messageId = league.commands.teams.message
+  const channelId = league.commands.teams.channel
+  const res = await DiscordRequestProd(
+    `channels/${channelId}/messages/${messageId}`,
+    {
+      method: "DELETE",
+    }
+  )
+
+  await updateDoc(doc(db, "leagues", guild_id), {
+    teams: deleteField(),
+    commands: {
+      teams: {
+        message: deleteField(),
+      },
+    },
+  })
+
+  return respond("team reset")
+}
+
 export const teamHandler = {
   configure: handleConfigure,
   assign: handleAssign,
   open: handleOpen,
+  reset: handleReset,
 }
