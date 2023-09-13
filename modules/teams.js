@@ -311,7 +311,7 @@ async function handleReset(guild_id, command, member) {
     ["commands.teams.message"]: deleteField(),
   })
 
-  return respond("team reset")
+  return respond("reset all teams, export the league again to restart")
 }
 
 export const teamHandler = {
