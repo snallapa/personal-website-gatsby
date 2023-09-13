@@ -1,45 +1,11 @@
 import { DiscordRequestProd } from "../../modules/utils.js"
 import { initializeApp } from "firebase/app"
-import {
-  getFirestore,
-  doc,
-  getDoc,
-  setDoc,
-  updateDoc,
-  deleteField,
-} from "firebase/firestore"
+import { doc, getDoc, setDoc, updateDoc, deleteField } from "firebase/firestore"
 import fetch from "node-fetch"
-
-const firebaseConfig = {
-  apiKey: "AIzaSyDf9ZiTBWf-sWY007WsKktMPewcrs07CWw",
-  authDomain: "championslounge-f0f36.firebaseapp.com",
-  projectId: "championslounge-f0f36",
-  storageBucket: "championslounge-f0f36.appspot.com",
-  messagingSenderId: "163156624093",
-  appId: "1:163156624093:web:dfe860c8bb38a62b075134",
-}
+import { findTeam } from "../../modules/teams.js"
+import { db, getLeague } from "../../modules/firebase-db.js"
 
 const SNALLABOT_USER = "970091866450198548"
-
-const app = initializeApp(firebaseConfig)
-
-// Initialize Cloud Firestore and get a reference to the service
-const db = getFirestore(app)
-
-function findTeam(teams, search_phrase) {
-  const term = search_phrase.toLowerCase()
-  for (let key in teams) {
-    const currentTeam = teams[key]
-    if (
-      currentTeam.abbr.toLowerCase() === term ||
-      currentTeam.cityName.toLowerCase() === term ||
-      currentTeam.teamName.toLowerCase() === term
-    ) {
-      return key
-    }
-  }
-  throw `could not find team ${search_phrase}`
-}
 
 const reactions = {
   sch: "%E2%8F%B0",
@@ -331,14 +297,13 @@ async function updateChannel(cId, league, users, guild_id) {
 
 exports.handler = async function (event, context) {
   const { guild_id, currentChannels, users } = JSON.parse(event.body)
-
   const docRef = doc(db, "leagues", guild_id)
-  const docSnap = await getDoc(docRef)
-  if (!docSnap.exists()) {
-    console.log(`no league found for ${guild_id}`)
-    return
+  let league
+  try {
+    league = await getLeague(guild_id)
+  } catch (e) {
+    console.error(e)
   }
-  let league = docSnap.data()
 
   // delete channels not there
   const channelStates = league.commands.game_channels.channels || {}
