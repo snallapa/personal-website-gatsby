@@ -308,11 +308,7 @@ async function handleReset(guild_id, command, member) {
 
   await updateDoc(doc(db, "leagues", guild_id), {
     teams: deleteField(),
-    commands: {
-      teams: {
-        message: deleteField(),
-      },
-    },
+    ["commands.teams.message"]: deleteField(),
   })
 
   return respond("team reset")
