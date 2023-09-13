@@ -41,7 +41,6 @@ exports.handler = async function (event, context) {
     } else if (name === "game_channels") {
       const command = options[0]
       const subcommand = command.name
-      console.log(subcommand)
       const response = await gameChannelHandler[subcommand](
         guild_id,
         command,

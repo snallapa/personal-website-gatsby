@@ -331,7 +331,6 @@ async function updateChannel(cId, league, users, guild_id) {
 
 exports.handler = async function (event, context) {
   const { guild_id, currentChannels, users } = JSON.parse(event.body)
-  console.log(currentChannels)
 
   const docRef = doc(db, "leagues", guild_id)
   const docSnap = await getDoc(docRef)
