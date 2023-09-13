@@ -1,9 +1,8 @@
-import { doc, setDoc } from "firebase/firestore"
+import { doc, setDoc, updateDoc, deleteField } from "firebase/firestore"
 import { respond } from "./utils.js"
 import { DiscordRequestProd } from "./utils.js"
 import { getLeague, db } from "./firebase-db.js"
 import fetch from "node-fetch"
-import { doc, updateDoc, deleteField } from "firebase/firestore"
 
 export function findTeam(teams, search_phrase) {
   const term = search_phrase.toLowerCase()
