@@ -235,6 +235,12 @@ const MADDEN_TEAMS_COMMANDS = {
         },
       ],
     },
+    {
+      type: 1, // sub command
+      name: "reset",
+      description: "resets all teams",
+      options: [],
+    },
   ],
   type: 1,
 }
