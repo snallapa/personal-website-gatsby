@@ -130,6 +130,13 @@ function splitter(str, l) {
   return strs
 }
 
+const shows = {
+  first_take: "Stephen A Smith",
+  fs: "Skip Bayless and Shannon Sharpe",
+  irving_and_prime: "Michael Irving and Deion Sanders",
+  pat: "Pat McAfee",
+}
+
 exports.handler = async function (event, context) {
   // console.log(event)
   const { guild_id, interaction_id, message_id } = JSON.parse(event.body)
@@ -167,10 +174,7 @@ exports.handler = async function (event, context) {
     awayTeamRoster,
     awayTeamName
   )
-  const mediaPersonality =
-    mediaId === "first_take"
-      ? "Stephen A Smith"
-      : "Skip Bayless and Shannon Sharpe"
+  const mediaPersonality = shows[mediaId]
   const weekString = stringifyWeek(weekNumber)
   const completion = await openai.createChatCompletion({
     model: "gpt-3.5-turbo-16k",

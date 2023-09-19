@@ -134,6 +134,19 @@ exports.handler = async function (event, context) {
                         description:
                           "Generates a sports article between Skip and Shannon from FS1",
                       },
+                      {
+                        label:
+                          "Michael Irvin's and Coach Prime take on the game",
+                        value: "irving_and_prime",
+                        description:
+                          "Generates a sports article with Michael Irvin and Deion Sanders",
+                      },
+                      {
+                        label: "The Pat McAfee Show talks about the game",
+                        value: "pat",
+                        description:
+                          "Generates a sports article preteneding to be on the Pat McAfee Show",
+                      },
                     ],
                     placeholder: "Choose the media you want to generate",
                   },
