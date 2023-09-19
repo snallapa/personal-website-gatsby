@@ -44,11 +44,17 @@ async function handleCreate(guild_id, command, member) {
     )
   }
 
-  if (week > 18) {
-    return respond(`sorry I dont know about playoffs :(`)
+  if (week === 22 || week > 23) {
+    return respond(`Please enter a valid week`)
   }
 
   const weeksGames = league.schedules.reg[`week${week}`]
+  if (!weeksGames) {
+    return respond("This week is currently not exported!")
+  }
+  if (weeksGames.every((g) => g.awayTeamId === 0 && g.homeTeamId === 0)) {
+    return respond("This week is currently not exported!")
+  }
   const teams = league.teams
   const channelPromises = weeksGames.map((game) => {
     return DiscordRequestProd(`guilds/${guild_id}/channels`, {
@@ -83,6 +89,30 @@ async function handleCreate(guild_id, command, member) {
   } else {
     return respond("something went wrong... maybe try again or contact owner")
   }
+}
+
+async function handleCreateWildcard(guild_id, command, member) {
+  command.options = []
+  command.options[0] = { value: 19 }
+  return handleCreate(guild_id, command, member)
+}
+
+async function handleCreateDivisional(guild_id, command, member) {
+  command.options = []
+  command.options[0] = { value: 20 }
+  return handleCreate(guild_id, command, member)
+}
+
+async function handleCreateConferenceChampionships(guild_id, command, member) {
+  command.options = []
+  command.options[0] = { value: 21 }
+  return handleCreate(guild_id, command, member)
+}
+
+async function handleCreateSuperBowl(guild_id, command, member) {
+  command.options = []
+  command.options[0] = { value: 23 }
+  return handleCreate(guild_id, command, member)
 }
 
 async function handleClear(guild_id, command, member) {
@@ -298,4 +328,8 @@ export const gameChannelHandler = {
   configure_notifier: handleConfigureNotifier,
   off_notifier: handleOffNotifier,
   clear: handleClear,
+  create_wildcard: handleCreateWildcard,
+  create_divisional: handleCreateDivisional,
+  create_conference: handleCreateConferenceChampionships,
+  create_superbowl: handleCreateSuperBowl,
 }

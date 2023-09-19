@@ -153,6 +153,30 @@ const MADDEN_CHANNELS_COMMANDS = {
       description: "turns off snallabot notifier",
       options: [],
     },
+    {
+      type: 1, // sub command
+      name: "create_wildcard",
+      description: "create wildcard game channels",
+      options: [],
+    },
+    {
+      type: 1, // sub command
+      name: "create_divisional",
+      description: "create divisional game channels",
+      options: [],
+    },
+    {
+      type: 1, // sub command
+      name: "create_conference",
+      description: "create conference championship game channels",
+      options: [],
+    },
+    {
+      type: 1, // sub command
+      name: "create_superbowl",
+      description: "create superbowl game channels",
+      options: [],
+    },
   ],
   type: 1,
 }
