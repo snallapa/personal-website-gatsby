@@ -85,8 +85,10 @@ exports.handler = async function (event, context) {
           `missing week ${week}. Please export the week in MCA (select ALL WEEKS in the app!)`
         )
       }
-      if (week > 18) {
-        return respond(`sorry I dont know about playoffs :(`)
+      if (week === 22 || week > 23) {
+        return respond(
+          `for playoff weeks use: 19 for wildcard, 20 for divisional, 21 for conference, 23 for superbowl`
+        )
       }
 
       const weeksGames = league.schedules.reg[`week${week}`]
