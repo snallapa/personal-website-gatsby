@@ -102,22 +102,16 @@ exports.handler = async function (event, context) {
           } else {
             if (game.awayScore > game.homeScore) {
               return `**__${teams[game.awayTeamId].teamName} ${
-                teams[game.awayTeamId].awayScore
-              }__** vs ${teams[game.homeTeamId].homeScore} ${
-                teams[game.homeTeamId].teamName
-              }`
+                game.awayScore
+              }__** vs ${game.homeScore} ${teams[game.homeTeamId].teamName}`
             } else if (game.homeScore > game.awayScore) {
               return `${teams[game.awayTeamId].teamName} ${
-                teams[game.awayTeamId].awayScore
-              } vs **__${teams[game.homeTeamId].homeScore} ${
-                teams[game.homeTeamId].teamName
-              }__**`
+                game.awayScore
+              } vs **__${game.homeScore} ${teams[game.homeTeamId].teamName}__**`
             }
-            return `${teams[game.awayTeamId].teamName} ${
-              teams[game.awayTeamId].awayScore
-            } vs ${teams[game.homeTeamId].homeScore} ${
-              teams[game.homeTeamId].teamName
-            }`
+            return `${teams[game.awayTeamId].teamName} ${game.awayScore} vs ${
+              game.homeScore
+            } ${teams[game.homeTeamId].teamName}`
           }
         })
         .join("\n")
