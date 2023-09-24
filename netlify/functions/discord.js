@@ -92,12 +92,32 @@ exports.handler = async function (event, context) {
       const weeksGames = league.schedules.reg[`week${week}`]
       const teams = league.teams
       const gamesContent = weeksGames
-        .map(
-          (game) =>
-            `${teams[game.awayTeamId].teamName} vs ${
+        .map((game) => {
+          if (game.awayScore === 0 && game.homeScore === 0) {
+            return `${teams[game.awayTeamId].teamName} vs ${
               teams[game.homeTeamId].teamName
             }`
-        )
+          } else {
+            if (game.awayScore > game.homeScore) {
+              return `**__${teams[game.awayTeamId].teamName} ${
+                teams[game.awayTeamId].awayScore
+              }__** vs ${teams[game.homeTeamId].homeScore} ${
+                teams[game.homeTeamId].teamName
+              }`
+            } else if (game.homeScore > game.awayScore) {
+              return `${teams[game.awayTeamId].teamName} ${
+                teams[game.awayTeamId].awayScore
+              } vs **__${teams[game.homeTeamId].homeScore} ${
+                teams[game.homeTeamId].teamName
+              }__**`
+            }
+            return `${teams[game.awayTeamId].teamName} ${
+              teams[game.awayTeamId].awayScore
+            } vs ${teams[game.homeTeamId].homeScore} ${
+              teams[game.homeTeamId].teamName
+            }`
+          }
+        })
         .join("\n")
       const scheduleContent = `__**Week ${week}**__\n${gamesContent}`
       return respond(scheduleContent)
