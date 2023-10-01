@@ -36,7 +36,7 @@ exports.handler = async function (event, context) {
 
     if (name === "media_export") {
       return respond(
-        `Type this URL carefully into your app (no spaces exactly as shown here): http://snallabot.herokuapp.com/media/${guild_id}\n\n Choose: League Info, Rosters, Weekly Stats. Scroll to ALL WEEKS`
+        `Type this URL carefully into your app (no spaces exactly as shown here): https://snallabot.herokuapp.com/media/${guild_id}\n\n Choose: League Info, Rosters, Weekly Stats. Scroll to ALL WEEKS`
       )
     } else if (name === "test_media") {
       return respond("bot is working! :)")
