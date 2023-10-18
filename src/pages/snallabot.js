@@ -9,12 +9,63 @@ const namespaces = {
 }
 
 export default () => {
+  const params = new URLSearchParams(window.location.search)
+  const guild = params.get("league")
+  if (!guild) {
+    return (
+      <div> Missing discord league, did you open this from snallabot? </div>
+    )
+  }
+
   const [state, setState] = useState({
-    loginState: "EA_LOGIN",
+    loginState: "INITIATE_LOGIN",
     code: "",
     personas: {},
     selectedPersona: "",
+    accessToken: "",
+    gameConsole: "",
+    personaMaddenLeagues: [],
+    selectedMaddenLeague: "",
+    league: {},
   })
+
+  useEffect(() => {
+    fetch("http://localhost:8888/.netlify/functions/exporter-state", {
+      method: "POST",
+      body: JSON.stringify({
+        guild_id: guild,
+      }),
+    })
+      .then((res) => res.json())
+      .then((currentState) =>
+        setState({
+          ...state,
+          loginState: currentState.state,
+          league: currentState.league,
+        })
+      )
+  }, [])
+
+  useEffect(() => {
+    if (state.loginState === "LEAGUE_PICKER") {
+      fetch("http://localhost:8888/.netlify/functions/snallabot-ea-connector", {
+        method: "POST",
+        body: JSON.stringify({
+          path: "getleagues",
+          guild: guild,
+          exporter_body: {},
+        }),
+      })
+        .then((res) => res.json())
+        .then((slimmedLeagues) =>
+          setState({
+            ...state,
+            personaMaddenLeagues: slimmedLeagues,
+            selectedMaddenLeague: slimmedLeagues[0].leagueId,
+          })
+        )
+    }
+  }, [state.loginState])
 
   const handleChange = (e) => {
     setState({
@@ -38,6 +89,8 @@ export default () => {
     setState({
       ...state,
       loginState: "CHOOSE_PERSONA",
+      accessToken: personas.accessToken,
+      gameConsole: personas.gameConsole,
       personas: personaList,
       selectedPersona: personaList[0].personaId,
     })
@@ -48,10 +101,55 @@ export default () => {
     await choosePersona(parsedCode)
   }
 
-  async function selectPersona(e) {}
+  async function selectPersona(e) {
+    const res = await fetch(
+      "http://localhost:8888/.netlify/functions/snallabot-ea-connector",
+      {
+        method: "POST",
+        body: JSON.stringify({
+          path: "linkea",
+          guild: guild,
+          exporter_body: {
+            persona: state.personas.filter(
+              (p) => p.personaId == state.selectedPersona //coerce on purpose oh well
+            )[0],
+            token: state.accessToken,
+            gameConsole: state.gameConsole,
+          },
+        }),
+      }
+    )
+    if (res.ok) {
+      setState({
+        ...state,
+        loginState: "LEAGUE_PICKER",
+      })
+    }
+  }
+
+  async function selectLeague(e) {
+    const res = await fetch(
+      "http://localhost:8888/.netlify/functions/snallabot-ea-connector",
+      {
+        method: "POST",
+        body: JSON.stringify({
+          path: "selectLeague",
+          guild: guild,
+          exporter_body: {
+            selectedLeague: state.personaMaddenLeagues.filter(
+              (m) => m.leagueId == state.selectedMaddenLeague
+            )[0],
+          },
+        }),
+      }
+    )
+    if (res.ok) {
+      setState({ ...state, loginState: "LEAGUE_DASHBOARD" })
+    }
+  }
 
   switch (state.loginState) {
-    case "EA_LOGIN":
+    case "INITIATE_LOGIN":
       return (
         <div>
           <div>
@@ -71,12 +169,11 @@ export default () => {
             </label>
             <button onClick={handleClick}>Retrieve Leagues</button>
           </div>
-          <div> {state.loading === "LOADING" && <h2> Loading </h2>} </div>
         </div>
       )
     case "CHOOSE_PERSONA":
       const options = state.personas.map((p) => (
-        <option value={p.personaId}>
+        <option value={p.personaId} key={p.personaId}>
           {p.displayName} - {namespaces[p.namespaceName]}
         </option>
       ))
@@ -96,5 +193,31 @@ export default () => {
           <button onClick={selectPersona}>Submit</button>
         </div>
       )
+    case "LEAGUE_PICKER":
+      const leagueOptions = state.personaMaddenLeagues.map((m) => (
+        <option value={m.leagueId} key={m.leagueId}>
+          {m.leagueName} - {m.userTeamName}
+        </option>
+      ))
+      return (
+        <div>
+          <label>
+            Which league are we linking?
+            <select
+              value={state.selectedMaddenLeague}
+              onChange={(e) =>
+                setState({ ...state, selectedMaddenLeague: e.target.value })
+              }
+            >
+              {leagueOptions}
+            </select>
+          </label>
+          <button onClick={selectLeague}>Submit</button>
+        </div>
+      )
+    case "LEAGUE_DASHBOARD":
+      return <div> league dashboard </div>
+    default:
+      return <div> LOADING </div>
   }
 }
