@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react"
 import fetch from "node-fetch"
+import * as styles from "./snallabot.module.css"
 
 const namespaces = {
   xbox: "XBOX",
@@ -38,13 +39,13 @@ export default () => {
     })
       .then((res) => res.json())
       .then((currentState) =>
-        setState({
-          ...state,
+        setState((s) => ({
+          ...s,
           loginState: currentState.state,
           league: currentState.league,
-        })
+        }))
       )
-  }, [])
+  }, [guild])
 
   useEffect(() => {
     if (state.loginState === "LEAGUE_PICKER") {
@@ -58,14 +59,31 @@ export default () => {
       })
         .then((res) => res.json())
         .then((slimmedLeagues) =>
-          setState({
-            ...state,
+          setState((s) => ({
+            ...s,
             personaMaddenLeagues: slimmedLeagues,
             selectedMaddenLeague: slimmedLeagues[0].leagueId,
-          })
+          }))
         )
     }
-  }, [state.loginState])
+    if (state.loginState === "LEAGUE_DASHBOARD") {
+      fetch("http://localhost:8888/.netlify/functions/snallabot-ea-connector", {
+        method: "POST",
+        body: JSON.stringify({
+          path: "getLeagueInfo",
+          guild: guild,
+          exporter_body: {},
+        }),
+      })
+        .then((res) => res.json())
+        .then((leagueInfo) =>
+          setState((s) => ({
+            ...s,
+            leagueInfo,
+          }))
+        )
+    }
+  }, [state.loginState, guild])
 
   const handleChange = (e) => {
     setState({
@@ -167,7 +185,7 @@ export default () => {
               Enter the URL of the page. It should start with 127.0.0.1:
               <input type="text" value={state.code} onChange={handleChange} />
             </label>
-            <button onClick={handleClick}>Retrieve Leagues</button>
+            <button onClick={handleClick}>Login to EA</button>
           </div>
         </div>
       )
@@ -190,7 +208,7 @@ export default () => {
               {options}
             </select>
           </label>
-          <button onClick={selectPersona}>Submit</button>
+          <button onClick={selectPersona}>Submit EA Account</button>
         </div>
       )
     case "LEAGUE_PICKER":
@@ -212,11 +230,67 @@ export default () => {
               {leagueOptions}
             </select>
           </label>
-          <button onClick={selectLeague}>Submit</button>
+          <button onClick={selectLeague}>Submit League</button>
         </div>
       )
     case "LEAGUE_DASHBOARD":
-      return <div> league dashboard </div>
+      if (!state.leagueInfo) {
+        return <div></div>
+      }
+      console.log(state.leagueInfo)
+      const {
+        leagueInfo: { gameScheduleHubInfo, teamIdInfoList, seasonInfo },
+      } = state
+      const rows = gameScheduleHubInfo.leagueSchedule.map((seasonGame) => {
+        const game = seasonGame.seasonGameInfo
+        return (
+          <tr key={seasonGame.seasonGameKey}>
+            <td>
+              {`${game.isAwayHuman ? game.awayUserName : "CPU"} ${
+                game.awayCityName
+              } ${game.awayName} (${game.awayWin} - ${game.awayLoss}${
+                game.awayTie > 0 ? " - " + game.awayTie : ""
+              }) at ${game.isHomeHuman ? game.homeUserName : "CPU"} ${
+                game.homeCityName
+              } ${game.homeName} (${game.homeWin} - ${game.homeLoss}${
+                game.homeTie > 0 ? " - " + game.homeTie : ""
+              })`}
+            </td>
+            <td>{`${game.result || "Not Played"}`}</td>
+            <td>{`${game.numberTimesPlayed || 0}`}</td>
+          </tr>
+        )
+      })
+      return (
+        <div>
+          <header className={styles["w3-container"]}>
+            {" "}
+            Snallabot Dashbaord{" "}
+          </header>
+          <div>
+            <div>
+              {`${seasonInfo.seasonTitle} ${
+                seasonInfo.seasonYear > 0 ? seasonInfo.seasonYear : ""
+              }, Year ${seasonInfo.calendarYear}`}
+            </div>
+            <div>
+              {`Current Week: ${seasonInfo.weekTitle} ${
+                seasonInfo.displayWeek > 0 ? seasonInfo.displayWeek : ""
+              }`}
+            </div>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <td>Game</td>
+                <td>Result</td>
+                <td>Number of Times Played</td>
+              </tr>
+            </thead>
+            <tbody>{rows}</tbody>
+          </table>
+        </div>
+      )
     default:
       return <div> LOADING </div>
   }

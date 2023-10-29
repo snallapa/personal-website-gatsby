@@ -16,7 +16,7 @@ exports.handler = async function (event, context) {
       }),
     }
   }
-  const { madden_server: tokenInfo, madden_league: leagueInfo } = league
+  const { madden_server: tokenInfo } = league
   if (!tokenInfo?.accessToken) {
     return {
       statusCode: 200,
@@ -26,7 +26,7 @@ exports.handler = async function (event, context) {
       }),
     }
   }
-  if (!leagueInfo?.leagueId) {
+  if (!tokenInfo?.leagueId) {
     return {
       statusCode: 200,
       body: JSON.stringify({
