@@ -19,7 +19,7 @@ export default () => {
   }
 
   const [state, setState] = useState({
-    loginState: "INITIATE_LOGIN",
+    loginState: "LOADING",
     code: "",
     personas: {},
     selectedPersona: "",
@@ -93,6 +93,7 @@ export default () => {
   }
 
   async function choosePersona(code) {
+    setState((s) => ({ ...s, loginState: "LOADING" }))
     const res = await fetch(
       "http://localhost:8888/.netlify/functions/ea-persona-picker",
       {
@@ -120,6 +121,7 @@ export default () => {
   }
 
   async function selectPersona(e) {
+    setState((s) => ({ ...s, loginState: "LOADING" }))
     const res = await fetch(
       "http://localhost:8888/.netlify/functions/snallabot-ea-connector",
       {
@@ -146,6 +148,7 @@ export default () => {
   }
 
   async function selectLeague(e) {
+    setState((s) => ({ ...s, loginState: "LOADING" }))
     const res = await fetch(
       "http://localhost:8888/.netlify/functions/snallabot-ea-connector",
       {
@@ -166,7 +169,37 @@ export default () => {
     }
   }
 
+  async function unlinkLeague(e) {
+    setState((s) => ({ ...s, loginState: "LOADING" }))
+    const res = await fetch(
+      "http://localhost:8888/.netlify/functions/snallabot-ea-connector",
+      {
+        method: "POST",
+        body: JSON.stringify({
+          path: "unlink",
+          guild: guild,
+          exporter_body: {},
+        }),
+      }
+    )
+    if (res.ok) {
+      setState({
+        loginState: "INITIATE_LOGIN",
+        code: "",
+        personas: {},
+        selectedPersona: "",
+        accessToken: "",
+        gameConsole: "",
+        personaMaddenLeagues: [],
+        selectedMaddenLeague: "",
+        league: {},
+      })
+    }
+  }
+
   switch (state.loginState) {
+    case "LOADING":
+      return <div> Fetching... </div>
     case "INITIATE_LOGIN":
       return (
         <div>
@@ -239,7 +272,12 @@ export default () => {
       }
       console.log(state.leagueInfo)
       const {
-        leagueInfo: { gameScheduleHubInfo, teamIdInfoList, seasonInfo },
+        leagueInfo: {
+          gameScheduleHubInfo,
+          teamIdInfoList,
+          seasonInfo,
+          exportUrls,
+        },
       } = state
       const rows = gameScheduleHubInfo.leagueSchedule.map((seasonGame) => {
         const game = seasonGame.seasonGameInfo
@@ -261,22 +299,37 @@ export default () => {
           </tr>
         )
       })
+      const seasonType = (() => {
+        switch (seasonInfo.seasonWeekType) {
+          case 0:
+            return "Preseason"
+          case 1:
+            return "Regular Season"
+          case 2:
+          case 3:
+          case 5:
+          case 6:
+            return "Post Season"
+          case 8:
+            return "Off Season"
+          default:
+            return "something else"
+        }
+      })()
       return (
-        <div>
-          <header className={styles["w3-container"]}>
-            {" "}
-            Snallabot Dashbaord{" "}
-          </header>
-          <div>
+        <div className={styles.dashboard}>
+          <header> Snallabot Dashboard </header>
+          <div className={styles.header}>
             <div>
-              {`${seasonInfo.seasonTitle} ${
-                seasonInfo.seasonYear > 0 ? seasonInfo.seasonYear : ""
-              }, Year ${seasonInfo.calendarYear}`}
+              <div>{`${seasonType}, Year ${seasonInfo.calendarYear}`}</div>
+              <div>
+                {`Current Week: ${seasonInfo.weekTitle} ${
+                  seasonInfo.displayWeek > 0 ? seasonInfo.displayWeek : ""
+                }`}
+              </div>
             </div>
             <div>
-              {`Current Week: ${seasonInfo.weekTitle} ${
-                seasonInfo.displayWeek > 0 ? seasonInfo.displayWeek : ""
-              }`}
+              <button onClick={unlinkLeague}>Unlink League</button>
             </div>
           </div>
           <table>
