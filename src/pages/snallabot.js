@@ -384,16 +384,38 @@ export default () => {
       return <div> Fetching... </div>
     case "INITIATE_LOGIN":
       return (
-        <div>
+        <div className={styles.dashboard}>
           <div>
+            Please read all these instructions before doing anything! This
+            connects snallabot to EA and your madden league. To be clear,{" "}
+            <strong>
+              snallabot does not save your credentials, EA credentials, or any
+              console credentials (such as PSN, Xbox, etc)
+            </strong>
+            . It uses special tokens to retain its connection to EA and is
+            completely safe and secure with your personal information! This is a{" "}
+            <strong>one time setup</strong> for your league, you should not have
+            to login again
+            <br />
+            <br /> You will soon login to EA, this login is the same login you
+            would normally use for the Madden Companion App, therefore login the
+            same way you would in that app. If you are not sure, usually
+            choosing the console you are logging into will find your league
+            properly. <br />
+            <br /> Once you login to EA, you will be met with an error/blank
+            page and your browser will be at url "http://127.0.0.1". this is{" "}
+            <strong>EXPECTED AND NORMAL</strong>. Copy that entire URL into the
+            box below and you will move on to the next step! <br />
+            <br />
+            Legality wise this all falls under <strong>interoperability</strong>
+            <br />
+            <br />
             <a
               href="https://accounts.ea.com/connect/auth?hide_create=true&release_type=prod&response_type=code&redirect_uri=http://127.0.0.1/success&client_id=MaddenCompanionApp19&machineProfileKey=MCA4b35d75Vm-MCA&authentication_source=317239"
               target="_blank"
             >
               Login to EA
             </a>
-            . Once you are logged in it will have an error/blank page at the
-            end. That is EXPECTED AND NORMAL!!
           </div>
           <div>
             <label>

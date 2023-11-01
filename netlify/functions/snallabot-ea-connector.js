@@ -1,7 +1,6 @@
 import fetch from "node-fetch"
 
 exports.handler = async function (event, context) {
-  console.log(event)
   const body = JSON.parse(event.body)
   const { path, exporter_body: exporterBody, guild } = body
   const res = await fetch(`https://snallabot.herokuapp.com/${guild}/${path}`, {
