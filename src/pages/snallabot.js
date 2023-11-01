@@ -122,6 +122,9 @@ const exportWeeks = {
 }
 
 export default () => {
+  if (typeof window === "undefined" || !window.location) {
+    return <div>SSR?</div>
+  }
   const params = new URLSearchParams(window.location.search)
   const origin = window.location.origin
   const guild = params.get("league")
