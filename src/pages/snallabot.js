@@ -475,7 +475,7 @@ export default () => {
       )
     case "LEAGUE_DASHBOARD":
       if (!state.leagueInfo) {
-        return <div></div>
+        return <div>Fetching League Data...</div>
       }
       const {
         leagueInfo: { gameScheduleHubInfo, teamIdInfoList, seasonInfo },
