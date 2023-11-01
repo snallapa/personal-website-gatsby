@@ -9,8 +9,121 @@ const namespaces = {
   stadia: "Stadia",
 }
 
+const exportWeeks = {
+  "Preseason Week 1": {
+    stage: 0,
+    week: 1,
+  },
+  "Preseason Week 2": {
+    stage: 0,
+    week: 2,
+  },
+  "Preseason Week 3": {
+    stage: 0,
+    week: 3,
+  },
+  "Preseason Week 4": {
+    stage: 0,
+    week: 4,
+  },
+  "Regular Season Week 1": {
+    stage: 1,
+    week: 1,
+  },
+  "Regular Season Week 2": {
+    stage: 1,
+    week: 2,
+  },
+  "Regular Season Week 3": {
+    stage: 1,
+    week: 3,
+  },
+  "Regular Season Week 4": {
+    stage: 1,
+    week: 4,
+  },
+  "Regular Season Week 5": {
+    stage: 1,
+    week: 5,
+  },
+  "Regular Season Week 6": {
+    stage: 1,
+    week: 6,
+  },
+  "Regular Season Week 7": {
+    stage: 1,
+    week: 7,
+  },
+  "Regular Season Week 8": {
+    stage: 1,
+    week: 8,
+  },
+  "Regular Season Week 9": {
+    stage: 1,
+    week: 9,
+  },
+  "Regular Season Week 10": {
+    stage: 1,
+    week: 10,
+  },
+  "Regular Season Week 11": {
+    stage: 1,
+    week: 11,
+  },
+  "Regular Season Week 12": {
+    stage: 1,
+    week: 12,
+  },
+  "Regular Season Week 13": {
+    stage: 1,
+    week: 13,
+  },
+  "Regular Season Week 14": {
+    stage: 1,
+    week: 14,
+  },
+  "Regular Season Week 15": {
+    stage: 1,
+    week: 15,
+  },
+  "Regular Season Week 16": {
+    stage: 1,
+    week: 16,
+  },
+  "Regular Season Week 17": {
+    stage: 1,
+    week: 17,
+  },
+  "Regular Season Week 18": {
+    stage: 1,
+    week: 18,
+  },
+  "Wildcard Round": {
+    stage: 1,
+    week: 19,
+  },
+  "Divisional Round": {
+    stage: 1,
+    week: 20,
+  },
+
+  "Conference Championship Round": {
+    stage: 1,
+    week: 21,
+  },
+  Superbowl: {
+    stage: 1,
+    week: 23,
+  },
+  "All Weeks": {
+    stage: -1,
+    week: 100,
+  },
+}
+
 export default () => {
   const params = new URLSearchParams(window.location.search)
+  const origin = window.location.origin
   const guild = params.get("league")
   if (!guild) {
     return (
@@ -28,10 +141,11 @@ export default () => {
     personaMaddenLeagues: [],
     selectedMaddenLeague: "",
     league: {},
+    exportOption: "Preaseason Week 1",
   })
 
   useEffect(() => {
-    fetch("http://localhost:8888/.netlify/functions/exporter-state", {
+    fetch(`${origin}/.netlify/functions/exporter-state`, {
       method: "POST",
       body: JSON.stringify({
         guild_id: guild,
@@ -49,7 +163,7 @@ export default () => {
 
   useEffect(() => {
     if (state.loginState === "LEAGUE_PICKER") {
-      fetch("http://localhost:8888/.netlify/functions/snallabot-ea-connector", {
+      fetch(`${origin}/.netlify/functions/snallabot-ea-connector`, {
         method: "POST",
         body: JSON.stringify({
           path: "getleagues",
@@ -67,7 +181,7 @@ export default () => {
         )
     }
     if (state.loginState === "LEAGUE_DASHBOARD") {
-      fetch("http://localhost:8888/.netlify/functions/snallabot-ea-connector", {
+      fetch(`${origin}/.netlify/functions/snallabot-ea-connector`, {
         method: "POST",
         body: JSON.stringify({
           path: "getLeagueInfo",
@@ -80,6 +194,7 @@ export default () => {
           setState((s) => ({
             ...s,
             leagueInfo,
+            exports: leagueInfo.exports,
           }))
         )
     }
@@ -94,15 +209,12 @@ export default () => {
 
   async function choosePersona(code) {
     setState((s) => ({ ...s, loginState: "LOADING" }))
-    const res = await fetch(
-      "http://localhost:8888/.netlify/functions/ea-persona-picker",
-      {
-        method: "POST",
-        body: JSON.stringify({
-          code: code,
-        }),
-      }
-    )
+    const res = await fetch(`${origin}/.netlify/functions/ea-persona-picker`, {
+      method: "POST",
+      body: JSON.stringify({
+        code: code,
+      }),
+    })
     const personas = await res.json()
     const personaList = personas.personas.persona
     setState({
@@ -116,14 +228,16 @@ export default () => {
   }
 
   async function handleClick(e) {
-    const parsedCode = state.code.replace("http://127.0.0.1/success?code=", "")
+    const searchParams = state.code.substring(state.code.indexOf("?"))
+    const eaCode = new URLSearchParams(searchParams)
+    const parsedCode = eaCode.get("code")
     await choosePersona(parsedCode)
   }
 
   async function selectPersona(e) {
     setState((s) => ({ ...s, loginState: "LOADING" }))
     const res = await fetch(
-      "http://localhost:8888/.netlify/functions/snallabot-ea-connector",
+      `${origin}/.netlify/functions/snallabot-ea-connector`,
       {
         method: "POST",
         body: JSON.stringify({
@@ -150,7 +264,7 @@ export default () => {
   async function selectLeague(e) {
     setState((s) => ({ ...s, loginState: "LOADING" }))
     const res = await fetch(
-      "http://localhost:8888/.netlify/functions/snallabot-ea-connector",
+      `${origin}/.netlify/functions/snallabot-ea-connector`,
       {
         method: "POST",
         body: JSON.stringify({
@@ -172,7 +286,7 @@ export default () => {
   async function unlinkLeague(e) {
     setState((s) => ({ ...s, loginState: "LOADING" }))
     const res = await fetch(
-      "http://localhost:8888/.netlify/functions/snallabot-ea-connector",
+      `${origin}/.netlify/functions/snallabot-ea-connector`,
       {
         method: "POST",
         body: JSON.stringify({
@@ -195,6 +309,74 @@ export default () => {
         league: {},
       })
     }
+  }
+
+  async function onExportChanged(newExports) {
+    const res = await fetch(
+      `${origin}/.netlify/functions/snallabot-ea-connector`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          path: "updateExports",
+          guild: guild,
+          exporter_body: {
+            exports: newExports,
+          },
+        }),
+      }
+    )
+    if (res.ok) {
+      const savedExports = await res.json()
+      setState((s) => ({ ...s, exports: savedExports }))
+    } else {
+      console.error("failed to update!")
+      const oldExports = state.exports.filter((e) => !e.inEdit)
+      setState((s) => ({ ...s, exports: oldExports }))
+    }
+  }
+
+  async function onExport(_) {
+    setState((s) => ({ ...s, exportedStatus: "" }))
+    const exportKey = state.exportOption
+    const exportWeek = exportWeeks[exportKey]
+    const res = await fetch(
+      `${origin}/.netlify/functions/snallabot-ea-connector`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          path: "export",
+          guild: guild,
+          exporter_body: {
+            ...exportWeek,
+          },
+        }),
+      }
+    )
+    if (res.ok) {
+      setState((s) => ({ ...s, exportedStatus: "SUCCESS" }))
+    } else {
+      if (exportKey === "All Weeks") {
+        setState((s) => ({ ...s, exportedStatus: "IN_PROGRESS" }))
+      } else {
+        setState((s) => ({ ...s, exportedStatus: "FAILURE" }))
+      }
+    }
+  }
+
+  function addExport(e) {
+    setState((s) => ({
+      ...s,
+      exports: s.exports.concat([
+        {
+          url: "",
+          leagueInfo: false,
+          weeklyStats: false,
+          rosters: false,
+          autoUpdate: false,
+          inEdit: true,
+        },
+      ]),
+    }))
   }
 
   switch (state.loginState) {
@@ -270,14 +452,9 @@ export default () => {
       if (!state.leagueInfo) {
         return <div></div>
       }
-      console.log(state.leagueInfo)
       const {
-        leagueInfo: {
-          gameScheduleHubInfo,
-          teamIdInfoList,
-          seasonInfo,
-          exportUrls,
-        },
+        leagueInfo: { gameScheduleHubInfo, teamIdInfoList, seasonInfo },
+        exports,
       } = state
       const rows = gameScheduleHubInfo.leagueSchedule.map((seasonGame) => {
         const game = seasonGame.seasonGameInfo
@@ -299,6 +476,144 @@ export default () => {
           </tr>
         )
       })
+      const exportRows = exports.map((exportDestination, i) => {
+        if (exportDestination.inEdit) {
+          return (
+            <tr key={i}>
+              <td>
+                <input
+                  value={exportDestination.url}
+                  onChange={(e) => {
+                    setState((s) => {
+                      const currentExports = [...s.exports]
+                      currentExports[i].url = e.target.value
+                      return { ...s, exports: currentExports }
+                    })
+                  }}
+                />
+              </td>
+              <td className={styles.exportboxes}>
+                <input
+                  type="checkbox"
+                  checked={exportDestination.leagueInfo}
+                  onChange={(e) => {
+                    setState((s) => {
+                      const currentExports = [...s.exports]
+                      currentExports[i].leagueInfo =
+                        !currentExports[i].leagueInfo
+                      return { ...s, exports: currentExports }
+                    })
+                  }}
+                ></input>
+              </td>
+              <td className={styles.exportboxes}>
+                <input
+                  type="checkbox"
+                  checked={exportDestination.weeklyStats}
+                  onChange={(e) => {
+                    setState((s) => {
+                      const currentExports = [...s.exports]
+                      currentExports[i].weeklyStats =
+                        !currentExports[i].weeklyStats
+                      return { ...s, exports: currentExports }
+                    })
+                  }}
+                ></input>
+              </td>
+              <td className={styles.exportboxes}>
+                <input
+                  type="checkbox"
+                  checked={exportDestination.rosters}
+                  onChange={(e) => {
+                    setState((s) => {
+                      const currentExports = [...s.exports]
+                      currentExports[i].rosters = !currentExports[i].rosters
+                      return { ...s, exports: currentExports }
+                    })
+                  }}
+                ></input>
+              </td>
+              <td className={styles.exportboxes}>
+                <input
+                  type="checkbox"
+                  checked={exportDestination.autoUpdate}
+                  onChange={(e) => {
+                    setState((s) => {
+                      const currentExports = [...s.exports]
+                      currentExports[i].autoUpdate =
+                        !currentExports[i].autoUpdate
+                      return { ...s, exports: currentExports }
+                    })
+                  }}
+                ></input>
+              </td>
+              <td>
+                <div className={styles.actions}>
+                  <div
+                    onClick={(e) => {
+                      onExportChanged(
+                        state.exports.map((e) => {
+                          const { inEdit: _, ...rest } = e
+                          return rest
+                        })
+                      )
+                    }}
+                    className={styles.actionable}
+                  >
+                    ✅
+                  </div>
+                </div>
+              </td>
+            </tr>
+          )
+        }
+        return (
+          <tr key={i}>
+            <td>{exportDestination.url}</td>
+            <td className={styles.exportboxes}>
+              <input
+                type="checkbox"
+                disabled={true}
+                checked={exportDestination.leagueInfo}
+              ></input>
+            </td>
+            <td className={styles.exportboxes}>
+              <input
+                type="checkbox"
+                disabled={true}
+                checked={exportDestination.weeklyStats}
+              ></input>
+            </td>
+            <td className={styles.exportboxes}>
+              <input
+                type="checkbox"
+                disabled={true}
+                checked={exportDestination.rosters}
+              ></input>
+            </td>
+            <td className={styles.exportboxes}>
+              <input
+                type="checkbox"
+                disabled={true}
+                checked={exportDestination.autoUpdate}
+              ></input>
+            </td>
+            <td>
+              <div className={styles.actions}>
+                <div
+                  onClick={(e) => {
+                    onExportChanged(state.exports.filter((e, idx) => idx !== i))
+                  }}
+                  className={styles.actionable}
+                >
+                  ❌
+                </div>
+              </div>
+            </td>
+          </tr>
+        )
+      })
+
       const seasonType = (() => {
         switch (seasonInfo.seasonWeekType) {
           case 0:
@@ -316,6 +631,13 @@ export default () => {
             return "something else"
         }
       })()
+      const exportWeekOptions = Object.keys(exportWeeks).map((key) => {
+        return (
+          <option key={key} value={key}>
+            {key}
+          </option>
+        )
+      })
       return (
         <div className={styles.dashboard}>
           <header> Snallabot Dashboard </header>
@@ -332,7 +654,49 @@ export default () => {
               <button onClick={unlinkLeague}>Unlink League</button>
             </div>
           </div>
-          <table>
+          <div className={styles.exportTable}>
+            <div>
+              <select
+                className={styles.weekPicker}
+                value={state.exportOption}
+                onChange={(e) =>
+                  setState((s) => ({ ...s, exportOption: e.target.value }))
+                }
+              >
+                {exportWeekOptions}
+              </select>
+              <button onClick={onExport}>Export</button>
+              {state.exportedStatus === "SUCCESS" && (
+                <div className={styles.exportSuccess}>Success</div>
+              )}
+
+              {state.exportedStatus === "FAILURE" && (
+                <div className={styles.exportFailed}>Failed</div>
+              )}
+              {state.exportedStatus === "IN_PROGRESS" && (
+                <div className={styles.exportSuccess}>
+                  All Weeks can take a bit, but it's in progress and should
+                  finish up soon!
+                </div>
+              )}
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <td>Url</td>
+                  <td className={styles.exportboxes}> League Info </td>
+                  <td className={styles.exportboxes}> Weekly Stats </td>
+                  <td className={styles.exportboxes}> Rosters </td>
+                  <td className={styles.exportboxes}> Auto Update </td>
+                  <td className={styles.exportboxes}>
+                    <button onClick={addExport}>Add Export</button>
+                  </td>
+                </tr>
+              </thead>
+              <tbody>{exportRows}</tbody>
+            </table>
+          </div>
+          <table className={styles.gamesTable}>
             <thead>
               <tr>
                 <td>Game</td>
