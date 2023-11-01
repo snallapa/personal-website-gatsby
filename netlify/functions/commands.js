@@ -34,6 +34,12 @@ const MADDEN_EXPORTER_COMMAND = {
   type: 1,
 }
 
+const MADDEN_DASHBOARD_COMMAND = {
+  name: "dashboard",
+  description: "your snallabot dashboard link",
+  type: 1,
+}
+
 const MADDEN_CHANNELS_CREATE_COMMAND = {
   name: "create_game_channels",
   description: "Create game channels for the current week",
@@ -440,6 +446,7 @@ const COMMANDS = [
   MADDEN_STREAMS_COMMANDS,
   MADDEN_SCHEDULE_COMMAND,
   MADDEN_LOGGER_COMMANDS,
+  MADDEN_DASHBOARD_COMMAND,
 ]
 
 const DELETED_COMMANDS = [

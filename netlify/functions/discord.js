@@ -38,6 +38,10 @@ exports.handler = async function (event, context) {
       return respond(
         `Type this URL carefully into your app (no spaces exactly as shown here): https://snallabot.herokuapp.com/${guild_id}`
       )
+    } else if (name === "dashboard") {
+      return respond(
+        `Snallabot Dashboard: https://nallapareddy.com/snallabot/?league=${guild_id}`
+      )
     } else if (name === "game_channels") {
       const command = options[0]
       const subcommand = command.name

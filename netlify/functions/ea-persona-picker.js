@@ -25,6 +25,9 @@ const namespaces = {
   stadia: "Stadia",
 }
 
+const TWO_DIGIT_YEAR = "24"
+const YEAR = "2024"
+
 exports.handler = async function (event, context) {
   const body = JSON.parse(event.body)
   const code = body.code
@@ -81,11 +84,13 @@ exports.handler = async function (event, context) {
 
   console.log(res3Json["entitlements"]["entitlement"])
 
-  const pidUri = res3Json["entitlements"]["entitlement"].filter(
+  const { pidUri, groupName: gameConsole } = res3Json["entitlements"][
+    "entitlement"
+  ].filter(
     (p) =>
       p.entitlementTag === "ONLINE_ACCESS" &&
-      Object.values(VALID_ENTITLEMENTS("24")).includes(p.groupName)
-  )[0].pidUri
+      Object.values(VALID_ENTITLEMENTS(TWO_DIGIT_YEAR)).includes(p.groupName)
+  )[0]
 
   const res4 = await fetch(
     `https://gateway.ea.com/proxy/identity${pidUri}/personas?status=ACTIVE&access_token=${access_token}`,
@@ -100,6 +105,8 @@ exports.handler = async function (event, context) {
     }
   )
   const res4Json = await res4.json()
+  res4Json.accessToken = access_token
+  res4Json.gameConsole = gameConsole
   return {
     statusCode: 200,
     body: JSON.stringify(res4Json),
