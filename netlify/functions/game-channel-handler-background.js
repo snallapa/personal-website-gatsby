@@ -17,6 +17,7 @@ async function respond(token, content) {
 }
 
 exports.handler = async function (event, context) {
+  console.log(event)
   const { guild_id, command, member, token, commandType } = JSON.parse(
     event.body
   )
