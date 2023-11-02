@@ -8,7 +8,7 @@ async function respond(token, content) {
   await DiscordRequestProd(
     `webhooks/${process.env.APP_ID}/${token}/messages/@original`,
     {
-      method: "POST",
+      method: "PATCH",
       body: {
         content: content,
       },
