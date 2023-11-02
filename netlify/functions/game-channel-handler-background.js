@@ -62,8 +62,8 @@ exports.handler = async function (event, context) {
             path: "export",
             guild: guild_id,
             exporter_body: {
-              week: 101,
-              stage: -1,
+              week: week,
+              stage: 1,
             },
           }),
         }
