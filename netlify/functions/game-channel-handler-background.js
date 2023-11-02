@@ -68,6 +68,7 @@ exports.handler = async function (event, context) {
           }),
         }
       )
+      league = await getLeague(guild_id)
     }
     const teams = league.teams
     const channelPromises = weeksGames.map((game) => {
