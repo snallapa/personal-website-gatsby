@@ -149,7 +149,7 @@ async function updateChannel(cId, league, users, guild_id) {
   const channelStates = league.commands.game_channels.channels || {}
   const currentState = channelStates[cId]
   const logger = league.commands.logger || {}
-  const exporterOn = !!league.madden_server
+  const exporterOn = !!league.madden_server?.leagueId
   try {
     if (!currentState) {
       return {}
