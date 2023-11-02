@@ -172,7 +172,7 @@ exports.handler = async function (event, context) {
       }
       const exporterOn = !!league.madden_server?.leagueId
       if (exporterOn) {
-        await respond("exporting your last week for you now!")
+        await respond(token, "exporting your last week for you now!")
         await fetch(
           `https://nallapareddy.com/.netlify/functions/snallabot-ea-connector`,
           {
