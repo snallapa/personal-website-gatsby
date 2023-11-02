@@ -339,5 +339,6 @@ exports.handler = async function (event, context) {
     updateChannel(cId, league, users, guild_id)
   )
   const res = await Promise.all(promises)
-  await setDoc(doc(db, "leagues", guild_id), league, { merge: true })
+  const { commands, ...rest } = league
+  await setDoc(doc(db, "leagues", guild_id), { commands }, { merge: true })
 }
