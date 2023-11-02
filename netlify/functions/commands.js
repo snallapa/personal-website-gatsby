@@ -30,7 +30,7 @@ const MADDEN_LEAGUE_COMMAND = {
 
 const MADDEN_EXPORTER_COMMAND = {
   name: "league_export",
-  description: "retrieve the Madden Companion App exporter url",
+  description: "retrieve the Madden Companion  exporter url",
   type: 1,
 }
 
