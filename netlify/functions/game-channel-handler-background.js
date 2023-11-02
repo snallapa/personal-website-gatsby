@@ -96,35 +96,6 @@ exports.handler = async function (event, context) {
         }
       )
     }
-    if (league.commands?.game_channels?.autoUpdate) {
-      const newChannels = await Promise.all(
-        responses
-          .filter((r) => r.ok)
-          .map((r) => r.json().then((channel) => channel.id))
-      )
-      const res = await DiscordRequestProd(
-        `guilds/${guild_id}/members?limit=1000`,
-        {
-          method: "GET",
-        }
-      )
-      const users = await res.json()
-      const userWithRoles = users.map((u) => ({
-        id: u.user.id,
-        roles: u.roles,
-      }))
-      const backgroundRes = await fetch(
-        "https://nallapareddy.com/.netlify/functions/notifier-plane-background",
-        {
-          method: "POST",
-          body: JSON.stringify({
-            guild_id: guild_id,
-            currentChannels: newChannels,
-            users: userWithRoles,
-          }),
-        }
-      )
-    }
     respond(token, "channels created!")
   } else if (commandType === "CLEAR") {
     let league
