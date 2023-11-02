@@ -24,7 +24,7 @@ exports.handler = async function (event, context) {
     }
   }
   // console.log(event)
-  const { type, guild_id, data, member, name } = JSON.parse(event.body)
+  const { token, type, guild_id, data, member, name } = JSON.parse(event.body)
   if (type === InteractionType.PING) {
     return {
       statusCode: 200,
@@ -48,7 +48,8 @@ exports.handler = async function (event, context) {
       const response = await gameChannelHandler[subcommand](
         guild_id,
         command,
-        member
+        member,
+        token
       )
       return response
     } else if (name === "teams") {

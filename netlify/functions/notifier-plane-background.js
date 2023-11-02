@@ -149,6 +149,7 @@ async function updateChannel(cId, league, users, guild_id) {
   const channelStates = league.commands.game_channels.channels || {}
   const currentState = channelStates[cId]
   const logger = league.commands.logger || {}
+  const exporterOn = !!league.madden_server
   try {
     if (!currentState) {
       return {}
@@ -202,6 +203,22 @@ async function updateChannel(cId, league, users, guild_id) {
           )
         } else {
           await DiscordRequestProd(`channels/${cId}`, { method: "DELETE" })
+        }
+        if (exporterOn) {
+          await fetch(
+            `https://nallapareddy.com/.netlify/functions/snallabot-ea-connector`,
+            {
+              method: "POST",
+              body: JSON.stringify({
+                path: "export",
+                guild: guild_id,
+                exporter_body: {
+                  week: 101,
+                  stage: -1,
+                },
+              }),
+            }
+          )
         }
         return currentState
       }
