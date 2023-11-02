@@ -27,21 +27,21 @@ exports.handler = async function (event, context) {
       league = await getLeague(guild_id)
     } catch (e) {
       console.error(e)
-      respond(token, e.message)
+      await respond(token, e.message)
       return
     }
     let category
     try {
       category = league.commands.game_channels.category
     } catch (error) {
-      respond(
+      await respond(
         token,
         "missing configuration, run `/game_channels configure` first"
       )
       return
     }
     if (week === 22 || week > 23) {
-      respond(token, "Please enter a valid week")
+      await respond(token, "Please enter a valid week")
       return
     }
 
@@ -49,7 +49,7 @@ exports.handler = async function (event, context) {
     const weeksGames = league.schedules?.reg?.[`week${week}`]
     if (weeksGames?.every((g) => g.awayTeamId === 0 && g.homeTeamId === 0)) {
       if (!exporterOn) {
-        respond(token, "This week is currently not exported!")
+        await respond(token, "This week is currently not exported!")
         return
       }
       await fetch(
@@ -96,21 +96,21 @@ exports.handler = async function (event, context) {
         }
       )
     }
-    respond(token, "channels created!")
+    await respond(token, "channels created!")
   } else if (commandType === "CLEAR") {
     let league
     try {
       league = await getLeague(guild_id)
     } catch (e) {
       console.error(e)
-      respond(token, e.message)
+      await respond(token, e.message)
       return
     }
     let category
     try {
       category = league.commands.game_channels.category
     } catch (error) {
-      respond(
+      await respond(
         token,
         "missing configuration, run `/game_channels configure` first"
       )
@@ -176,8 +176,8 @@ exports.handler = async function (event, context) {
       )
     }
     const success = responses.every((r) => r.ok)
-    success
+    await (success
       ? respond(token, "channels deleted!")
-      : respond(token, "something went wrong...")
+      : respond(token, "something went wrong..."))
   }
 }
