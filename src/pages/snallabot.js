@@ -339,7 +339,7 @@ export default () => {
   }
 
   async function onExport(_) {
-    setState((s) => ({ ...s, exportedStatus: "" }))
+    setState((s) => ({ ...s, exportedStatus: "FETCHING" }))
     const exportKey = state.exportOption
     const exportWeek = exportWeeks[exportKey]
     const res = await fetch(
@@ -697,6 +697,11 @@ export default () => {
 
               {state.exportedStatus === "FAILURE" && (
                 <div className={styles.exportFailed}>Failed</div>
+              )}
+              {state.exportedStatus === "FETCHING" && (
+                <div className={styles.exportFetching}>
+                  Export in progress...
+                </div>
               )}
               {state.exportedStatus === "IN_PROGRESS" && (
                 <div className={styles.exportSuccess}>
