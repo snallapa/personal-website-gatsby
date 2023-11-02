@@ -489,7 +489,11 @@ export default () => {
       )
     case "LEAGUE_DASHBOARD":
       if (!state.leagueInfo) {
-        return <div>Fetching League Data...</div>
+        return (
+          <div>
+            Fetching League Data... Sometimes EA is slow and this takes a minute
+          </div>
+        )
       }
       const {
         leagueInfo: { gameScheduleHubInfo, teamIdInfoList, seasonInfo },
