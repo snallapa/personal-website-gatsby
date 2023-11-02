@@ -1,7 +1,7 @@
 import { doc, setDoc } from "firebase/firestore"
-import { DiscordRequestProd } from "./utils.js"
-import { getLeague, db } from "./firebase-db.js"
-import { findTeam } from "./teams.js"
+import { DiscordRequestProd } from "../../modules/utils.js"
+import { getLeague, db } from "../../modules/firebase-db.js"
+import { findTeam } from "../../modules/teams.js"
 import fetch from "node-fetch"
 
 async function respond(token, content) {
