@@ -47,7 +47,9 @@ exports.handler = async function (event, context) {
 
     const exporterOn = !!league.madden_server?.leagueId
     const weeksGames = league.schedules?.reg?.[`week${week}`]
-    if (weeksGames?.every((g) => g.awayTeamId === 0 && g.homeTeamId === 0)) {
+    if (
+      !weeksGames?.every((g) => !(g.awayTeamId === 0 && g.homeTeamId === 0))
+    ) {
       if (!exporterOn) {
         await respond(token, "This week is currently not exported!")
         return
