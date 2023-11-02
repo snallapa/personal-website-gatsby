@@ -50,13 +50,13 @@ async function handleCreate(guild_id, command, member, token) {
 async function handleCreateWildcard(guild_id, command, member, token) {
   command.options = []
   command.options[0] = { value: 19 }
-  return handleCreate(guild_id, command, member)
+  return handleCreate(guild_id, command, member, token)
 }
 
 async function handleCreateDivisional(guild_id, command, member, token) {
   command.options = []
   command.options[0] = { value: 20 }
-  return handleCreate(guild_id, command, member)
+  return handleCreate(guild_id, command, member, token)
 }
 
 async function handleCreateConferenceChampionships(
@@ -67,13 +67,13 @@ async function handleCreateConferenceChampionships(
 ) {
   command.options = []
   command.options[0] = { value: 21 }
-  return handleCreate(guild_id, command, member)
+  return handleCreate(guild_id, command, member, token)
 }
 
 async function handleCreateSuperBowl(guild_id, command, member, token) {
   command.options = []
   command.options[0] = { value: 23 }
-  return handleCreate(guild_id, command, member)
+  return handleCreate(guild_id, command, member, token)
 }
 
 async function handleClear(guild_id, command, member, token) {
