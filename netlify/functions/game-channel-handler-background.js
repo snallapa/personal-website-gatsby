@@ -46,7 +46,7 @@ exports.handler = async function (event, context) {
     }
 
     const exporterOn = !!league.madden_server?.leagueId
-    const weeksGames = league.schedules?.reg?.[`week${week}`]
+    let weeksGames = league.schedules?.reg?.[`week${week}`]
     if (
       !weeksGames?.every((g) => !(g.awayTeamId === 0 && g.homeTeamId === 0))
     ) {
@@ -69,6 +69,7 @@ exports.handler = async function (event, context) {
         }
       )
       league = await getLeague(guild_id)
+      weeksGames = league.schedules?.reg?.[`week${week}`]
     }
     const teams = league.teams
     const channelPromises = weeksGames.map((game) => {
