@@ -193,6 +193,6 @@ exports.handler = async function (event, context) {
         : respond(token, "something went wrong..."))
     }
   } catch (e) {
-    respond(token, "hmm something went wrong. contact The Creator")
+    await respond(token, "hmm something went wrong. contact The Creator")
   }
 }
