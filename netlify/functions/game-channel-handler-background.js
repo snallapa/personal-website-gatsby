@@ -51,7 +51,10 @@ exports.handler = async function (event, context) {
       !weeksGames?.every((g) => !(g.awayTeamId === 0 && g.homeTeamId === 0))
     ) {
       if (!exporterOn) {
-        await respond(token, "This week is currently not exported!")
+        await respond(
+          token,
+          "This week is currently not exported! Setup snallabot exporter and I will automatically export it for you!"
+        )
         return
       }
       await fetch(
