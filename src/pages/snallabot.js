@@ -162,6 +162,7 @@ export default () => {
           league: currentState.league,
         }))
       )
+      .catch((e) => setState((s) => ({ ...s, loginState: "ERROR" })))
   }, [guild])
 
   useEffect(() => {
@@ -182,6 +183,7 @@ export default () => {
             selectedMaddenLeague: slimmedLeagues[0].leagueId,
           }))
         )
+        .catch((e) => setState((s) => ({ ...s, loginState: "ERROR" })))
     }
     if (state.loginState === "LEAGUE_DASHBOARD") {
       fetch(`${origin}/.netlify/functions/snallabot-ea-connector`, {
@@ -200,6 +202,7 @@ export default () => {
             exports: leagueInfo.exports,
           }))
         )
+        .catch((e) => setState((s) => ({ ...s, loginState: "ERROR" })))
     }
   }, [state.loginState, guild])
 
@@ -211,23 +214,30 @@ export default () => {
   }
 
   async function choosePersona(code) {
-    setState((s) => ({ ...s, loginState: "LOADING" }))
-    const res = await fetch(`${origin}/.netlify/functions/ea-persona-picker`, {
-      method: "POST",
-      body: JSON.stringify({
-        code: code,
-      }),
-    })
-    const personas = await res.json()
-    const personaList = personas.personas.persona
-    setState({
-      ...state,
-      loginState: "CHOOSE_PERSONA",
-      accessToken: personas.accessToken,
-      gameConsole: personas.gameConsole,
-      personas: personaList,
-      selectedPersona: personaList[0].personaId,
-    })
+    try {
+      setState((s) => ({ ...s, loginState: "LOADING" }))
+      const res = await fetch(
+        `${origin}/.netlify/functions/ea-persona-picker`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            code: code,
+          }),
+        }
+      )
+      const personas = await res.json()
+      const personaList = personas.personas.persona
+      setState({
+        ...state,
+        loginState: "CHOOSE_PERSONA",
+        accessToken: personas.accessToken,
+        gameConsole: personas.gameConsole,
+        personas: personaList,
+        selectedPersona: personaList[0].personaId,
+      })
+    } catch (e) {
+      setState((s) => ({ ...s, loginState: "ERROR" }))
+    }
   }
 
   async function handleClick(e) {
@@ -261,6 +271,8 @@ export default () => {
         ...state,
         loginState: "LEAGUE_PICKER",
       })
+    } else {
+      setState({ ...state, loginState: "ERROR" })
     }
   }
 
@@ -283,6 +295,8 @@ export default () => {
     )
     if (res.ok) {
       setState({ ...state, loginState: "LEAGUE_DASHBOARD" })
+    } else {
+      setState({ ...state, loginState: "ERROR" })
     }
   }
 
@@ -739,6 +753,11 @@ export default () => {
         </div>
       )
     default:
-      return <div> LOADING </div>
+      return (
+        <div>
+          hmm something went wrong.
+          <button onClick={unlinkLeague}>Unlink League</button>
+        </div>
+      )
   }
 }
