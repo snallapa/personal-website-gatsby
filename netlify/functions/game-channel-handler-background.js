@@ -57,6 +57,10 @@ exports.handler = async function (event, context) {
         )
         return
       }
+      await respond(
+        token,
+        "I dont have this week, give me a second to export it!"
+      )
       await fetch(
         `https://nallapareddy.com/.netlify/functions/snallabot-ea-connector`,
         {
