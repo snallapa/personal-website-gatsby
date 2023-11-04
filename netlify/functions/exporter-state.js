@@ -8,11 +8,11 @@ exports.handler = async function (event, context) {
   try {
     league = await getLeague(guild_id)
   } catch (e) {
-    console.error(e)
     return {
-      statusCode: 500,
+      statusCode: 200,
       body: JSON.stringify({
-        error: e.mesasge,
+        state: "INITIATE_LOGIN",
+        league: {},
       }),
     }
   }
