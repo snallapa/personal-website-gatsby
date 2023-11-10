@@ -10,6 +10,10 @@ const namespaces = {
 }
 
 const exportWeeks = {
+  "Current Week": {
+    stage: -1,
+    week: 101,
+  },
   "Preseason Week 1": {
     stage: 0,
     week: 1,
@@ -144,7 +148,7 @@ export default () => {
     personaMaddenLeagues: [],
     selectedMaddenLeague: "",
     league: {},
-    exportOption: "Preaseason Week 1",
+    exportOption: "Current Week",
   })
 
   useEffect(() => {
