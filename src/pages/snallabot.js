@@ -248,7 +248,9 @@ export default () => {
     const searchParams = state.code.substring(state.code.indexOf("?"))
     const eaCode = new URLSearchParams(searchParams)
     const parsedCode = eaCode.get("code")
-    await choosePersona(parsedCode)
+    if (parsedCode) {
+      await choosePersona(parsedCode)
+    }
   }
 
   async function selectPersona(e) {
