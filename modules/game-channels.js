@@ -187,6 +187,18 @@ async function handleNotify(guild_id, command, member, token) {
       return acc
     }, league.commands.game_channels.channels)
     await setDoc(doc(db, "leagues", guild_id), league, { merge: true })
+    //add reactions
+    const _ = await fetch(
+      "https://nallapareddy.com/.netlify/functions/notifier-plane-background",
+      {
+        method: "POST",
+        body: JSON.stringify({
+          guild_id: guild_id,
+          currentChannels: messages.map((m) => m.channel_id),
+          users: [],
+        }),
+      }
+    )
     return respond("all users notified!")
   } else {
     return respond("hmm something went wrong :(, not all of them were notified")

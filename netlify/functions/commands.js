@@ -149,7 +149,7 @@ const MADDEN_CHANNELS_COMMANDS = {
           type: 8, // role
           name: "fw_admin",
           description: "admin role to confirm force wins",
-          required: false,
+          required: true,
         },
       ],
     },
