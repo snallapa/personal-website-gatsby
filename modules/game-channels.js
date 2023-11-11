@@ -141,7 +141,6 @@ async function handleNotify(guild_id, command, member, token) {
       )
     })
     .flatMap((c) => {
-      console.log(c.name)
       const channelId = c.id
       const channelTeams = c.name.split("-vs-").map((t) => t.replace("-", " "))
       const content = channelTeams
