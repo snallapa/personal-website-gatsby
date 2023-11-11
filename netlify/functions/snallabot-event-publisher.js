@@ -20,34 +20,6 @@ const app = initializeApp(firebaseConfig)
 // Initialize Cloud Firestore and get a reference to the service
 const db = getFirestore(app)
 
-async function publishGuildTeamEvent(guild_id) {
-  try {
-    const res = await DiscordRequestProd(
-      `guilds/${guild_id}/members?limit=1000`,
-      {
-        method: "GET",
-      }
-    )
-    const users = await res.json()
-    const userWithRoles = users.map((u) => ({ id: u.user.id, roles: u.roles }))
-    const backgroundRes = await fetch(
-      "https://nallapareddy.com/.netlify/functions/teams-background",
-      {
-        method: "POST",
-        body: JSON.stringify({
-          guild_id: guild_id,
-          users: userWithRoles,
-        }),
-      }
-    )
-    console.log(`guild ${guild_id} team publish successfully`)
-    return backgroundRes
-  } catch (e) {
-    console.error(`guild ${guild_id} team publish unsuccessful error: ${e}`)
-    return { ok: false }
-  }
-}
-
 async function publishChannelEvent(guild_id) {
   try {
     const res = await DiscordRequestProd(
@@ -102,16 +74,6 @@ exports.handler = async function (event, context) {
   const docRef = doc(db, "leagues", "guild_updates")
   const docSnap = await getDoc(docRef)
   const updateData = docSnap.data()
-  const teamGuilds = Object.keys(updateData.teams || {})
-  const teamUpdates = teamGuilds
-    .filter((g) => updateData.teams[g])
-    .map((g) => publishGuildTeamEvent(g))
-  const teamUpdatesRes = await Promise.all(teamUpdates)
-  if (teamUpdatesRes.every((r) => r.ok)) {
-    console.log("team updates sent successfully")
-  } else {
-    console.log("not all team updates were sent succesfully")
-  }
 
   const gameChannelGuilds = Object.keys(updateData.gameChannels || {})
   const gameChannelUpdates = gameChannelGuilds
