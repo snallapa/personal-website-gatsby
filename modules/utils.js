@@ -69,6 +69,7 @@ export function respond(
   interactionType = InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
   flags = 0
 ) {
+  console.log(flags)
   return {
     statusCode: statusCode,
     headers: { "Content-Type": "application/json" },
