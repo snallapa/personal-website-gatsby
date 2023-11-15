@@ -24,7 +24,7 @@ async function handleConfigure(guild_id, command, member, token) {
 
 async function handleCreate(guild_id, command, member, token) {
   await fetch(
-    "https://nallapareddy.com/.netlify/functions/game-channel-handler-background",
+    "https://nallapareddy.com/.netlify/functions/interaction-handler-background",
     {
       method: "POST",
       body: JSON.stringify({
@@ -78,7 +78,7 @@ async function handleCreateSuperBowl(guild_id, command, member, token) {
 
 async function handleClear(guild_id, command, member, token) {
   await fetch(
-    "https://nallapareddy.com/.netlify/functions/game-channel-handler-background",
+    "https://nallapareddy.com/.netlify/functions/interaction-handler-background",
     {
       method: "POST",
       body: JSON.stringify({
