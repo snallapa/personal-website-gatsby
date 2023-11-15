@@ -66,7 +66,8 @@ export async function DiscordRequestMedia(endpoint, options, maxTries = 5) {
 export function respond(
   message,
   statusCode = 200,
-  interactionType = InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE
+  interactionType = InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+  flags = 0
 ) {
   return {
     statusCode: statusCode,
@@ -75,6 +76,7 @@ export function respond(
       type: interactionType,
       data: {
         content: message,
+        flags: flags,
       },
     }),
   }

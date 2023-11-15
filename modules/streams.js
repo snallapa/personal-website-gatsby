@@ -113,7 +113,7 @@ async function handleCount(guild_id, command, member) {
       }
     }
     await setDoc(doc(db, "leagues", guild_id), league, { merge: true })
-    return respond("stream count updated!")
+    return respond("stream count updated!", (flags = 64))
   } catch (e) {
     console.log(e)
     return respond("could not update stream count :(")
