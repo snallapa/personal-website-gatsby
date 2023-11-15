@@ -1,5 +1,5 @@
 import { doc, setDoc } from "firebase/firestore"
-import { respond } from "./utils.js"
+import { respond, respondEphemeral } from "./utils.js"
 import { DiscordRequestProd } from "./utils.js"
 import { getLeague, db } from "./firebase-db.js"
 import fetch from "node-fetch"
@@ -113,7 +113,7 @@ async function handleCount(guild_id, command, member) {
       }
     }
     await setDoc(doc(db, "leagues", guild_id), league, { merge: true })
-    return respond("stream count updated!", (flags = 64))
+    return respondEphemeral("stream count updated!")
   } catch (e) {
     console.log(e)
     return respond("could not update stream count :(")

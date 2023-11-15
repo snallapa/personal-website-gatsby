@@ -66,8 +66,7 @@ export async function DiscordRequestMedia(endpoint, options, maxTries = 5) {
 export function respond(
   message,
   statusCode = 200,
-  interactionType = InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-  flags = 0
+  interactionType = InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE
 ) {
   console.log(flags)
   return {
@@ -77,7 +76,24 @@ export function respond(
       type: interactionType,
       data: {
         content: message,
-        flags: flags,
+      },
+    }),
+  }
+}
+
+export function respondEphemeral(
+  message,
+  statusCode = 200,
+  interactionType = InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE
+) {
+  return {
+    statusCode: statusCode,
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      type: interactionType,
+      data: {
+        content: message,
+        flags: 64,
       },
     }),
   }
