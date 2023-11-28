@@ -48,8 +48,14 @@ exports.handler = async function (event, context) {
 
       const exporterOn = !!league.madden_server?.leagueId
       let weeksGames = league.schedules?.reg?.[`week${week}`]
+      const teams = league.teams
       if (
-        !weeksGames?.every((g) => !(g.awayTeamId === 0 && g.homeTeamId === 0))
+        !weeksGames?.every(
+          (g) => !(g.awayTeamId === 0 && g.homeTeamId === 0)
+        ) ||
+        !weeksGames?.every(
+          (g) => g.awayTeamId in teams && g.homeTeamId in teams
+        )
       ) {
         if (!exporterOn) {
           await respond(
@@ -79,7 +85,7 @@ exports.handler = async function (event, context) {
         league = await getLeague(guild_id)
         weeksGames = league.schedules?.reg?.[`week${week}`]
       }
-      const teams = league.teams
+
       const channelPromises = weeksGames.map((game) => {
         return DiscordRequestProd(`guilds/${guild_id}/channels`, {
           method: "POST",
