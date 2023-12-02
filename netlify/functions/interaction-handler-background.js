@@ -189,6 +189,7 @@ exports.handler = async function (event, context) {
               exporter_body: {
                 week: 102,
                 stage: -1,
+                auto: true,
               },
             }),
           }

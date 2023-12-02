@@ -215,6 +215,7 @@ async function updateChannel(cId, league, users, guild_id) {
                 exporter_body: {
                   week: 101,
                   stage: -1,
+                  auto: true,
                 },
               }),
             }
