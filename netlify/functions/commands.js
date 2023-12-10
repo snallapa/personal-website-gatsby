@@ -436,6 +436,39 @@ const MADDEN_LOGGER_COMMANDS = {
   type: 1,
 }
 
+const MADDEN_EXPORT_COMMAND = {
+  name: "export",
+  description: "export your league through the dashboard",
+  options: [
+    {
+      type: 1, // sub command
+      name: "current",
+      description: "exports the current week",
+      options: [],
+    },
+    {
+      type: 1, // sub command
+      name: "week",
+      description: "exports the specified week",
+      options: [
+        {
+          type: 4, // integer
+          name: "week",
+          description: "the week number to export",
+          required: true,
+        },
+      ],
+    },
+    {
+      type: 1, // sub command
+      name: "all_weeks",
+      description: "exports all weeks",
+      options: [],
+    },
+  ],
+  type: 1,
+}
+
 const COMMANDS = [
   TEST_COMMAND,
   MADDEN_LEAGUE_COMMAND,
@@ -447,6 +480,7 @@ const COMMANDS = [
   MADDEN_SCHEDULE_COMMAND,
   MADDEN_LOGGER_COMMANDS,
   MADDEN_DASHBOARD_COMMAND,
+  MADDEN_EXPORT_COMMAND,
 ]
 
 const DELETED_COMMANDS = [
