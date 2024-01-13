@@ -5,8 +5,7 @@ subtitle: "Reverse engineering Madden API's and exposing vulnerabilities in EA"
 ---
 
 I have been playing Madden for basically my entire life. I think every Madden player remembers their first Madden. Mine was Madden 2003, and I remember being with my dad in this GameStop, and asking him to buy a used copy of Madden03 for $3 as it was old for whatever year that was (2006? maybe I was in 1st grade?). I was surprised he said yes, but looking back $3 was nothing for any game lol. I remember only being able to play as the Patriots against those random European teams (they had the European teams back then, they had a lot of stuff back then that the current game does not...). While I did not play every version since then, I took a huge break between Madden 15 to Madden 22, I have been back on my bs and playing it at full swing with the latest releases. I cannot express this enough: this. game. is. not. good. It is also the only viable football game out there right now (can maximum save us?). Soon after picking it back up, I started joining franchise leagues and getting involved a lot in some of them in Discord. This is where the problem starts.
-
-
+<br/><br/>
 Side note: this article was supposed to contain a lot of images and descriptions. However, I got lazy and wanted to just get this out there so I am going to release it with basically whatever I can in one sitting. I will try to come back and add some pictures but who knows how long that will take me. Also I was going to censor EA and Madden because I got scared of them getting mad at me, but you know what fuck it, just ban me if it really comes down to it. Free me from your shackles EA.
 
 # EA does not care about this
@@ -25,11 +24,9 @@ When running these leagues, an essential part is knowing information about your 
 * [Bug in M22, M23. maybe fixed in M24] Unable to use Let's Encrypt certificate (very popular, and free) for SSL?? I have a feeling I know why, but who really knows.
 * [Never Fixed] ID's change. Sometimes the ID's Madden assigns for teams and players change.. Why?? It causes most bots to break and have to reset them because IDs are important, and should not have to change. This is not really an app issue, its just a Madden issue but I am grouping it in here because it is part of the developer experience.
 * [Never Fixed] There are also various stats and such that are just not exported. Important ones like tackles for loss are not exported.
-
-
+<br/><br/>
 These issues make any app using the data from this extremely difficult. At my actual job, I work on really hard problems all the time. However, the most frustrating problems I have ever worked on have been related to using these APIs and understanding EA. They have continually let us out to starve and fend for ourselves when all we want to do is play some online football with friends.
-
-
+<br/><br/>
 With that in mind, there are some REALLY good solutions that exist right now that handle so much of this BS and I commend those developers for sticking to it. I am going to shoutout MyMadden because the dev was really nice to me! If you are looking for an all in one solution, hit them up
 
 # The Journey: Reverse Engineering
@@ -47,8 +44,7 @@ With some intuition, I knew that the Madden Companion App (MCA) had to be making
 ### Problem 1: Certificate Pinning
 
 I applaud EA a bit, they knew someone like me would come along and try to do this if they released this app. So they had some security measures in place. This one was a common way to thwart MITM attacks like I was doing. In short, they pinned the TLS certificate they were using in the MCA app to make their requests so my MITM proxy could not actually decrypt any of the network requests because it was not using the MITM TLS certificate! I don't really want to get into the specifics of TLS. I am also not a great authority for most of this stuff, but the problem is described [here in MITM Proxy's docs](https://docs.mitmproxy.org/stable/concepts-certificates/#certificate-pinning). EA put their own metaphorical lock on their requests so someone like me could not easily see what was inside.
-
-
+<br/><br/>
 I was stumped here for some time, maybe an entire year of on and off trying random stuff that did not work. I thought this was a dead end tbh, so I started decompling the MCA APK (android package) and seeing what was inside. I found some useful stuff:
 
 * EA had configuration files that had properties like server urls for their APIs and such. Its not very useful to know server URLs if you don't know the APIs to call or the requests to make though. Funny enough, in later versions of the app these properties were removed and this comment was left: "Be Careful with what you are putting here as this is visible outside the code!" Were they on to me?
@@ -86,8 +82,7 @@ Yes I was. I dove back into the assembly code to figure out how these fields wer
 ### Solution 3: Ghidra
 
 I didn't talk before how I looked at the assembly code. I think if you are a pro reverse engineer you usually use tools like IDA. These can cost money depending on what you are doing, and I had no idea what I was doing. There is one pretty great free solution called [Ghidra](https://ghidra-sre.org/). It has an old school look to it, but it works fantastic. It is completely open source too! It's maintained by the National Security Agency... The NSA... The NSA has an open source decompiler they use for reverse engineering?!?! That was my first thought when I found this tool LOL. It works great however so lets use it!
-
-
+<br/><br/>
 Once you boot up Ghidra, you just stick the lib file in and let it go to work. The decompling and analysis can take some time, so just let it sit for a while, but its definitely working. Ghidra has a pretty great default UI and it shows you C code that it tried to translate for you so you don't have to look straight at assembly. I usually look at the C code as I find that to be the only part I actually understand, but you have to be really careful because it can just be simply wrong and in the end the assembly is the truth.
 
 ![Ghidra photo](/6/ghidra.png)
@@ -97,8 +92,7 @@ Reading the disassembly can get you pretty far! Almost all of the encryption is 
 ### Solution 4: Frida
 
 Just looking at assembly is fine, but it can be really hard to figure out what is going on just from assembly. It is like debugging code without being able to run it and use a debugger or logging statements. What I needed and what helped me a lot was looking at live data. I wanted to look at what data was being encrypted and what was the output. There was one tool that let me do all that (and much more if you know what you are doing) and that was [Frida](https://frida.re/). I don't think I can properly describe how powerful this tool is and what it can do. I did such simple things with it and it's honestly so impressive. Frida lets you dynamically inject code into native apps. This means with a few lines of Javascript, you can run your own code as the app is running. This is extremely useful for adding instrumentation to code that you do not have!
-
-
+<br/><br/>
 Using Frida, I was able to see exactly what data was being passed from various function calls and see what was the output. This made it easy to make the final step and figure out exactly how EA was encrypting their messages. There was no actual encryption, it was just security by obfuscation. Nice try EA! That only goes so far. Using various hashes and some "secret" keys (static data LOL) they scramble the data using XOR. To keep the data different, they had a counter that they would increment on every request, so that is why the same request would have different authentication data!
 
 # Integrating with Snallabot
@@ -108,13 +102,13 @@ Finally, I had every step I needed to connect to EA servers myself. There was no
 * While implementing, I looked into why EA does not return Free Agents in their data. They had a flag in their request that said `returnFreeAgent`. Well, they made a typo! This flag should say `returnFreeAgents` with an `s` at the end LMAO. This bug is still not fixed to the day of this writing, and I fixed it in my bot just by guessing how they messed up. A one character fix!
 * EA uses various tokens in their app to keep the sessions fresh. However, the app kept signing me out. I thought this would be a dealbreaker because I would have to have my bot sign in to EA every so often to refresh its token. However, when I started implementing I found that EA did implement a refreshToken API and they were calling it, but each call would return a 404. I looked into it and this was because that API expected form delimited data, which is delimited like so `key1=value1&key2=value2&key3=value3`. EA was sending them... JSON! I properly send form data and I was able to successfully refresh my tokens without having to sign into EA again. How do you mess up sending data to your own APIs? How do you let this go to customers??
 * When calling their Blaze Servers, I ran into some weird Javascript Fetch issues. The issue manifested with this error `ERR_SSL_UNSAFE_LEGACY_RENEGOTIATION_DISABLED`. This is because EA uses old TLS version that Node 17 by default cannot connect to that version. This is honestly pretty bad security practice for EA to be on this old SSL version. It is not my problem! I found various fixes on stack overflow and was able to turn on a flag to allow Node to connect to the blaze servers.
-
+<br/><br/>
 These really showed some serious problems with how EA released this app, and how little they care about it working. My two cents is that the release of this was extremely rushed, and there was little to not testing done at all. Seriously, these were mind boggling mistakes to find as even using the app would expose most of them...
 
 # Final result
 
 I have created my own dashboard with this data, [here is an example of what it looks like](https://nallapareddy.com/snallabot/?league=972269092440530994). I recreated all the functionality I needed and it is used by 40 leagues at the time of this writing! If you would like to give it a try, you can find all the information about my [bot here](https://github.com/snallapa/snallabot). This whole endeavor took me close to 2 years, and I am so excited that I was able to get it done. 
-
+<br/><br/>
 Your turn EA, let's see how long it takes for you to break this and how long it takes for me now to figure it out again.
 
 ![Snallabot Dashboard](/6/snallabot.png)
