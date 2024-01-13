@@ -54,7 +54,7 @@ I was stumped here for some time, maybe an entire year of on and off trying rand
 * EA had configuration files that had properties like server urls for their APIs and such. Its not very useful to know server URLs if you don't know the APIs to call or the requests to make though. Funny enough, in later versions of the app these properties were removed and this comment was left: "Be Careful with what you are putting here as this is visible outside the code!" Were they on to me?
 * I was hoping that the app was all in Java/Android so I could see more in the decompiled APK. However, it was not. It was using something called Haxe and this was all C++ code. So their app was almost entirely in C++ binaries, which means decompiling those meant looking straight into assembly... yikes. I spent hours looking at that assembly and made almost 0 progress. This skill did turn out to be useful tho!
 
-### Solution 1: Unpin the certificate
+### Solution 2: Unpin the certificate
 
 Finally though, I made my first of two major breakthroughs. After messing with the assembly for some time, I went back to the certificate pinning issue. Conceptually, I just needed to unpin the certificate that was being used and replace it with the MITM certificate. That is when the solution seemed so easy. I bet if I knew what I was doing I could have done this the first day! I decompiled the APK, looked into the resources folder and behold the EA certificate that was being used for their pinning. I replaced that with the MITM certificate, recompiled the APK, and installed it on my emulator and viola! We were now looking at all requests made from the app!!!
 
@@ -62,7 +62,7 @@ Finally though, I made my first of two major breakthroughs. After messing with t
 
 Just like that, I thought I was ready to replicate everything. Almost an entire year on and off, and the solution was actually quite simple in the end. I started coding immediately, and made all the calls to EA from my own server. I was able to log in successfully, pull my EA persona, and was about to make calls to the Madden server before I realized we would hit our next biggest hurdle...
 
-### Solution 2: The easiest way to solve Certificate Pinning
+### Solution 2.5: The easiest way to solve Certificate Pinning
 
 Before I get into this next part, I took so long to do this whole operation that it actually got easier over time. In the latest version of the MCA for Madden 24, EA rewrote the entire app. They did not use Haxe anymore and switched to Apache Cordova!! This meant the entire app was in Javascript, which was WAY easier to decompile and look into the code. Another big change, was in this rewrite they removed their certificate pinning completely. So if you are trying to replicate this now, you won't even need to do what I did LOL, just by using MITM proxy you will see all the requests you need to see. However, this won't be enough as there was still a relatively complex task ahead.
 
