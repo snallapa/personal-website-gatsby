@@ -127,11 +127,12 @@ async function ping(gameChannel, teams) {
   const channelTeams = channelName.split("-vs-").map((t) => t.replace("-", " "))
   const content = channelTeams
     .map((t) => {
-      const user = teams[findTeam(teams, t)].discordUser
+      const team = teams[findTeam(teams, t)]
+      const user = team.discordUser
       if (user) {
         return `<@${user}>`
       } else {
-        return ""
+        return team.username ? team.username : "CPU"
       }
     })
     .join(" ")
