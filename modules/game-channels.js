@@ -145,11 +145,12 @@ async function handleNotify(guild_id, command, member, token) {
       const channelTeams = c.name.split("-vs-").map((t) => t.replace("-", " "))
       const content = channelTeams
         .map((t) => {
-          const user = league.teams[findTeam(league.teams, t)].discordUser
+          const team = league.teams[findTeam(league.teams, t)]
+          const user = team.discordUser
           if (user) {
             return `<@${user}>`
           } else {
-            return ""
+            return team.username ? team.username : "CPU"
           }
         })
         .join(" at ")
