@@ -495,6 +495,7 @@ export default () => {
             </select>
           </label>
           <button onClick={selectLeague}>Submit League</button>
+          <button onClick={unlinkLeague}>Unlink</button>
         </div>
       )
     case "LEAGUE_DASHBOARD":
