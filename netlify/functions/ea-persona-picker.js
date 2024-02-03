@@ -117,6 +117,7 @@ exports.handler = async function (event, context) {
     })
     personas = personas.concat(res4Json["personas"]["persona"])
   }
+  console.log(personas)
 
   const jsonBody = {
     personas: { persona: personas },
