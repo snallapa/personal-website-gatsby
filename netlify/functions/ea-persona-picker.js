@@ -126,14 +126,13 @@ exports.handler = async function (event, context) {
     })
     personas = personas.concat(res4Json["personas"]["persona"])
   }
-  console.log(personas)
   personas = personas.filter((p) => {
     return (
       ENTITLEMENT_TO_VALID_NAMESPACE(TWO_DIGIT_YEAR)[p.gameConsole] ===
       p.namespaceName
     )
   })
-
+  console.log(personas)
   const jsonBody = {
     personas: { persona: personas },
     accessToken: access_token,
