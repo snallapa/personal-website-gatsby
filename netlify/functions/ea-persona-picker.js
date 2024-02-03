@@ -18,6 +18,15 @@ const VALID_ENTITLEMENTS = (a) => ({
   stadia: `MADDEN_${a}SDA`,
 })
 
+const ENTITLEMENT_TO_VALID_NAMESPACE = (a) => ({
+  [`MADDEN_${a}XONE`]: "xbox",
+  [`MADDEN_${a}PS4`]: "ps3",
+  [`MADDEN_${a}PC`]: "cem_ea_id",
+  [`MADDEN_${a}PS5`]: "ps3",
+  [`MADDEN_${a}XBSX`]: "xbox",
+  [`MADDEN_${a}SDA`]: "stadia",
+})
+
 const namespaces = {
   xbox: "XBOX",
   ps3: "PSN",
@@ -118,6 +127,12 @@ exports.handler = async function (event, context) {
     personas = personas.concat(res4Json["personas"]["persona"])
   }
   console.log(personas)
+  personas = personas.filter((p) => {
+    return (
+      ENTITLEMENT_TO_VALID_NAMESPACE(TWO_DIGIT_YEAR)[p.gameConsole] ===
+      p.namespaceName
+    )
+  })
 
   const jsonBody = {
     personas: { persona: personas },
