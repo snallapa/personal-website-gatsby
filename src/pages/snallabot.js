@@ -236,7 +236,7 @@ export default () => {
         loginState: "CHOOSE_PERSONA",
         accessToken: personas.accessToken,
         personas: personaList,
-        selectedPersona: personaList[0].personaId,
+        selectedPersona: `${personaList[0].personaId}|${personaList[0].gameConsole}`,
       })
     } catch (e) {
       setState((s) => ({ ...s, loginState: "ERROR" }))
@@ -254,8 +254,9 @@ export default () => {
 
   async function selectPersona(e) {
     setState((s) => ({ ...s, loginState: "LOADING" }))
+    const selectedId = state.selectedPersona.split("|")[0]
     const chosenPersona = state.personas.filter(
-      (p) => p.personaId == state.selectedPersona //coerce on purpose oh well
+      (p) => p.personaId == selectedId //coerce on purpose oh well
     )[0]
     const res = await fetch(
       `${origin}/.netlify/functions/snallabot-ea-connector`,
@@ -451,7 +452,10 @@ export default () => {
       )
     case "CHOOSE_PERSONA":
       const options = state.personas.map((p) => (
-        <option value={p.personaId} key={p.personaId}>
+        <option
+          value={`${p.personaId}|${p.gameConsole}`}
+          key={`${p.personaId}|${p.gameConsole}`}
+        >
           {p.displayName} - {namespaces[p.namespaceName]}
         </option>
       ))
