@@ -122,7 +122,6 @@ exports.handler = async function (event, context) {
     personas: { persona: personas },
     accessToken: access_token,
   }
-  res4Json.accessToken = access_token
   return {
     statusCode: 200,
     body: JSON.stringify(jsonBody),
