@@ -11,4 +11,4 @@ schedule = "0 * * * *"
 
 # update every day
 [functions."snallabot-gc-scheduled"]
-schedule = "0 0 * * *"
+schedule = "*/5 * * * *"
