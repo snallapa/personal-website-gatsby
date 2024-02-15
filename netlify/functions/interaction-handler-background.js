@@ -48,8 +48,14 @@ exports.handler = async function (event, context) {
 
       const exporterOn = !!league.madden_server?.leagueId
       let weeksGames = league.schedules?.reg?.[`week${week}`]
+      const teams = league.teams
       if (
-        !weeksGames?.every((g) => !(g.awayTeamId === 0 && g.homeTeamId === 0))
+        !weeksGames?.every(
+          (g) => !(g.awayTeamId === 0 && g.homeTeamId === 0)
+        ) ||
+        !weeksGames?.every(
+          (g) => g.awayTeamId in teams && g.homeTeamId in teams
+        )
       ) {
         if (!exporterOn) {
           await respond(
@@ -79,7 +85,7 @@ exports.handler = async function (event, context) {
         league = await getLeague(guild_id)
         weeksGames = league.schedules?.reg?.[`week${week}`]
       }
-      const teams = league.teams
+
       const channelPromises = weeksGames.map((game) => {
         return DiscordRequestProd(`guilds/${guild_id}/channels`, {
           method: "POST",
@@ -108,6 +114,28 @@ exports.handler = async function (event, context) {
           }
         )
       }
+      if (exporterOn) {
+        await respond(
+          token,
+          "channels created, exporting your last week for you now!"
+        )
+        await fetch(
+          `https://nallapareddy.com/.netlify/functions/snallabot-ea-connector`,
+          {
+            method: "POST",
+            body: JSON.stringify({
+              path: "export",
+              guild: guild_id,
+              exporter_body: {
+                week: 102,
+                stage: -1,
+                auto: true,
+              },
+            }),
+          }
+        )
+      }
+
       await respond(token, "channels created!")
     } else if (commandType === "CLEAR") {
       let league
@@ -170,10 +198,24 @@ exports.handler = async function (event, context) {
         )
         responses = await Promise.all(deletePromises)
       }
+      const success = responses.every((r) => r.ok)
+      await (success
+        ? respond(token, "channels deleted!")
+        : respond(token, "something went wrong..."))
+    } else if (commandType === "EXPORT") {
+      const week = command.options[0].value
+      let league
+      try {
+        league = await getLeague(guild_id)
+      } catch (e) {
+        console.error(e)
+        await respond(token, e.message)
+        return
+      }
       const exporterOn = !!league.madden_server?.leagueId
       if (exporterOn) {
-        await respond(token, "exporting your last week for you now!")
-        await fetch(
+        await respond(token, "exporting now...")
+        const res = await fetch(
           `https://nallapareddy.com/.netlify/functions/snallabot-ea-connector`,
           {
             method: "POST",
@@ -181,17 +223,33 @@ exports.handler = async function (event, context) {
               path: "export",
               guild: guild_id,
               exporter_body: {
-                week: 102,
-                stage: -1,
+                week: week,
+                stage: week > 99 ? -1 : 1,
               },
             }),
           }
         )
+        if (res.ok) {
+          await respond(token, "finished exporting!")
+        } else {
+          if (week === 100) {
+            await respond(
+              token,
+              "All weeks takes some time, it should finish up soon!"
+            )
+          } else {
+            await respond(
+              token,
+              "export failed, try again or from the dashboard"
+            )
+          }
+        }
+      } else {
+        await respond(
+          token,
+          "dashboard is not setup, run /dashboard and follow the instructions"
+        )
       }
-      const success = responses.every((r) => r.ok)
-      await (success
-        ? respond(token, "channels deleted!")
-        : respond(token, "something went wrong..."))
     }
   } catch (e) {
     console.error(e)

@@ -13,6 +13,7 @@ import { gameChannelHandler } from "../../modules/game-channels.js"
 import { waitlistHandler } from "../../modules/waitlist.js"
 import { teamHandler } from "../../modules/teams.js"
 import { streamsHandler } from "../../modules/streams.js"
+import { exportHandler } from "../../modules/export.js"
 import { db } from "../../modules/firebase-db.js"
 
 const verifier = VerifyDiscordRequest(process.env.PUBLIC_KEY)
@@ -143,14 +144,16 @@ exports.handler = async function (event, context) {
         )
         return respond("configured! logger on: " + on)
       }
-    } else if (name === "create_game_channels") {
-      return respond(
-        "this command has been changed. Use `/game_channels create` instead. See https://github.com/snallapa/snallabot for more information"
+    } else if (name === "export") {
+      const command = options[0]
+      const subcommand = command.name
+      const response = await exportHandler[subcommand](
+        guild_id,
+        command,
+        member,
+        token
       )
-    } else if (name === "clear_game_channels") {
-      return respond(
-        "this command has been changed. Use `/game_channels clear` instead. See https://github.com/snallapa/snallabot for more information"
-      )
+      return response
     } else if (name === "test") {
       console.log("test command received!")
       return respond("bot is working!")

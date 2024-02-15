@@ -18,6 +18,15 @@ const VALID_ENTITLEMENTS = (a) => ({
   stadia: `MADDEN_${a}SDA`,
 })
 
+const ENTITLEMENT_TO_VALID_NAMESPACE = (a) => ({
+  [`MADDEN_${a}XONE`]: "xbox",
+  [`MADDEN_${a}PS4`]: "ps3",
+  [`MADDEN_${a}PC`]: "cem_ea_id",
+  [`MADDEN_${a}PS5`]: "ps3",
+  [`MADDEN_${a}XBSX`]: "xbox",
+  [`MADDEN_${a}SDA`]: "stadia",
+})
+
 const namespaces = {
   xbox: "XBOX",
   ps3: "PSN",
@@ -82,34 +91,55 @@ exports.handler = async function (event, context) {
   )
   const res3Json = await res3.json()
 
-  console.log(res3Json["entitlements"]["entitlement"])
+  console.log(
+    res3Json["entitlements"]["entitlement"].filter(
+      (p) =>
+        p.entitlementTag === "ONLINE_ACCESS" &&
+        Object.values(VALID_ENTITLEMENTS(TWO_DIGIT_YEAR)).includes(p.groupName)
+    )
+  )
 
-  const { pidUri, groupName: gameConsole } = res3Json["entitlements"][
-    "entitlement"
-  ].filter(
+  const validEntitles = res3Json["entitlements"]["entitlement"].filter(
     (p) =>
       p.entitlementTag === "ONLINE_ACCESS" &&
       Object.values(VALID_ENTITLEMENTS(TWO_DIGIT_YEAR)).includes(p.groupName)
-  )[0]
-
-  const res4 = await fetch(
-    `https://gateway.ea.com/proxy/identity${pidUri}/personas?status=ACTIVE&access_token=${access_token}`,
-    {
-      headers: {
-        "Acccept-Charset": "UTF-8",
-        "X-Expand-Results": "true",
-        "User-Agent":
-          "Dalvik/2.1.0 (Linux; U; Android 13; sdk_gphone_x86_64 Build/TE1A.220922.031)",
-        "Accept-Encoding": "gzip",
-      },
-    }
   )
-  const res4Json = await res4.json()
-  res4Json.accessToken = access_token
-  res4Json.gameConsole = gameConsole
+
+  let personas = []
+  for (let entity of validEntitles) {
+    const { pidUri, groupName: gameConsole } = entity
+    const res4 = await fetch(
+      `https://gateway.ea.com/proxy/identity${pidUri}/personas?status=ACTIVE&access_token=${access_token}`,
+      {
+        headers: {
+          "Acccept-Charset": "UTF-8",
+          "X-Expand-Results": "true",
+          "User-Agent":
+            "Dalvik/2.1.0 (Linux; U; Android 13; sdk_gphone_x86_64 Build/TE1A.220922.031)",
+          "Accept-Encoding": "gzip",
+        },
+      }
+    )
+    const res4Json = await res4.json()
+    res4Json["personas"]["persona"].forEach((p) => {
+      p.gameConsole = gameConsole
+    })
+    personas = personas.concat(res4Json["personas"]["persona"])
+  }
+  personas = personas.filter((p) => {
+    return (
+      ENTITLEMENT_TO_VALID_NAMESPACE(TWO_DIGIT_YEAR)[p.gameConsole] ===
+      p.namespaceName
+    )
+  })
+  console.log(personas)
+  const jsonBody = {
+    personas: { persona: personas },
+    accessToken: access_token,
+  }
   return {
     statusCode: 200,
-    body: JSON.stringify(res4Json),
+    body: JSON.stringify(jsonBody),
   }
 
   /*
