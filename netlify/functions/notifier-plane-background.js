@@ -257,7 +257,7 @@ async function updateChannel(cId, league, users, guild_id) {
               return currentState
             }
           } else if (!currentState.events.includes("FW_REQUESTED")) {
-            const message = `FW requested <@&${
+            const message = `Sim requested <@&${
               league.commands.game_channels.adminRole
             }> by ${joinUsers(requestedUsers)}`
             await DiscordRequestProd(`channels/${cId}/messages`, {
