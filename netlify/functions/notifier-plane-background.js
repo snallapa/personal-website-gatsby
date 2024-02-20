@@ -295,7 +295,10 @@ async function updateChannel(cId, league, users, guild_id) {
         }
       }
 
-      if (scheduledUsers.length === 1) {
+      if (
+        scheduledUsers.length === 1 &&
+        !currentState.events.includes("FW_REQUESTED")
+      ) {
         const waitPing = league.commands.game_channels.waitPing || 12
         const now = new Date()
         const last = new Date(currentState.lastNotified)
