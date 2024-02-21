@@ -26,7 +26,7 @@ async function handleExport(guild_id, command, member, token) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       type: InteractionResponseType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE,
-      data: {},
+      data: { flags: 64 },
     }),
   }
 }

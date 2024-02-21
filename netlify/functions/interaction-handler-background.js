@@ -16,6 +16,19 @@ async function respond(token, content) {
   )
 }
 
+async function respondEphemeral(token, content) {
+  await DiscordRequestProd(
+    `webhooks/${process.env.APP_ID}/${token}/messages/@original`,
+    {
+      method: "PATCH",
+      body: {
+        content: content,
+        flags: 64,
+      },
+    }
+  )
+}
+
 exports.handler = async function (event, context) {
   const { guild_id, command, member, token, commandType } = JSON.parse(
     event.body
@@ -68,20 +81,13 @@ exports.handler = async function (event, context) {
           token,
           "I dont have this week, give me a second to export it!"
         )
-        await fetch(
-          `https://nallapareddy.com/.netlify/functions/snallabot-ea-connector`,
-          {
-            method: "POST",
-            body: JSON.stringify({
-              path: "export",
-              guild: guild_id,
-              exporter_body: {
-                week: week,
-                stage: 1,
-              },
-            }),
-          }
-        )
+        await fetch(`https://snallabot.herokuapp.com/${guild_id}/export`, {
+          method: "POST",
+          body: JSON.stringify({
+            week: week,
+            stage: 1,
+          }),
+        })
         league = await getLeague(guild_id)
         weeksGames = league.schedules?.reg?.[`week${week}`]
       }
@@ -119,21 +125,14 @@ exports.handler = async function (event, context) {
           token,
           "channels created, exporting your last week for you now!"
         )
-        await fetch(
-          `https://nallapareddy.com/.netlify/functions/snallabot-ea-connector`,
-          {
-            method: "POST",
-            body: JSON.stringify({
-              path: "export",
-              guild: guild_id,
-              exporter_body: {
-                week: 102,
-                stage: -1,
-                auto: true,
-              },
-            }),
-          }
-        )
+        await fetch(`https://snallabot.herokuapp.com/${guild_id}/export`, {
+          method: "POST",
+          body: JSON.stringify({
+            week: 102,
+            stage: -1,
+            auto: true,
+          }),
+        })
       }
 
       await respond(token, "channels created!")
@@ -209,43 +208,39 @@ exports.handler = async function (event, context) {
         league = await getLeague(guild_id)
       } catch (e) {
         console.error(e)
-        await respond(token, e.message)
+        await respondEphemeral(token, e.message)
         return
       }
       const exporterOn = !!league.madden_server?.leagueId
       if (exporterOn) {
-        await respond(token, "exporting now...")
+        await respondEphemeral(token, "exporting now...")
         const res = await fetch(
-          `https://nallapareddy.com/.netlify/functions/snallabot-ea-connector`,
+          `https://snallabot.herokuapp.com/${guild_id}/export`,
           {
             method: "POST",
             body: JSON.stringify({
-              path: "export",
-              guild: guild_id,
-              exporter_body: {
-                week: week,
-                stage: week > 99 ? -1 : 1,
-              },
+              week: week,
+              stage: week > 99 ? -1 : 1,
             }),
           }
         )
         if (res.ok) {
-          await respond(token, "finished exporting!")
+          await respondEphemeral(token, "finished exporting!")
         } else {
           if (week === 100) {
-            await respond(
+            await respondEphemeral(
               token,
               "All weeks takes some time, it should finish up soon!"
             )
           } else {
-            await respond(
+            await respondEphemeral(
               token,
               "export failed, try again or from the dashboard"
             )
           }
         }
       } else {
-        await respond(
+        await respondEphemeral(
           token,
           "dashboard is not setup, run /dashboard and follow the instructions"
         )
