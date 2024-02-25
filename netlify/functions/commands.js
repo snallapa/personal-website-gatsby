@@ -379,7 +379,7 @@ const MADDEN_STREAMS_COMMANDS = {
         },
         {
           type: 4, // integer
-          name: "step",
+          name: "increment",
           description:
             "changes the increment from 1 to your choice. can be negative",
           required: false,
