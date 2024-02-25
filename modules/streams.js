@@ -53,9 +53,8 @@ async function handleCount(guild_id, command, member) {
     return respond("streams is not configured yet. Configure it first")
   }
   const currentUserCount = league.commands.streams.counts[user] || 0
-  const newCount = command.options[1]
-    ? command.options[1].value
-    : currentUserCount + 1
+  const step = command.options[1] ? command.options[1].value : 1
+  const newCount = currentUserCount + step
   league.commands.streams.counts[user] = newCount
   const content = createStreamsMessage(league.commands.streams.counts)
   try {
