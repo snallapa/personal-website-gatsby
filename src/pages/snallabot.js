@@ -456,7 +456,7 @@ export default () => {
           value={`${p.personaId}|${p.gameConsole}`}
           key={`${p.personaId}|${p.gameConsole}`}
         >
-          {p.displayName} - {namespaces[p.namespaceName]}
+              {p.displayName} - {namespaces[p.namespaceName]} - {p.gameConsole}
         </option>
       ))
       return (
