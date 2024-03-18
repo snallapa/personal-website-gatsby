@@ -253,10 +253,12 @@ export default () => {
   }
 
   async function selectPersona(e) {
-    setState((s) => ({ ...s, loginState: "LOADING" }))
-    const selectedId = state.selectedPersona.split("|")[0]
+      setState((s) => ({ ...s, loginState: "LOADING" }))
+      const selected = state.selectedPersona.split("|")
+      const selectedId = selected[0]
+      const selectedGameConsole = selected[1]
     const chosenPersona = state.personas.filter(
-      (p) => p.personaId == selectedId //coerce on purpose oh well
+      (p) => p.personaId == selectedId && p.gameConsole == selectedGameConsole
     )[0]
     const res = await fetch(
       `${origin}/.netlify/functions/snallabot-ea-connector`,
@@ -268,7 +270,7 @@ export default () => {
           exporter_body: {
             persona: chosenPersona,
             token: state.accessToken,
-            gameConsole: chosenPersona.gameConsole,
+              gameConsole: selectedGameConsole,
           },
         }),
       }
