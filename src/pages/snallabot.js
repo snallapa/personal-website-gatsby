@@ -253,10 +253,10 @@ export default () => {
   }
 
   async function selectPersona(e) {
-      setState((s) => ({ ...s, loginState: "LOADING" }))
-      const selected = state.selectedPersona.split("|")
-      const selectedId = selected[0]
-      const selectedGameConsole = selected[1]
+    setState((s) => ({ ...s, loginState: "LOADING" }))
+    const selected = state.selectedPersona.split("|")
+    const selectedId = selected[0]
+    const selectedGameConsole = selected[1]
     const chosenPersona = state.personas.filter(
       (p) => p.personaId == selectedId && p.gameConsole == selectedGameConsole
     )[0]
@@ -270,7 +270,7 @@ export default () => {
           exporter_body: {
             persona: chosenPersona,
             token: state.accessToken,
-              gameConsole: selectedGameConsole,
+            gameConsole: selectedGameConsole,
           },
         }),
       }
@@ -458,7 +458,7 @@ export default () => {
           value={`${p.personaId}|${p.gameConsole}`}
           key={`${p.personaId}|${p.gameConsole}`}
         >
-              {p.displayName} - {namespaces[p.namespaceName]} - {p.gameConsole}
+          {p.displayName} - {namespaces[p.namespaceName]} - {p.gameConsole}
         </option>
       ))
       return (
