@@ -8,6 +8,9 @@ exports.handler = async function (event, context) {
         event_type: "5_MIN_TRIGGER",
         delivery: "EVENT_TRANSFER",
       }),
+      headers: {
+        "Content-Type": "application/json",
+      },
     }
   )
   return {
