@@ -294,29 +294,48 @@ async function handleBroadcastConfiguration(guild_id, command, member) {
 
 async function handleYoutube(guild_id, command, member) {
   const subCommand = command.options[0]
-  const event_type =
-    subCommand.name === "add" ? "ADD_CHANNEL" : "REMOVE_CHANNEL"
-  const youtubeUrl = subCommand.options[0]
-  const res = await fetch(
-    "https://snallabot-yt-notifier-46962131d2d5.herokuapp.com/configure",
-    {
-      method: "POST",
-      body: JSON.stringify({
-        youtube_url: youtubeUrl,
-        discord_server: guild_id,
-        event_type: event_type,
-      }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }
-  )
-  if (res.ok) {
-    return respond("channel updated successfully")
-  } else {
+  const commandName = subCommand.name
+  if (commandName === "list") {
+    const youtubeUrls = await fetch(
+      "https://snallabot-yt-notifier-46962131d2d5.herokuapp.com/list",
+      {
+        method: "POST",
+        body: JSON.stringify({
+          discord_server: guild_id,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    ).then((res) => res.json())
     return respond(
-      "channel coud not be updated, please make sure you input the whole youtube channel url"
+      `Here are your currently configured youtube channels:\n\n${youtubeUrls.join("\n")}`
     )
+  } else {
+    const event_type =
+      subCommand.name === "add" ? "ADD_CHANNEL" : "REMOVE_CHANNEL"
+    const youtubeUrl = subCommand.options[0]
+    const res = await fetch(
+      "https://snallabot-yt-notifier-46962131d2d5.herokuapp.com/configure",
+      {
+        method: "POST",
+        body: JSON.stringify({
+          youtube_url: youtubeUrl,
+          discord_server: guild_id,
+          event_type: event_type,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    )
+    if (res.ok) {
+      return respond("channel updated successfully")
+    } else {
+      return respond(
+        "channel coud not be updated, please make sure you input the whole youtube channel url"
+      )
+    }
   }
 }
 
