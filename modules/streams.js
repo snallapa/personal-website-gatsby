@@ -312,6 +312,7 @@ async function handleYoutube(guild_id, command, member) {
       `Here are your currently configured youtube channels:\n\n${youtubeUrls.join("\n")}`
     )
   } else {
+    console.log(subCommand)
     const event_type =
       subCommand.name === "add" ? "ADD_CHANNEL" : "REMOVE_CHANNEL"
     const youtubeUrl = subCommand.options[0]
