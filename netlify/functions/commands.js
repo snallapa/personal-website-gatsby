@@ -463,6 +463,12 @@ const MADDEN_STREAMS_COMMANDS = {
             },
           ],
         },
+        {
+          type: 1, // sub command
+          name: "list",
+          description: "list all youtube broadcast",
+          options: [],
+        },
       ],
     },
   ],
