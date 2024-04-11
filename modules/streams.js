@@ -270,9 +270,61 @@ async function handleReset(guild_id, command, member) {
   }
 }
 
+async function handleBroadcastConfiguration(guild_id, command, member) {
+  const role = command.options[2] ? command.options[2].value : ""
+  await fetch(
+    "https://snallabot-event-sender-b869b2ccfed0.herokuapp.com/post",
+    {
+      method: "POST",
+      body: JSON.stringify({
+        key: guild_id,
+        event_type: "BROADCAST_CONFIGURATION",
+        delivery: "EVENT_SOURCE",
+        channel_id: command.options[1].value,
+        title_keyword: command.options[0].value,
+        role: role,
+      }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  )
+  return respond("broadcast configured")
+}
+
+async function handleYoutube(guild_id, command, member) {
+  const subCommand = command.options[0]
+  const event_type =
+    subCommand.name === "add" ? "ADD_CHANNEL" : "REMOVE_CHANNEL"
+  const youtubeUrl = subCommand.options[0]
+  const res = await fetch(
+    "https://snallabot-yt-notifier-46962131d2d5.herokuapp.com/configure",
+    {
+      method: "POST",
+      body: JSON.stringify({
+        youtube_url: youtubeUrl,
+        discord_server: guild_id,
+        event_type: event_type,
+      }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  )
+  if (res.ok) {
+    return respond("channel updated successfully")
+  } else {
+    return respond(
+      "channel coud not be updated, please make sure you input the whole youtube channel url"
+    )
+  }
+}
+
 export const streamsHandler = {
   configure: handleConfigure,
   count: handleCount,
   remove: handleRemove,
   reset: handleReset,
+  broadcast: handleBroadcastConfiguration,
+  youtube: handleYoutube,
 }

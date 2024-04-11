@@ -405,6 +405,66 @@ const MADDEN_STREAMS_COMMANDS = {
       description: "DANGER resets all users to 0",
       options: [],
     },
+    {
+      type: 1, // sub command
+      name: "broadcast",
+      description: "configures snallabot broadcaster",
+      options: [
+        {
+          type: 3, // string
+          name: "keyword",
+          description: "only show broadcasts with this keyword in the title",
+          required: true,
+        },
+        {
+          type: 7, // channel
+          name: "channel",
+          description: "channel to send broadcasts to",
+          required: true,
+          channel_types: [0],
+        },
+        {
+          type: 8, // optional role to notify
+          name: "notifier_role",
+          description: "optional role to notify on every broadcast",
+          required: false,
+        },
+      ],
+    },
+    {
+      type: 2, // sub command group
+      name: "youtube",
+      description: "configures youtube broadcasts",
+      options: [
+        {
+          type: 1, // sub command
+          name: "add",
+          description: "add youtube broadcast",
+          options: [
+            {
+              type: 3, // string
+              name: "youtube_channel",
+              description:
+                "the youtube channel you want to show broadcasts for",
+              required: true,
+            },
+          ],
+        },
+        {
+          type: 1, // sub command
+          name: "remove",
+          description: "remove youtube broadcast",
+          options: [
+            {
+              type: 3, // string
+              name: "youtube_channel",
+              description: "the youtube channel you want to remove",
+              required: true,
+            },
+          ],
+        },
+      ],
+    },
   ],
   type: 1,
 }
