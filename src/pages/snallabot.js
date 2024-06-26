@@ -184,7 +184,7 @@ export default () => {
           setState((s) => ({
             ...s,
             personaMaddenLeagues: slimmedLeagues,
-            selectedMaddenLeague: slimmedLeagues[0].leagueId,
+            selectedMaddenLeague: slimmedLeagues?.[0]?.leagueId,
           }))
         )
         .catch((e) => setState((s) => ({ ...s, loginState: "ERROR" })))
@@ -483,6 +483,14 @@ export default () => {
           {m.leagueName} - {m.userTeamName}
         </option>
       ))
+      if (leagueOptions.length === 0) {
+        return (
+          <div>
+            <div>No Madden Leagues found for this account</div>
+            <button onClick={unlinkLeague}>Unlink</button>
+          </div>
+        )
+      }
       return (
         <div>
           <label>
