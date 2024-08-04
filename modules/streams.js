@@ -363,7 +363,7 @@ async function handleTwitch(guild_id, command, member) {
       subCommand.name === "add" ? "addTwitchNotifier" : "removeTwitchNotifier"
     const twitchUrl = subCommand.options[0].value
     const res = await fetch(
-      `https://snallabot-yt-notifier-46962131d2d5.herokuapp.com/${endpoint}`,
+      `https://snallabot-twitch-notifier-38043494ff8d.herokuapp.com/${endpoint}`,
       {
         method: "POST",
         body: JSON.stringify({
