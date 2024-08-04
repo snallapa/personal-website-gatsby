@@ -343,7 +343,7 @@ async function handleTwitch(guild_id, command, member) {
   const subCommand = command.options[0]
   const commandName = subCommand.name
   if (commandName === "list") {
-    const youtubeUrls = await fetch(
+    const twitchUrls = await fetch(
       "https://snallabot-twitch-notifier-38043494ff8d.herokuapp.com/listTwitchNotifiers",
       {
         method: "POST",
@@ -356,7 +356,7 @@ async function handleTwitch(guild_id, command, member) {
       }
     ).then((res) => res.json())
     return respond(
-      `Here are your currently configured twitch channels:\n\n${youtubeUrls.join("\n")}`
+      `Here are your currently configured twitch channels:\n\n${twitchUrls.join("\n")}`
     )
   } else {
     const endpoint =
