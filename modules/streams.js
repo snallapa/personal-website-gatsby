@@ -339,6 +339,52 @@ async function handleYoutube(guild_id, command, member) {
   }
 }
 
+async function handleTwitch(guild_id, command, member) {
+  const subCommand = command.options[0]
+  const commandName = subCommand.name
+  if (commandName === "list") {
+    const youtubeUrls = await fetch(
+      "https://snallabot-twitch-notifier-38043494ff8d.herokuapp.com/listTwitchNotifiers",
+      {
+        method: "POST",
+        body: JSON.stringify({
+          discord_server: guild_id,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    ).then((res) => res.json())
+    return respond(
+      `Here are your currently configured twitch channels:\n\n${youtubeUrls.join("\n")}`
+    )
+  } else {
+    const endpoint =
+      subCommand.name === "add" ? "addTwitchNotifier" : "removeTwitchNotifier"
+    const twitchUrl = subCommand.options[0].value
+    const res = await fetch(
+      `https://snallabot-yt-notifier-46962131d2d5.herokuapp.com/${endpoint}`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          twitch_url: twitchUrl,
+          discord_server: guild_id,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    )
+    if (res.ok) {
+      return respond("channel updated successfully")
+    } else {
+      return respond(
+        "channel coud not be updated, please make sure you input the whole twitch channel url"
+      )
+    }
+  }
+}
+
 export const streamsHandler = {
   configure: handleConfigure,
   count: handleCount,
@@ -346,4 +392,5 @@ export const streamsHandler = {
   reset: handleReset,
   broadcast: handleBroadcastConfiguration,
   youtube: handleYoutube,
+  twitch: handleTwitch,
 }

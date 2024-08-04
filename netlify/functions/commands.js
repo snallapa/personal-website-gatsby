@@ -471,6 +471,45 @@ const MADDEN_STREAMS_COMMANDS = {
         },
       ],
     },
+    {
+      type: 2, // sub command group
+      name: "twitch",
+      description: "configures twitch broadcasts",
+      options: [
+        {
+          type: 1, // sub command
+          name: "add",
+          description: "add twitch broadcast",
+          options: [
+            {
+              type: 3, // string
+              name: "twitch_channel",
+              description: "the twitch channel you want to show broadcasts for",
+              required: true,
+            },
+          ],
+        },
+        {
+          type: 1, // sub command
+          name: "remove",
+          description: "remove twitch broadcast",
+          options: [
+            {
+              type: 3, // string
+              name: "twitch_channel",
+              description: "the twitch channel you want to remove",
+              required: true,
+            },
+          ],
+        },
+        {
+          type: 1, // sub command
+          name: "list",
+          description: "list all twitch broadcast",
+          options: [],
+        },
+      ],
+    },
   ],
   type: 1,
 }
