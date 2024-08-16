@@ -90,7 +90,7 @@ exports.handler = async function (event, context) {
     }
   )
   const res3Json = await res3.json()
-  console.log(res3Json)
+  console.log(res3Json["entitlements"]["entitlement"])
 
   const validEntitles = res3Json["entitlements"]["entitlement"].filter(
     (p) =>
