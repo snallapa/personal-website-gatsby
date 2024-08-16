@@ -90,14 +90,7 @@ exports.handler = async function (event, context) {
     }
   )
   const res3Json = await res3.json()
-
-  console.log(
-    res3Json["entitlements"]["entitlement"].filter(
-      (p) =>
-        p.entitlementTag === "ONLINE_ACCESS" &&
-        Object.values(VALID_ENTITLEMENTS(TWO_DIGIT_YEAR)).includes(p.groupName)
-    )
-  )
+  console.log(res3Json)
 
   const validEntitles = res3Json["entitlements"]["entitlement"].filter(
     (p) =>
