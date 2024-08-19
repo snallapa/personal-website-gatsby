@@ -145,7 +145,7 @@ export default () => {
     selectedPersona: "",
     accessToken: "",
     gameConsole: "",
-    personaMaddenLeagues: [],
+    personaMaddenLeagues: undefined,
     selectedMaddenLeague: "",
     league: {},
     exportOption: "Current Week",
@@ -183,7 +183,7 @@ export default () => {
         .then((slimmedLeagues) =>
           setState((s) => ({
             ...s,
-            personaMaddenLeagues: slimmedLeagues,
+            personaMaddenLeagues: slimmedLeagues ?? [],
             selectedMaddenLeague: slimmedLeagues?.[0]?.leagueId,
           }))
         )
@@ -330,7 +330,7 @@ export default () => {
         selectedPersona: "",
         accessToken: "",
         gameConsole: "",
-        personaMaddenLeagues: [],
+        personaMaddenLeagues: undefined,
         selectedMaddenLeague: "",
         league: {},
       })
@@ -478,6 +478,15 @@ export default () => {
         </div>
       )
     case "LEAGUE_PICKER":
+      if (!state.personaMaddenLeagues) {
+        return (
+          <div>
+            <div>
+              Finding all your leagues... Please be patient, EA can be slow
+            </div>
+          </div>
+        )
+      }
       const leagueOptions = state.personaMaddenLeagues.map((m) => (
         <option value={m.leagueId} key={m.leagueId}>
           {m.leagueName} - {m.userTeamName}
