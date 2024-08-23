@@ -34,8 +34,8 @@ const namespaces = {
   stadia: "Stadia",
 }
 
-const TWO_DIGIT_YEAR = "24"
-const YEAR = "2024"
+const TWO_DIGIT_YEAR = "25"
+const YEAR = "2025"
 
 exports.handler = async function (event, context) {
   const body = JSON.parse(event.body)
@@ -50,7 +50,7 @@ exports.handler = async function (event, context) {
       "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
       "Accept-Encoding": "gzip",
     },
-    body: `authentication_source=317239&client_secret=U02zL2khwlgFdODLWCyLPmccOc5EiPBBYcEwCqKDTWBrZj2Fwcx4b4Zd9rsA6lHLkIU4qlVvNh84olij&grant_type=authorization_code&code=${code}&redirect_uri=http://127.0.0.1/success&release_type=prod&client_id=MaddenCompanionApp19`,
+    body: `authentication_source=317239&client_secret=wfGAWnrxLroZOwwELYA2ZrAuaycuF2WDb00zOLv48Sb79viJDGlyD6OyK8pM5eIiv_20240731135155&grant_type=authorization_code&code=${code}&redirect_uri=http://127.0.0.1/success&release_type=prod&client_id=MCA_25_COMP_APP`,
   })
   const res1Json = await res1.json()
   const access_token = res1Json["access_token"]
