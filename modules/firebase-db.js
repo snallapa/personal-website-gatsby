@@ -1,6 +1,6 @@
 import { initializeApp } from "firebase/app"
 import { getFirestore } from "firebase/firestore"
-import { doc, getDoc, deleteDoc } from "firebase/firestore"
+import { doc, getDoc, deleteDoc, collection, query, where, getDocs, orderBy } from "firebase/firestore"
 
 const firebaseConfig = {
   apiKey: "AIzaSyDf9ZiTBWf-sWY007WsKktMPewcrs07CWw",
@@ -62,4 +62,15 @@ export async function getMediaWeek(guild_id, weekNum) {
     )
   }
   return docSnap.data()
+}
+
+export async function getAllDashboardLeagues() {
+    const leagueRef = collection(db, "leagues")
+    const q = query(leagueRef, orderBy("madden_server.leagueId"))
+    const snapshot = await getDocs(q)
+    const leagues = []
+    snapshot.forEach(doc => {
+	leagues.push(doc)
+    })
+    return leagues
 }
