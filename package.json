@@ -19,12 +19,13 @@
     "gatsby-plugin-typography": "^5.11.0",
     "gatsby-source-filesystem": "^5.11.0",
     "gatsby-transformer-remark": "^6.11.0",
+    "netlify-cli": "^17.36.4",
     "node-fetch": "^2.6.1",
+    "openai": "^3.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-typography": "^0.16.19",
-    "typography": "^0.16.19",
-    "openai": "^3.1.0"
+    "typography": "^0.16.19"
   },
   "devDependencies": {
     "prettier": "^3.0.0"
