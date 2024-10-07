@@ -17,6 +17,6 @@ schedule = "0 0 * * *"
 [functions."time-trigger"]
 schedule = "0/5 * * * *"
 
-# updates every 5 minutes
+# updates every 3 hours
 [functions."dashboard-refresh"]
 schedule = "0 0/3 * * *"
