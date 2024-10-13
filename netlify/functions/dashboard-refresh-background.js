@@ -9,7 +9,7 @@ exports.handler = async function (event, context) {
           body: JSON.stringify({
             week: 102,
             stage: -1,
-            auto: false,
+            auto: true,
           }),
         });
 	if (!res.ok) {
