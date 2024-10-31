@@ -297,7 +297,7 @@ async function handleYoutube(guild_id, command, member) {
   const commandName = subCommand.name
   if (commandName === "list") {
     const youtubeUrls = await fetch(
-      "https://snallabot-yt-notifier-46962131d2d5.herokuapp.com/list",
+      "https://snallabot.me/youtube/list",
       {
         method: "POST",
         body: JSON.stringify({
@@ -316,7 +316,7 @@ async function handleYoutube(guild_id, command, member) {
       subCommand.name === "add" ? "ADD_CHANNEL" : "REMOVE_CHANNEL"
     const youtubeUrl = subCommand.options[0].value
     const res = await fetch(
-      "https://snallabot-yt-notifier-46962131d2d5.herokuapp.com/configure",
+      "https://snallabot.me/youtube/configure",
       {
         method: "POST",
         body: JSON.stringify({
@@ -344,7 +344,7 @@ async function handleTwitch(guild_id, command, member) {
   const commandName = subCommand.name
   if (commandName === "list") {
     const twitchUrls = await fetch(
-      "https://snallabot-twitch-notifier-38043494ff8d.herokuapp.com/listTwitchNotifiers",
+      "https://snallabot.me/twitch/listTwitchNotifiers",
       {
         method: "POST",
         body: JSON.stringify({
@@ -363,7 +363,7 @@ async function handleTwitch(guild_id, command, member) {
       subCommand.name === "add" ? "addTwitchNotifier" : "removeTwitchNotifier"
     const twitchUrl = subCommand.options[0].value
     const res = await fetch(
-      `https://snallabot-twitch-notifier-38043494ff8d.herokuapp.com/${endpoint}`,
+      `https://snallabot.me/twitch/${endpoint}`,
       {
         method: "POST",
         body: JSON.stringify({
