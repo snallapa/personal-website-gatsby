@@ -82,7 +82,7 @@ exports.handler = async function (event, context) {
   }
 
   const deletePromises = querySnapshot.docs.flatMap((fDoc) => {
-    if (!guilds.includes(fDoc.id) && !reservedLeagues.includes(fDoc.id)) {
+      if (!guilds.includes(fDoc.id) && !reservedLeagues.includes(fDoc.id) && fDoc.id.toLowerCase().indexOf("cfmstats") === -1) {
       console.log(`deleting league ${fDoc.id}`)
       const update = {}
       update["gameChannels"] = {}
