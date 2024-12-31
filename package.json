@@ -6,9 +6,9 @@
   "license": "MIT",
   "scripts": {
     "build": "npx gatsby build",
-    "develop": "npx netlify dev",
+    "develop": "npx gatsby develop",
     "format": "prettier --write \"**/*.{js,jsx,json,md}\"",
-    "start": "npm run develop",
+    "functions": "npx netlify dev",
     "serve": "gatsby serve",
     "test": "echo \"Write tests! -> https://gatsby.dev/unit-testing\" && exit 1"
   },
