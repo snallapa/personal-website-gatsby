@@ -125,18 +125,11 @@ const exportWeeks = {
   },
 }
 
-function snallabot() {
-  if (typeof window === "undefined" || !window.location) {
-    return <div>SSR?</div>
-  }
+function Snallabot() {
+  const isSSR = typeof window === "undefined" || !window.location
   const params = new URLSearchParams(window.location.search)
   const origin = window.location.origin
   const guild = params.get("league")
-  if (!guild) {
-    return (
-      <div> Missing discord league, did you open this from snallabot? </div>
-    )
-  }
 
   const [state, setState] = useState({
     loginState: "LOADING",
@@ -152,63 +145,77 @@ function snallabot() {
   })
 
   useEffect(() => {
-    fetch(`${origin}/.netlify/functions/exporter-state`, {
-      method: "POST",
-      body: JSON.stringify({
-        guild_id: guild,
-      }),
-    })
-      .then((res) => res.json())
-      .then((currentState) =>
-        setState((s) => ({
-          ...s,
-          loginState: currentState.state,
-          league: currentState.league,
-        }))
-      )
-      .catch((e) => setState((s) => ({ ...s, loginState: "ERROR" })))
-  }, [guild])
+    if (!isSSR && guild) {
+      fetch(`${origin}/.netlify/functions/exporter-state`, {
+        method: "POST",
+        body: JSON.stringify({
+          guild_id: guild,
+        }),
+      })
+        .then((res) => res.json())
+        .then((currentState) =>
+          setState((s) => ({
+            ...s,
+            loginState: currentState.state,
+            league: currentState.league,
+          }))
+        )
+        .catch((e) => setState((s) => ({ ...s, loginState: "ERROR" })))
+    }
+  }, [guild, isSSR, guild])
 
   useEffect(() => {
-    if (state.loginState === "LEAGUE_PICKER") {
-      fetch(`${origin}/.netlify/functions/snallabot-ea-connector`, {
-        method: "POST",
-        body: JSON.stringify({
-          path: "getleagues",
-          guild: guild,
-          exporter_body: {},
-        }),
-      })
-        .then((res) => res.json())
-        .then((slimmedLeagues) =>
-          setState((s) => ({
-            ...s,
-            personaMaddenLeagues: slimmedLeagues ?? [],
-            selectedMaddenLeague: slimmedLeagues?.[0]?.leagueId,
-          }))
-        )
-        .catch((e) => setState((s) => ({ ...s, loginState: "ERROR" })))
+    if (!isSSR && guild) {
+      if (state.loginState === "LEAGUE_PICKER") {
+        fetch(`${origin}/.netlify/functions/snallabot-ea-connector`, {
+          method: "POST",
+          body: JSON.stringify({
+            path: "getleagues",
+            guild: guild,
+            exporter_body: {},
+          }),
+        })
+          .then((res) => res.json())
+          .then((slimmedLeagues) =>
+            setState((s) => ({
+              ...s,
+              personaMaddenLeagues: slimmedLeagues ?? [],
+              selectedMaddenLeague: slimmedLeagues?.[0]?.leagueId,
+            }))
+          )
+          .catch((e) => setState((s) => ({ ...s, loginState: "ERROR" })))
+      }
+      if (state.loginState === "LEAGUE_DASHBOARD") {
+        fetch(`${origin}/.netlify/functions/snallabot-ea-connector`, {
+          method: "POST",
+          body: JSON.stringify({
+            path: "getLeagueInfo",
+            guild: guild,
+            exporter_body: {},
+          }),
+        })
+          .then((res) => res.json())
+          .then((leagueInfo) =>
+            setState((s) => ({
+              ...s,
+              leagueInfo,
+              exports: leagueInfo.exports,
+            }))
+          )
+          .catch((e) => setState((s) => ({ ...s, loginState: "ERROR" })))
+      }
     }
-    if (state.loginState === "LEAGUE_DASHBOARD") {
-      fetch(`${origin}/.netlify/functions/snallabot-ea-connector`, {
-        method: "POST",
-        body: JSON.stringify({
-          path: "getLeagueInfo",
-          guild: guild,
-          exporter_body: {},
-        }),
-      })
-        .then((res) => res.json())
-        .then((leagueInfo) =>
-          setState((s) => ({
-            ...s,
-            leagueInfo,
-            exports: leagueInfo.exports,
-          }))
-        )
-        .catch((e) => setState((s) => ({ ...s, loginState: "ERROR" })))
-    }
-  }, [state.loginState, guild])
+  }, [state.loginState, guild, isSSR])
+
+  if (isSSR) {
+    return <div>SSR?</div>
+  }
+
+  if (!guild) {
+    return (
+      <div> Missing discord league, did you open this from snallabot? </div>
+    )
+  }
 
   const handleChange = (e) => {
     setState({
@@ -448,7 +455,7 @@ function snallabot() {
               Enter the URL of the page. It should start with 127.0.0.1:
               <input type="text" value={state.code} onChange={handleChange} />
             </label>
-            <button type="button" class="btn btn-primary" onClick={handleClick}>
+            <button type="button" className="btn btn-primary" onClick={handleClick}>
               Login to EA
             </button>
           </div>
@@ -476,7 +483,7 @@ function snallabot() {
               {options}
             </select>
           </label>
-          <button type="button" class="btn btn-primary" onClick={selectPersona}>
+          <button type="button" className="btn btn-primary" onClick={selectPersona}>
             Submit EA Account
           </button>
         </div>
@@ -502,7 +509,7 @@ function snallabot() {
             <div>No Madden Leagues found for this account</div>
             <button
               type="button"
-              class="btn btn-warning"
+              className="btn btn-warning"
               onClick={unlinkLeague}
             >
               Unlink
@@ -523,10 +530,10 @@ function snallabot() {
               {leagueOptions}
             </select>
           </label>
-          <button type="button" class="btn btn-primary" onClick={selectLeague}>
+          <button type="button" className="btn btn-primary" onClick={selectLeague}>
             Submit League
           </button>
-          <button type="button" class="btn btn-warning" onClick={unlinkLeague}>
+          <button type="button" className="btn btn-warning" onClick={unlinkLeague}>
             Unlink
           </button>
         </div>
@@ -740,7 +747,7 @@ function snallabot() {
             <div>
               <button
                 type="button"
-                class="btn btn-warning"
+                className="btn btn-warning"
                 onClick={unlinkLeague}
               >
                 Unlink League
@@ -758,7 +765,7 @@ function snallabot() {
               >
                 {exportWeekOptions}
               </select>
-              <button type="button" class="btn btn-primary" onClick={onExport}>
+              <button type="button" className="btn btn-primary" onClick={onExport}>
                 Export
               </button>
               {state.exportedStatus === "SUCCESS" && (
@@ -791,7 +798,7 @@ function snallabot() {
                   <td className={styles.exportboxes}>
                     <button
                       type="button"
-                      class="btn btn-success"
+                      className="btn btn-success"
                       onClick={addExport}
                     >
                       Add Export
@@ -818,7 +825,7 @@ function snallabot() {
       return (
         <div>
           hmm something went wrong.
-          <button type="button" class="btn btn-warning" onClick={unlinkLeague}>
+          <button type="button" className="btn btn-warning" onClick={unlinkLeague}>
             Unlink League
           </button>
         </div>
@@ -834,14 +841,14 @@ export default () => {
         rel="stylesheet"
         href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
-        crossorigin="anonymous"
+        crossOrigin="anonymous"
       ></link>
       <script
         src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
         integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
-        crossorigin="anonymous"
+        crossOrigin="anonymous"
       ></script>
-      {snallabot()}
+      {Snallabot()}
     </div>
   )
 }
