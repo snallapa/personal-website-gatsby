@@ -127,8 +127,8 @@ const exportWeeks = {
 
 function Snallabot() {
   const isSSR = typeof window === "undefined" || !window.location
-  const params = new URLSearchParams(window.location.search)
-  const origin = window.location.origin
+  const params = new URLSearchParams(window ? window.location.search : "")
+  const origin = window ? window.location.origin : ""
   const guild = params.get("league")
 
   const [state, setState] = useState({
