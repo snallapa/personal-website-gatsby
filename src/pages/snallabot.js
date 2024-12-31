@@ -126,9 +126,10 @@ const exportWeeks = {
 }
 
 function Snallabot() {
+  // when building for deployment, it will build the website but only for server side rendering (SSR). Window is not availaible then
   const isSSR = typeof window === "undefined" || !window.location
-  const params = new URLSearchParams(isSSR ? window.location.search : "")
-  const origin = isSSR ? window.location.origin : ""
+  const params = new URLSearchParams(!isSSR ? window.location.search : "")
+  const origin = !isSSR ? window.location.origin : ""
   const guild = params.get("league")
 
   const [state, setState] = useState({
