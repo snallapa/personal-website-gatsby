@@ -125,7 +125,7 @@ const exportWeeks = {
   },
 }
 
-export default () => {
+function snallabot() {
   if (typeof window === "undefined" || !window.location) {
     return <div>SSR?</div>
   }
@@ -448,7 +448,9 @@ export default () => {
               Enter the URL of the page. It should start with 127.0.0.1:
               <input type="text" value={state.code} onChange={handleChange} />
             </label>
-            <button onClick={handleClick}>Login to EA</button>
+            <button type="button" class="btn btn-primary" onClick={handleClick}>
+              Login to EA
+            </button>
           </div>
         </div>
       )
@@ -474,7 +476,9 @@ export default () => {
               {options}
             </select>
           </label>
-          <button onClick={selectPersona}>Submit EA Account</button>
+          <button type="button" class="btn btn-primary" onClick={selectPersona}>
+            Submit EA Account
+          </button>
         </div>
       )
     case "LEAGUE_PICKER":
@@ -496,7 +500,13 @@ export default () => {
         return (
           <div>
             <div>No Madden Leagues found for this account</div>
-            <button onClick={unlinkLeague}>Unlink</button>
+            <button
+              type="button"
+              class="btn btn-warning"
+              onClick={unlinkLeague}
+            >
+              Unlink
+            </button>
           </div>
         )
       }
@@ -513,8 +523,12 @@ export default () => {
               {leagueOptions}
             </select>
           </label>
-          <button onClick={selectLeague}>Submit League</button>
-          <button onClick={unlinkLeague}>Unlink</button>
+          <button type="button" class="btn btn-primary" onClick={selectLeague}>
+            Submit League
+          </button>
+          <button type="button" class="btn btn-warning" onClick={unlinkLeague}>
+            Unlink
+          </button>
         </div>
       )
     case "LEAGUE_DASHBOARD":
@@ -724,7 +738,13 @@ export default () => {
               </div>
             </div>
             <div>
-              <button onClick={unlinkLeague}>Unlink League</button>
+              <button
+                type="button"
+                class="btn btn-warning"
+                onClick={unlinkLeague}
+              >
+                Unlink League
+              </button>
             </div>
           </div>
           <div className={styles.exportTable}>
@@ -738,7 +758,9 @@ export default () => {
               >
                 {exportWeekOptions}
               </select>
-              <button onClick={onExport}>Export</button>
+              <button type="button" class="btn btn-primary" onClick={onExport}>
+                Export
+              </button>
               {state.exportedStatus === "SUCCESS" && (
                 <div className={styles.exportSuccess}>Success</div>
               )}
@@ -767,7 +789,13 @@ export default () => {
                   <td className={styles.exportboxes}> Rosters </td>
                   <td className={styles.exportboxes}> Auto Update </td>
                   <td className={styles.exportboxes}>
-                    <button onClick={addExport}>Add Export</button>
+                    <button
+                      type="button"
+                      class="btn btn-success"
+                      onClick={addExport}
+                    >
+                      Add Export
+                    </button>
                   </td>
                 </tr>
               </thead>
@@ -790,8 +818,30 @@ export default () => {
       return (
         <div>
           hmm something went wrong.
-          <button onClick={unlinkLeague}>Unlink League</button>
+          <button type="button" class="btn btn-warning" onClick={unlinkLeague}>
+            Unlink League
+          </button>
         </div>
       )
   }
+}
+
+export default () => {
+  return (
+    <div>
+      // Bootstrap CDN's
+      <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+        crossorigin="anonymous"
+      ></link>
+      <script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
+        integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
+        crossorigin="anonymous"
+      ></script>
+      {snallabot()}
+    </div>
+  )
 }
