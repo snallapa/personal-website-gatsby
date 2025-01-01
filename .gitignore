@@ -68,3 +68,12 @@ yarn-error.log
 # Yarn Integrity file
 .yarn-integrity
 .netlify
+/.vs/personal-website-gatsby/CopilotIndices/17.12.38.29086
+/.vs/personal-website-gatsby/FileContentIndex
+/.vs/personal-website-gatsby/v17/.wsuo
+/.vs/personal-website-gatsby/v17/DocumentLayout.json
+/.vs/ProjectSettings.json
+/.vs/slnx.sqlite
+/.vs/VSWorkspaceState.json
+/_redirects
+*.sqlite-journal
