@@ -476,14 +476,14 @@ function Snallabot() {
         </option>
       ))
       return (
-        <div class="container">
-          <div class="col">
+        <div className="container">
+          <div className="col">
             <br />
             <h2>Which EA account should we use?</h2>
 
-            <div class="input-group mt-3">
+            <div className="input-group mt-3">
               <select
-                class="form-select"
+                className="form-select"
                 value={state.selectedPersona}
                 onChange={(e) =>
                   setState({ ...state, selectedPersona: e.target.value })
@@ -533,14 +533,14 @@ function Snallabot() {
         )
       }
       return (
-        <div class="container">
-          <div class="col-lg-8">
+        <div className="container">
+          <div className="col-lg-8">
             <br />
             <h2>Which league are we linking?</h2>
 
-            <div class="input-group mt-3">
+            <div className="input-group mt-3">
               <select
-                class="form-select"
+                className="form-select"
                 value={state.selectedMaddenLeague}
                 onChange={(e) =>
                   setState({ ...state, selectedMaddenLeague: e.target.value })
@@ -564,7 +564,7 @@ function Snallabot() {
               </button>
             </div>
           </div>
-          <div class="col-lg-4"></div>
+          <div className="col-lg-4"></div>
         </div>
       )
     case "LEAGUE_DASHBOARD":
@@ -762,14 +762,14 @@ function Snallabot() {
         )
       })
       return (
-        <div className={styles.dashboard} class="container">
+        <div className={`${styles.dashboard} container`}>
           <header>
             {" "}
             <h4>Snallabot Dashboard</h4>{" "}
           </header>
 
-          <div class="row">
-            <div class="col">
+          <div className="row">
+            <div className="col">
               <div className={styles.header}>
                 <div>
                   <div>{`${seasonType}, Year ${seasonInfo.calendarYear}`}</div>
@@ -782,12 +782,11 @@ function Snallabot() {
               </div>
             </div>
 
-            <div class="col-lg-6">
+            <div className="col-lg-6">
               <div className={styles.exportTable}>
-                <div class="input-group">
+                <div className="input-group">
                   <select
-                    className={styles.weekPicker}
-                    class="form-select"
+                    className={`${styles.weekPicker} form-select`}
                     value={state.exportOption}
                     onChange={(e) =>
                       setState((s) => ({ ...s, exportOption: e.target.value }))
@@ -807,8 +806,7 @@ function Snallabot() {
 
                 {state.exportedStatus === "SUCCESS" && (
                   <span
-                    className={styles.exportSuccess}
-                    class="badge text-bg-success"
+                    className={`${styles.exportSuccess} badge text-bg-success `}
                   >
                     Success
                   </span>
@@ -816,16 +814,14 @@ function Snallabot() {
 
                 {state.exportedStatus === "FAILURE" && (
                   <span
-                    className={styles.exportFailed}
-                    class="badge text-bg-danger"
+                    className={`${styles.exportFailed} badge text-bg-danger `}
                   >
                     Failed
                   </span>
                 )}
                 {state.exportedStatus === "FETCHING" && (
                   <spanc
-                    className={styles.exportFetching}
-                    class="badge text-bg-info"
+                    className={`${styles.exportFetching} badge text-bg-info `}
                   >
                     Export in progress...
                   </spanc>
@@ -839,7 +835,7 @@ function Snallabot() {
               </div>
             </div>
 
-            <div class="col mt-lg-3">
+            <div className="col mt-lg-3">
               <button
                 type="button"
                 className="btn btn-danger float-end"
@@ -851,10 +847,10 @@ function Snallabot() {
             </div>
           </div>
 
-          <div class="table-responsive">
-            <table class="table table-hover table-sm caption-top">
+          <div className="table-responsive">
+            <table className="table table-hover table-sm caption-top">
               <caption>List of Export Url's</caption>
-              <thead class="table-light">
+              <thead className="table-light">
                 <tr>
                   <th>Url</th>
                   <th className={styles.exportboxes}> League Info </th>
@@ -876,10 +872,9 @@ function Snallabot() {
             </table>
           </div>
 
-          <div class="table-responsive">
+          <div className="table-responsive">
             <table
-              className={styles.gamesTable}
-              class="table table-hover table-condensed caption-top"
+              className={`${styles.gamesTable} table table-hover table-condensed caption-top`}
             >
               <caption>
                 Schedule for{" "}
@@ -887,7 +882,7 @@ function Snallabot() {
                   seasonInfo.displayWeek > 0 ? seasonInfo.displayWeek : ""
                 }`}
               </caption>
-              <thead class="table-light">
+              <thead className="table-light">
                 <tr>
                   <th>Game</th>
                   <th>Result</th>
