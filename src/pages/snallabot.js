@@ -786,7 +786,7 @@ function Snallabot() {
               <div className={styles.exportTable}>
                 <div className="input-group">
                   <select
-                    className={`${styles.weekPicker} form-select`}
+                    className="form-select"
                     value={state.exportOption}
                     onChange={(e) =>
                       setState((s) => ({ ...s, exportOption: e.target.value }))
