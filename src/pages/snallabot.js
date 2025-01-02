@@ -576,7 +576,12 @@ function Snallabot() {
         )
       }
       const {
-        leagueInfo: { gameScheduleHubInfo, teamIdInfoList, seasonInfo },
+        leagueInfo: {
+          gameScheduleHubInfo,
+          teamIdInfoList,
+          seasonInfo,
+          leagueName,
+        },
         exports,
       } = state
       const rows = gameScheduleHubInfo.leagueSchedule.map((seasonGame) => {
@@ -765,7 +770,7 @@ function Snallabot() {
         <div className={`${styles.dashboard} container`}>
           <header>
             {" "}
-            <h4>Snallabot Dashboard</h4>{" "}
+            <h4>{leagueName} Snallabot Dashboard</h4>{" "}
           </header>
 
           <div className="row">
