@@ -16,6 +16,6 @@ exports.handler = async function (event, context) {
 	    const e = await res.text();
 	    console.error("Could not refresh league " + l.guildId + " error: " + e);
 	}
-	await new Promise(r => setTimeout(r, 3000));
+	await new Promise(r => setTimeout(r, 5000));
     }
 }
