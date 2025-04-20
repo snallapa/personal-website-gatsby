@@ -1,22 +1,2 @@
 [functions]
   node_bundler = "esbuild"
-
-# update every 20 minutes
-[functions."updater-scheduled"]
-schedule = "0/20 * * * *"
-
-# update every hour
-[functions."snallabot-event-publisher"]
-schedule = "0 * * * *"
-
-# update every day
-[functions."snallabot-gc-scheduled"]
-schedule = "0 0 * * *"
-
-# updates every 5 minutes
-[functions."time-trigger"]
-schedule = "0/5 * * * *"
-
-# updates every 3 hours
-[functions."dashboard-refresh"]
-schedule = "0 0/3 * * *"
