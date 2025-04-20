@@ -38,7 +38,7 @@ async function DeleteGuildCommand(guildId, commandId, app_id, discord_token) {
   }
 }
 
-async function DeleteGlobalCommand(commandId, app_id) {
+async function DeleteGlobalCommand(commandId, app_id, discord_token) {
   // API endpoint to get and post guild commands
   const endpoint = `applications/${app_id}/commands/${commandId}`
   // install command
